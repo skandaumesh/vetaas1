@@ -29,7 +29,7 @@ const stats = [
 
 export default function OurImpactSection() {
   return (
-    <section className="w-full bg-white pt-24 pb-20 md:pt-32 lg:pt-40 lg:pb-24 relative z-30 overflow-x-clip font-sans">
+    <section className="w-full bg-white pt-16 pb-20 md:pt-10 lg:pt-12 lg:pb-24 relative z-50 overflow-x-clip font-sans">
 
       {/* Decorative Top Left Flower Background */}
       <motion.div 
@@ -37,7 +37,7 @@ export default function OurImpactSection() {
         whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 1.2, type: "spring", bounce: 0.3 }}
-        className="absolute top-[-10%] left-[-30%] md:top-[-15%] md:left-[-15%] w-[300px] h-[300px] md:w-[450px] md:h-[450px] z-0 pointer-events-none"
+        className="absolute top-[5%] left-[-35%] md:top-[-5%] md:left-[-12%] w-[350px] h-[250px] md:w-[500px] md:h-[350px] z-0 pointer-events-none"
       >
         <Image src="/impactflower.png" alt="Decorative flower" fill className="object-contain mix-blend-multiply opacity-100 drop-shadow-sm" />
       </motion.div>

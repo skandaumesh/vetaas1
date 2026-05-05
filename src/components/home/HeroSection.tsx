@@ -7,7 +7,7 @@ import { Zap } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full bg-white overflow-x-clip pt-48 md:pt-56 flex flex-col items-center font-sans z-40">
+    <section className="relative w-full bg-white overflow-x-clip pt-44 md:pt-36 flex flex-col items-center font-sans z-40">
       
       {/* Subtle Background Grid */}
       <div 
@@ -113,10 +113,14 @@ export default function HeroSection() {
              <Image src="/child.png" alt="" fill className="object-contain drop-shadow-lg" />
           </motion.div>
         </div>
+
+        {/* Subtle Horizon Line / Floor */}
+        <div className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 w-[120%] h-[100px] bg-gradient-to-t from-gray-50/50 to-transparent rounded-[100%] blur-2xl z-10" />
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent z-10 opacity-50" />
       </motion.div>
 
-      {/* Bottom Wave SVG Edge */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-30 pointer-events-none transform translate-y-[2px]">
+      {/* Background SVG Wave - Bottom */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0] z-50 pointer-events-none transform translate-y-[2px]">
         <svg 
           viewBox="0 0 1440 320" 
           preserveAspectRatio="none"
