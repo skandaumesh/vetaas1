@@ -1,26 +1,165 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ── Brand Palette ── */
+  --color-teal: #36ba98;
+  --color-blue: #1a4895;
+  --color-coral: #ff6e79;
+  --color-gold: #ffd166;
+  --color-sky: #b4e0f9;
+  --color-dark: #111827;
+  --color-canvas: #f8fafc;
+  --color-white: #ffffff;
+
+  /* Font families */
+  --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
+  --font-playfair: var(--font-playfair), serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ── Base ── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-canvas);
+  color: var(--color-dark);
+  font-family: var(--font-plus-jakarta);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+::selection {
+  background-color: var(--color-blue);
+  color: white;
+}
+
+/* ── Typography Utilities ── */
+.font-headline {
+  font-family: var(--font-playfair);
+  font-weight: 700;
+}
+.font-body {
+  font-family: var(--font-plus-jakarta);
+  font-weight: 400;
+}
+.font-highlight {
+  font-family: var(--font-plus-jakarta);
+  font-weight: 600;
+}
+
+/* ── Gradient Utilities ── */
+.gradient-teal-blue {
+  background: linear-gradient(135deg, #36ba98 0%, #1a4895 100%);
+}
+.gradient-coral-gold {
+  background: linear-gradient(135deg, #ff6e79 0%, #ffd166 100%);
+}
+.gradient-blue-sky {
+  background: linear-gradient(135deg, #1a4895 0%, #b4e0f9 100%);
+}
+.text-gradient-teal {
+  background: linear-gradient(135deg, #36ba98 0%, #1a4895 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Button System ── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2.25rem;
+  border-radius: 9999px;
+  background-color: var(--color-gold);
+  color: var(--color-dark);
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 2px solid var(--color-dark);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(255, 209, 102, 0.5);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2.25rem;
+  border-radius: 9999px;
+  background-color: var(--color-blue);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 2px solid var(--color-blue);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(26, 72, 149, 0.4);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2.25rem;
+  border-radius: 9999px;
+  background-color: transparent;
+  color: var(--color-dark);
+  font-weight: 600;
+  font-size: 1.1rem;
+  border: 2px solid var(--color-dark);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  background-color: var(--color-dark);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ── Card System ── */
+.card-elevated {
+  background: white;
+  border-radius: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card-elevated:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Section Spacing ── */
+.section-spacing {
+  padding-top: clamp(4rem, 8vw, 8rem);
+  padding-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-canvas); }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ── Floating animation ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(3deg); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
