@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronDown, Check } from "lucide-react";
+import { ArrowRight, ChevronDown, Check, Star, Zap, Heart } from "lucide-react";
 
 const CATEGORIES = ["All", "Curriculum", "Toolkits", "Resources"];
 
@@ -13,251 +13,239 @@ const PRODUCTS = [
     id: 1,
     category: "Curriculum",
     title: "SEL Starter Kit",
-    subtitle: "For K-5 Classrooms",
+    subtitle: "Foundational Learning",
     description: "A comprehensive introduction to Social Emotional Learning designed for early childhood classrooms.",
     image: "/product1.png",
-    color: "#45bcf6", // Sky Blue
-    btnColor: "bg-[#1e293b]",
-    height: "h-[500px]",
-    outcomes: ["Improved student self-regulation", "30% reduction in classroom conflicts"],
-    forWhom: ["Primary Schools", "Early Childhood Centers"],
+    color: "#f0f9ff", // Light Blue
+    accent: "#45bcf6",
+    tag: "Most Popular"
   },
   {
     id: 2,
     category: "Toolkits",
     title: "Parent Toolkit",
-    subtitle: "At-Home SEL Activities",
+    subtitle: "Home Integration",
     description: "Equip parents with simple, science-backed activities to nurture emotional intelligence at home.",
     image: "/product2.png",
-    color: "#ff6e79", // Coral
-    btnColor: "bg-[#0f172a]",
-    height: "h-[600px]",
-    outcomes: ["Stronger communication", "Better emotional vocabulary"],
-    forWhom: ["Parents", "Family Counselors"],
+    color: "#fff1f2", // Light Pink
+    accent: "#ff6e79",
+    tag: "Essential"
   },
   {
     id: 3,
     category: "Curriculum",
     title: "Training Manual",
-    subtitle: "Comprehensive Integration",
+    subtitle: "Educator Empowerment",
     description: "A structured training program that transforms teachers into SEL practitioners.",
     image: "/teacher2.png",
-    color: "#36ba98", // Emerald
-    btnColor: "bg-[#1e293b]",
-    height: "h-[550px]",
-    outcomes: ["SEL-certified teaching staff", "Embedded SEL in daily routines"],
-    forWhom: ["Schools", "Teacher Training"],
+    color: "#f0fdf4", // Light Green
+    accent: "#36ba98",
+    tag: "For Schools"
   },
   {
     id: 4,
     category: "Resources",
     title: "Assessment Tool",
-    subtitle: "Measure SEL Outcomes",
+    subtitle: "Impact Tracking",
     description: "Data-driven tools to track and measure SEL development across classrooms.",
     image: "/testimonial4.png",
-    color: "#fbbf24", // Amber
-    btnColor: "bg-[#0f172a]",
-    height: "h-[520px]",
-    outcomes: ["Evidence-based tracking", "Stakeholder-ready reports"],
-    forWhom: ["Schools", "NGOs"],
+    color: "#fffbeb", // Light Amber
+    accent: "#fbbf24",
+    tag: "Data-Driven"
   },
   {
     id: 5,
     category: "Resources",
     title: "Story Cards",
-    subtitle: "Illustrated Starters",
+    subtitle: "Creative Starters",
     description: "A beautifully illustrated deck of cards featuring diverse characters and emotional scenarios.",
     image: "/children.png",
-    color: "#ffa3c9", // Pink
-    btnColor: "bg-[#1e293b]",
-    height: "h-[580px]",
-    outcomes: ["Increased empathy expression", "Richer classroom discussions"],
-    forWhom: ["Teachers", "Parents"],
+    color: "#fdf2f8", // Light Pink/Purple
+    accent: "#ffa3c9",
+    tag: "Interactive"
   },
   {
     id: 6,
     category: "Toolkits",
     title: "Volunteer Pack",
-    subtitle: "Community SEL Program",
+    subtitle: "Community Outreach",
     description: "Everything a volunteer needs to run an SEL program in their community.",
     image: "/testimonial5.png",
-    color: "#6366f1", // Indigo
-    btnColor: "bg-[#0f172a]",
-    height: "h-[540px]",
-    outcomes: ["Scalable community programs", "Trained volunteer facilitators"],
-    forWhom: ["Volunteers", "Community Leaders"],
-  },
+    color: "#eef2ff", // Light Indigo
+    accent: "#6366f1",
+    tag: "Scalable"
+  }
 ];
 
 export default function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const filtered = activeCategory === "All" ? PRODUCTS : PRODUCTS.filter((p) => p.category === activeCategory);
 
   return (
-    <main className="bg-white min-h-screen font-sans">
-
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-24 overflow-hidden">
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-          <div 
-            className="absolute inset-0"
-            style={{
-              backgroundSize: '40px 40px',
-              backgroundImage: 'radial-gradient(circle, #cbd5e1 1.5px, transparent 1.5px)'
-            }}
-          />
-        </div>
+    <main className="bg-[#f8fafc] min-h-screen font-sans selection:bg-[#36ba98]/30">
+      {/* Playful & Bold Hero Section */}
+      <section className="relative pt-44 pb-24 overflow-hidden">
+        {/* Floating Abstract Shapes */}
+        <motion.div 
+          animate={{ y: [0, -20, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-20 right-[15%] w-20 h-20 bg-[#45bcf6]/20 rounded-full blur-xl"
+        />
+        <motion.div 
+          animate={{ y: [0, 20, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-20 left-[10%] w-32 h-32 bg-[#36ba98]/10 rounded-full blur-2xl"
+        />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center"
+            className="flex flex-col items-center text-center"
           >
-            <div className="inline-flex items-center justify-center bg-[#0f172a] text-white px-5 py-1.5 rounded-lg mb-8 shadow-sm -rotate-2">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em]">Our Catalog</span>
+            <div className="inline-flex items-center gap-2 bg-[#111827] text-white px-5 py-2 rounded-2xl mb-10 shadow-xl">
+              <Star size={16} fill="#fbbf24" stroke="none" />
+              <span className="text-[11px] font-black uppercase tracking-widest">Explore Our Universe</span>
             </div>
-            <h1 className="font-headline text-6xl md:text-8xl text-[#111827] tracking-tight leading-[0.9] mb-8">
-              Tools for <span className="text-[#36ba98]">Change</span>
+            
+            <h1 className="font-headline text-6xl md:text-9xl text-gray-900 leading-[0.85] tracking-tight mb-8">
+              Tools for <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#45bcf6] to-[#36ba98]">Extraordinary</span> Minds.
             </h1>
-            <p className="text-xl md:text-2xl text-gray-500 font-medium max-w-2xl mx-auto leading-relaxed">
-              Research-backed toolkits and resources designed to make SEL practical and measurable.
+            
+            <p className="text-xl md:text-2xl text-gray-500 max-w-3xl font-medium leading-relaxed mb-16">
+              Empowering educators, parents, and children with the world's most engaging SEL toolkits.
             </p>
+
+            {/* Premium Category Filter */}
+            <div className="flex flex-wrap justify-center gap-3">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-8 py-3.5 rounded-2xl text-sm font-black transition-all ${
+                    activeCategory === cat 
+                      ? "bg-[#111827] text-white shadow-2xl scale-110" 
+                      : "bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-900 border border-gray-100"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Exact Alignment Grid */}
-      <section className="pt-20 pb-32 px-6">
+      {/* Product Grid - Staggered Creative Tiles */}
+      <section className="pb-40 px-6">
         <div className="max-w-7xl mx-auto">
-          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-12 grid-flow-row-dense">
+          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence mode="popLayout">
-              {filtered.map((product, i) => {
-                
-                // Exact alignment logic mapping to the reference image
-                const getCardStyle = (id: number) => {
-                  switch(id) {
-                    case 1: 
-                      // 01: Top Left (Image Left)
-                      return { span: "md:col-start-1 md:col-span-1 md:row-start-1 md:row-span-1", layout: "flex-col md:flex-row", minH: "h-full min-h-[220px]" };
-                    case 2: 
-                      // 02: Bottom Left (Image Right)
-                      return { span: "md:col-start-1 md:col-span-1 md:row-start-2 md:row-span-1", layout: "flex-col md:flex-row-reverse", minH: "h-full min-h-[280px]" };
-                    case 3: 
-                      // 03: Right Tall
-                      return { span: "md:col-start-2 md:col-span-1 md:row-start-1 md:row-span-2", layout: "flex-col md:flex-row", minH: "h-full min-h-[400px] md:min-h-[600px]" };
-                    case 4: 
-                      // 04: Full Width Bottom (Image Right)
-                      return { span: "md:col-span-2", layout: "flex-col md:flex-row-reverse", minH: "h-full min-h-[350px]" };
-                    case 5: 
-                      // 05: Extra Card
-                      return { span: "md:col-span-1", layout: "flex-col md:flex-row", minH: "h-full min-h-[280px]" };
-                    case 6: 
-                      // 06: Extra Card
-                      return { span: "md:col-span-1", layout: "flex-col md:flex-row-reverse", minH: "h-full min-h-[280px]" };
-                    default: 
-                      return { span: "md:col-span-1", layout: "flex-col", minH: "h-full min-h-[280px]" };
-                  }
-                };
-
-                const style = getCardStyle(product.id);
-                const isHorizontal = style.layout.includes('flex-row');
-
-                return (
-                  <motion.div
-                    key={product.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.5, delay: i * 0.1 }}
-                    className={`relative rounded-[2.5rem] overflow-visible p-6 lg:p-10 flex transition-all duration-500 ${style.span} ${style.layout} ${style.minH} gap-6 lg:gap-8`}
-                    style={{ backgroundColor: product.color }}
-                  >
-                    {/* Image Area */}
-                    <div className={`relative z-10 flex items-center justify-center shrink-0 ${isHorizontal ? 'w-full md:w-5/12 h-48 md:h-full' : 'w-full h-56 md:h-1/2'}`}>
-                      <div className="relative w-full h-full">
-                        <Image 
-                          src={product.image} 
-                          alt={product.title} 
-                          fill 
-                          className={`object-contain transition-transform duration-700 
-                            ${product.id === 1 
-                              ? 'scale-[1.2] md:scale-[1.5] origin-center -translate-x-0 md:-translate-x-8 translate-y-0 md:translate-y-4 drop-shadow-[0_35px_45px_rgba(0,0,0,0.6)]' 
-                              : product.id === 2
-                              ? 'scale-[1.2] md:scale-[1.5] origin-center translate-x-0 md:translate-x-8 translate-y-0 md:translate-y-4 drop-shadow-[0_35px_45px_rgba(0,0,0,0.6)]'
-                              : product.id === 3
-                              ? 'scale-[1.3] md:scale-[2.2] origin-center md:origin-left -translate-x-0 md:-translate-x-32 drop-shadow-[0_35px_45px_rgba(0,0,0,0.6)]'
-                              : 'drop-shadow-[0_15px_25px_rgba(0,0,0,0.15)]'
-                            }
-                          `} 
-                        />
+              {filtered.map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                  className="group relative"
+                >
+                  {/* Card Container */}
+                  <div className="bg-white rounded-[3rem] p-8 h-full flex flex-col border border-gray-100 transition-all duration-500 hover:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] hover:-translate-y-4">
+                    
+                    {/* Badge */}
+                    <div className="absolute top-6 right-6 z-20">
+                      <div className="bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-gray-100 shadow-sm">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-900/60">{product.tag}</span>
                       </div>
                     </div>
 
-                    {/* Content Area */}
-                    <div className={`relative z-10 flex flex-col justify-center text-left ${isHorizontal ? 'w-full md:w-7/12' : 'w-full flex-grow mt-4'}`}>
-                      <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-900/60 mb-2">
+                    {/* Image Area with Decorative Platform */}
+                    <div className="relative w-full aspect-square mb-10 group-hover:scale-105 transition-transform duration-700">
+                      <div 
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-1/4 rounded-[100%] blur-3xl opacity-30 transition-opacity group-hover:opacity-60"
+                        style={{ backgroundColor: product.accent }}
+                      />
+                      <Image 
+                        src={product.image} 
+                        alt={product.title} 
+                        fill 
+                        className="object-contain drop-shadow-2xl z-10"
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-grow">
+                       <span className="text-[10px] font-black uppercase tracking-[0.3em] mb-3 block" style={{ color: product.accent }}>
                         {product.category}
                       </span>
-                      
-                      <h3 className="font-headline text-3xl md:text-4xl font-bold text-gray-900 mb-3 leading-none tracking-tight">
-                        {product.title}
-                      </h3>
-                      
-                      <p className={`text-gray-900/80 font-medium text-sm leading-relaxed mb-4 ${isHorizontal ? 'line-clamp-3' : 'line-clamp-5'}`}>
+                      <h3 className="font-headline text-3xl text-gray-900 mb-3 leading-tight">{product.title}</h3>
+                      <p className="text-gray-500 font-medium text-sm leading-relaxed mb-8 line-clamp-3">
                         {product.description}
                       </p>
-
-                      {/* Points / Outcomes */}
-                      <ul className="space-y-2 mb-8">
-                        {product.outcomes.map((outcome, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-xs font-bold text-gray-800 leading-tight">
-                            <Check size={14} className="text-gray-900 shrink-0 mt-0.5" />
-                            {outcome}
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      <Link 
-                        href={`/products/${product.id}`} 
-                        className="mt-auto w-fit bg-gray-900 text-white font-bold text-[10px] uppercase tracking-widest px-6 py-3 rounded-full flex items-center gap-2 hover:bg-white hover:text-gray-900 transition-colors shadow-lg"
-                      >
-                        Explore <ArrowRight size={14} />
-                      </Link>
                     </div>
-                  </motion.div>
-                );
-              })}
+
+                    {/* Action Button */}
+                    <Link 
+                      href={`/products/${product.id}`}
+                      className="inline-flex items-center justify-between w-full p-2 bg-gray-50 rounded-2xl group/btn hover:bg-[#111827] transition-all duration-500"
+                    >
+                      <span className="pl-4 text-xs font-black uppercase tracking-widest text-gray-900 group-hover/btn:text-white transition-colors">View Toolkit</span>
+                      <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm group-hover/btn:bg-[#36ba98] transition-colors">
+                        <ArrowRight size={20} className="text-gray-900 group-hover/btn:text-white transition-colors" />
+                      </div>
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
             </AnimatePresence>
           </motion.div>
         </div>
       </section>
 
-      {/* High-Impact CTA */}
-      <section className="py-24 bg-white px-6">
+      {/* Dynamic Impact Footer */}
+      <section className="py-32 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="relative bg-[#0f172a] rounded-[3rem] p-12 md:p-20 overflow-hidden text-center shadow-2xl">
-            {/* Decoration */}
-            <div className="absolute top-0 left-0 w-64 h-64 bg-[#36ba98]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#45bcf6]/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+          <div className="bg-white rounded-[4rem] p-12 md:p-24 shadow-2xl shadow-gray-200/50 flex flex-col md:flex-row items-center gap-16 relative overflow-hidden border border-gray-100">
+            {/* Background Hand-Drawn Elements */}
+            <div className="absolute top-10 left-10 opacity-5">
+               <Zap size={100} className="text-gray-900" />
+            </div>
             
-            <div className="relative z-10 max-w-3xl mx-auto">
-              <h2 className="font-headline text-5xl md:text-7xl text-white leading-tight mb-8 tracking-tight">
-                Need a <span className="text-[#36ba98]">Custom Solution?</span>
+            <div className="flex-1 text-center md:text-left relative z-10">
+              <div className="inline-flex items-center gap-2 mb-8 bg-[#36ba98]/10 text-[#36ba98] px-4 py-1 rounded-full">
+                <Heart size={14} fill="currentColor" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Built for humans</span>
+              </div>
+              <h2 className="font-headline text-5xl md:text-7xl text-gray-900 leading-tight mb-10 tracking-tight">
+                Can't find what <br /> you're <span className="text-[#45bcf6]">looking for?</span>
               </h2>
-              <p className="text-xl text-white/70 font-medium mb-12 leading-relaxed">
-                We partner with schools and organizations to create tailored SEL toolkits and training programs for their unique needs.
+              <p className="text-xl text-gray-500 font-medium max-w-xl mb-12">
+                We offer custom development for schools and organizations that need tailored SEL solutions.
               </p>
               <Link 
                 href="/contact"
-                className="inline-flex items-center gap-3 bg-[#36ba98] text-white px-10 py-5 rounded-full font-black uppercase tracking-widest text-sm hover:scale-105 transition-transform shadow-2xl shadow-[#36ba98]/20"
+                className="inline-flex items-center gap-3 bg-[#111827] text-white px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm hover:scale-105 transition-transform shadow-2xl"
               >
-                Start a Partnership <ArrowRight size={18} />
+                Let's Talk Shop <ArrowRight size={20} />
               </Link>
+            </div>
+
+            <div className="flex-1 relative w-full aspect-square max-w-md">
+              <div className="absolute inset-0 bg-[#f0fdf4] rounded-[3.5rem] rotate-6 border border-[#36ba98]/20" />
+              <div className="absolute inset-0 bg-white rounded-[3.5rem] shadow-xl flex flex-col items-center justify-center p-10 text-center">
+                 <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-6">
+                    <Zap size={32} className="text-[#36ba98]" />
+                 </div>
+                 <h4 className="font-headline text-2xl text-gray-900 mb-4">Custom Workshop?</h4>
+                 <p className="text-gray-500 text-sm font-medium mb-8">We can design a custom training manual or toolkit just for your team.</p>
+                 <Link href="/services" className="text-[#36ba98] font-black uppercase tracking-widest text-[10px] hover:gap-3 flex items-center gap-2 transition-all">
+                   Explore Services <ArrowRight size={14} />
+                 </Link>
+              </div>
             </div>
           </div>
         </div>

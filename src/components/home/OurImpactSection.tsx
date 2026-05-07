@@ -8,21 +8,21 @@ const stats = [
     id: 1,
     number: "50+",
     label: "Teachers",
-    image: "/teacher.png",
+    image: "/teacher1.png",
     hoverBg: "hover:bg-[#ffa3c9]", // Pink
   },
   {
     id: 2,
     number: "50+",
     label: "Parents",
-    image: "/parents.png",
+    image: "/parents2.png",
     hoverBg: "hover:bg-[#ffd166]", // Yellow
   },
   {
     id: 3,
     number: "300+",
     label: "Children",
-    image: "/children.png",
+    image: "/children1.png",
     hoverBg: "hover:bg-[#45bcf6]", // Blue
   }
 ];

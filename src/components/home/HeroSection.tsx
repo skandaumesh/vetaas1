@@ -84,33 +84,33 @@ export default function HeroSection() {
         {/* Card 1 (Left) */}
         <div className="absolute left-[5%] md:left-[8%] bottom-0 w-[35%] md:w-[32%] h-[65%] md:h-[80%] bg-[#45bcf6] rounded-t-[1.8rem] md:rounded-t-[3.5rem] z-10 flex flex-col items-center justify-end pb-0 shadow-lg origin-bottom -rotate-6 md:-rotate-[8deg] transition-transform duration-500 hover:-rotate-3 overflow-visible group">
           <motion.div 
-            whileHover={{ y: -25, scale: 1.1, rotate: -5 }}
+            whileHover={{ y: -30, scale: 1.15, rotate: -5 }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="relative w-[145%] md:w-[130%] aspect-square opacity-90 mb-[-8%] md:mb-[-5%]"
+            className="relative w-[155%] md:w-[145%] aspect-square opacity-90 mb-[-10%] md:mb-[-8%]"
           >
-             <Image src="/hero1.png" alt="" fill className="object-contain mix-blend-multiply" />
+             <Image src="/hero2.png" alt="" fill className="object-contain mix-blend-multiply" />
           </motion.div>
         </div>
 
         {/* Card 3 (Right) */}
         <div className="absolute right-[5%] md:right-[8%] bottom-0 w-[35%] md:w-[32%] h-[70%] md:h-[85%] bg-[#ff7f68] rounded-t-[1.8rem] md:rounded-t-[3.5rem] z-10 flex flex-col items-center justify-end pb-0 shadow-lg origin-bottom rotate-6 md:rotate-[8deg] transition-transform duration-500 hover:rotate-3 overflow-visible group">
            <motion.div 
-            whileHover={{ y: -25, scale: 1.1, rotate: 5 }}
+            whileHover={{ y: -30, scale: 1.15, rotate: 5 }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="relative w-[145%] md:w-[130%] aspect-square opacity-90 mb-[-8%] md:mb-[-5%]"
+            className="relative w-[155%] md:w-[145%] aspect-square opacity-90 mb-[-10%] md:mb-[-8%]"
           >
-             <Image src="/hero2.png" alt="" fill className="object-contain mix-blend-multiply" />
+             <Image src="/hero3.png" alt="" fill className="object-contain mix-blend-multiply" />
           </motion.div>
         </div>
 
         {/* Card 2 (Center) - overlaps the others */}
         <div className="absolute bottom-0 w-[42%] md:w-[38%] h-[90%] md:h-[100%] bg-[#ffa3c9] rounded-t-[1.8rem] md:rounded-t-[3.5rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-20 flex flex-col items-center justify-end pb-0 border border-black/5 hover:-translate-y-4 transition-all duration-500 overflow-visible group">
           <motion.div 
-            whileHover={{ y: -35, scale: 1.15 }}
+            whileHover={{ y: -40, scale: 1.2 }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="relative w-[155%] md:w-[140%] aspect-square mb-[-8%] md:mb-[-5%]"
+            className="relative w-[165%] md:w-[155%] aspect-square mb-[-10%] md:mb-[-8%]"
           >
-             <Image src="/child.png" alt="" fill className="object-contain drop-shadow-lg" />
+             <Image src="/hero1.png" alt="" fill className="object-contain drop-shadow-lg" />
           </motion.div>
         </div>
 

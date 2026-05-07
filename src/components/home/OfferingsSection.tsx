@@ -12,33 +12,33 @@ export default function OfferingsSection() {
       color: "bg-[#45bcf6]", // Sky Blue
       iconBg: "bg-[#8bd6f9]",
       btnColor: "bg-[#35a8df]", 
-      title: "Products",
-      subtitle: "SEL CURRICULUM & TOOLKITS",
-      description: "Research-backed learning materials, story cards, and assessment frameworks designed for K-8 classrooms.",
-      link: "/products",
-      marginTop: "mt-16", // Push down to stagger
+      title: "Parent Engagement",
+      subtitle: "WORKSHOPS & SPACES",
+      description: "Action oriented workshops that cater to creating conversation spaces, meaningful parent-child engagements, and exposure to SEL and ECE theories.",
+      link: "/parents",
+      marginTop: "mt-16", 
     },
     {
       image: "/flow2.png",
       color: "bg-[#36ba98]", // Emerald Green
       iconBg: "bg-[#7fd9bc]",
       btnColor: "bg-[#2da182]",
-      title: "Services",
-      subtitle: "TRAINING & WORKSHOPS",
-      description: "Professional development for teachers, parent engagement programs, and end-to-end school partnerships.",
-      link: "/services",
-      marginTop: "mt-0", // Higher up
+      title: "Teacher Engagement",
+      subtitle: "CAPACITY BUILDING",
+      description: "Carefully created sessions for SEL 101 course, teachers' wellbeing, and creating a SEL-supportive classroom environment.",
+      link: "/teachers",
+      marginTop: "mt-0", 
     },
     {
       image: "/flow3.png",
       color: "bg-[#ff7f68]", // Coral
       iconBg: "bg-[#ffa696]",
       btnColor: "bg-[#e56d58]",
-      title: "Volunteer",
-      subtitle: "JOIN THE MOVEMENT",
-      description: "Be part of a community of changemakers. Volunteer your time and skills to transform education.",
-      link: "/contact",
-      marginTop: "mt-16", // Push down to stagger
+      title: "Child Engagement",
+      subtitle: "FUN FILLED EVENTS",
+      description: "Fun filled events that cater to creating rich learning experiences, SEL-focused activities, and take-home projects to extend learning.",
+      link: "/events",
+      marginTop: "mt-16", 
     },
   ];
 
@@ -65,11 +65,10 @@ export default function OfferingsSection() {
           className="text-center max-w-2xl mx-auto mb-20 flex flex-col items-center"
         >
           <div className="inline-flex items-center justify-center bg-[#0f172a] text-white px-5 py-1.5 rounded-lg mb-8 shadow-sm -rotate-2">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">What We Offer</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Our Mission</span>
           </div>
-          <h2 className="font-headline text-5xl md:text-6xl lg:text-7xl text-[#111827] tracking-tight leading-[1.05]">
-            <span className="font-medium">Tools, Training &</span><br />
-            <span className="inline-block bg-[#ffa3c9] text-white px-8 py-2 rounded-[2rem] rotate-2 mt-4 shadow-sm font-bold">Community</span>
+          <h2 className="font-headline text-5xl md:text-7xl lg:text-8xl text-[#111827] tracking-tight leading-[1.05]">
+            Our <span className="inline-block bg-[#ffa3c9] text-white px-8 py-2 rounded-[2rem] rotate-2 mt-4 shadow-sm font-bold">Work</span>
           </h2>
         </motion.div>
 
