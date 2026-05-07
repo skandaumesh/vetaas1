@@ -14,7 +14,12 @@ export default function OfferingsSection() {
       btnColor: "bg-[#35a8df]", 
       title: "Parent Engagement",
       subtitle: "WORKSHOPS & SPACES",
-      description: "Action oriented workshops that cater to creating conversation spaces, meaningful parent-child engagements, and exposure to SEL and ECE theories.",
+      intro: "Action oriented workshops that cater to",
+      points: [
+        "Creating conversation spaces.",
+        "Meaningful parent and child engagements.",
+        "Exposure to SEL and ECE theories."
+      ],
       link: "/parents",
       marginTop: "mt-16", 
     },
@@ -25,7 +30,12 @@ export default function OfferingsSection() {
       btnColor: "bg-[#2da182]",
       title: "Teacher Engagement",
       subtitle: "CAPACITY BUILDING",
-      description: "Carefully created sessions for SEL 101 course, teachers' wellbeing, and creating a SEL-supportive classroom environment.",
+      intro: "Carefully created sessions that cater to",
+      points: [
+        "SEL 101 course for teachers' capacity building.",
+        "SEL for teachers' wellbeing.",
+        "Creating a SEL-supportive classroom environment."
+      ],
       link: "/teachers",
       marginTop: "mt-0", 
     },
@@ -36,7 +46,12 @@ export default function OfferingsSection() {
       btnColor: "bg-[#e56d58]",
       title: "Child Engagement",
       subtitle: "FUN FILLED EVENTS",
-      description: "Fun filled events that cater to creating rich learning experiences, SEL-focused activities, and take-home projects to extend learning.",
+      intro: "Fun filled events that cater to",
+      points: [
+        "Creating a rich learning experience for children.",
+        "SEL-focused activities for children.",
+        "Take-home projects to extend learning."
+      ],
       link: "/events",
       marginTop: "mt-16", 
     },
@@ -82,7 +97,7 @@ export default function OfferingsSection() {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, delay: i * 0.15 }}
               whileHover={{ y: -10 }}
-              className={`relative ${item.color} p-8 lg:p-10 rounded-[3rem] shadow-xl border border-black/5 transition-all duration-500 flex flex-col min-h-[520px] overflow-hidden group ${item.marginTop}`}
+              className={`relative ${item.color} p-8 lg:p-10 rounded-[3rem] shadow-xl border border-black/5 transition-all duration-500 flex flex-col min-h-[560px] overflow-hidden group ${item.marginTop}`}
             >
               
               {/* Animated Inner Blobs */}
@@ -105,7 +120,7 @@ export default function OfferingsSection() {
                 className="absolute bottom-10 -left-10 w-48 h-48 bg-black rounded-full blur-3xl pointer-events-none"
               />
 
-              {/* Top Left Icon Container with Hover Animation */}
+              {/* Top Left Icon Container */}
               <div className="relative z-10 w-24 h-24 mb-10 flex items-center justify-start transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
                 <Image 
                   src={item.image} 
@@ -116,20 +131,28 @@ export default function OfferingsSection() {
                 />
               </div>
 
-              {/* Subtitle */}
+              {/* Content Header */}
               <div className="relative z-10 text-[9px] font-black uppercase tracking-[0.2em] mb-3 text-[#111827]/70">
                 {item.subtitle}
               </div>
-              
-              {/* Title */}
               <h3 className="relative z-10 font-headline text-4xl lg:text-5xl font-bold text-[#111827] mb-6 tracking-tight group-hover:-translate-y-1 transition-transform duration-500">
                 {item.title}
               </h3>
               
-              {/* Description */}
-              <p className="relative z-10 text-lg lg:text-xl text-[#111827]/80 font-medium leading-relaxed mb-auto group-hover:-translate-y-1 transition-transform duration-500 delay-75">
-                {item.description}
-              </p>
+              {/* Points List */}
+              <div className="relative z-10 flex-grow group-hover:-translate-y-1 transition-transform duration-500 delay-75">
+                <p className="text-sm lg:text-base text-[#111827] font-bold leading-relaxed mb-4">
+                  {item.intro}
+                </p>
+                <ul className="space-y-3">
+                  {item.points.map((point, idx) => (
+                    <li key={idx} className="flex items-start gap-3 text-base lg:text-lg text-[#111827]/80 font-medium leading-tight">
+                      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[#111827] shrink-0" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
               {/* Learn More Button */}
               <Link 
