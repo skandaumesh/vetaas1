@@ -2,50 +2,105 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export default function CTASection() {
   return (
-    <section className="py-24 lg:py-32 bg-[#FDFBF7] relative overflow-hidden font-sans z-10">
-      <div className="max-w-[1100px] mx-auto px-6 md:px-12">
+    <section className="py-20 md:py-28 relative overflow-hidden font-[family-name:var(--font-poppins)] bg-gradient-to-b from-[#f0f6fa] to-white">
+      {/* Background Decor — Layered Premium */}
+      <div className="absolute top-[10%] left-[-15%] w-[450px] h-[450px] rounded-full bg-[#1a4895]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] right-[-15%] w-[450px] h-[450px] rounded-full bg-[#ff6e79]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[-5%] right-[10%] w-[350px] h-[350px] rounded-full bg-[#36ba98]/3 blur-[110px] animate-pulse-slow pointer-events-none z-0" />
+
+      {/* Morphing organic blobs */}
+      <div className="absolute top-[8%] left-[10%] w-[250px] h-[250px] bg-gradient-to-br from-[#1a4895]/6 to-[#4285F4]/5 animate-morph pointer-events-none z-0 blur-[55px]" />
+      <div className="absolute bottom-[5%] right-[8%] w-[280px] h-[280px] bg-gradient-to-tr from-[#ff6e79]/6 to-[#ffd166]/5 animate-morph pointer-events-none z-0 blur-[60px]" style={{ animationDelay: '-3s' }} />
+      <div className="absolute top-[50%] left-[40%] w-[220px] h-[220px] bg-gradient-to-br from-[#36ba98]/5 to-[#ffd166]/4 animate-morph pointer-events-none z-0 blur-[50px]" style={{ animationDelay: '-7s' }} />
+
+      {/* Drifting geometric rings */}
+      <div className="absolute top-[12%] right-[18%] w-[100px] h-[100px] rounded-full border-2 border-[#1a4895]/8 animate-drift pointer-events-none z-0" />
+      <div className="absolute bottom-[15%] left-[12%] w-[80px] h-[80px] rounded-full border-2 border-[#ff6e79]/8 animate-drift-reverse pointer-events-none z-0" />
+      <div className="absolute top-[40%] left-[5%] w-[60px] h-[60px] rounded-full border border-[#36ba98]/10 animate-drift pointer-events-none z-0" style={{ animationDelay: '-12s' }} />
+      {/* Orbiting dots */}
+      <div className="absolute top-[25%] right-[30%] w-[10px] h-[10px] rounded-full bg-[#1a4895]/12 animate-orbit pointer-events-none z-0" />
+      <div className="absolute bottom-[35%] left-[20%] w-[7px] h-[7px] rounded-full bg-[#ff6e79]/15 animate-orbit pointer-events-none z-0" style={{ animationDelay: '-18s' }} />
+
+      {/* Layered SVG journey lines */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <svg width="100%" height="100%" viewBox="0 0 1440 700" preserveAspectRatio="none" fill="none" className="w-full h-full">
+          {/* Primary blue curve */}
+          <path 
+            d="M-50,200 C300,400 600,100 1000,350 C1200,480 1350,200 1500,280" 
+            stroke="#1a4895" 
+            strokeWidth="3" 
+            strokeLinecap="round" 
+            opacity="0.06"
+          />
+          {/* Secondary coral curve */}
+          <path 
+            d="M-50,350 C250,150 550,450 950,200 C1150,100 1350,350 1500,300" 
+            stroke="#ff6e79" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            opacity="0.05"
+          />
+          {/* Dashed teal accent */}
+          <path 
+            d="M-50,500 C200,350 500,550 800,380 C1100,250 1300,480 1500,420" 
+            stroke="#36ba98" 
+            strokeWidth="1.5" 
+            strokeLinecap="round" 
+            strokeDasharray="10 7"
+            opacity="0.05"
+          />
+          {/* Decorative circles */}
+          <circle cx="180" cy="150" r="55" stroke="#1a4895" strokeWidth="1" opacity="0.04" />
+          <circle cx="1250" cy="500" r="70" stroke="#ff6e79" strokeWidth="1" opacity="0.04" />
+          <circle cx="750" cy="80" r="30" stroke="#36ba98" strokeWidth="1.5" opacity="0.05" />
+        </svg>
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 relative z-10">
         <motion.div 
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="bg-[#ffd166] rounded-[3rem] p-12 md:p-20 text-[#111827] text-center relative shadow-[0_20px_50px_rgba(255,209,102,0.3)] border border-black/5 rotate-1 hover:rotate-0 transition-transform duration-500"
+          transition={{ duration: 0.8 }}
+          className="relative flex flex-col items-center justify-center text-center"
         >
-          {/* Decorative Doodles */}
-          <div className="absolute top-10 left-10 opacity-60 w-12 h-12 -rotate-12">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-            </svg>
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <span className="inline-block py-1.5 px-6 rounded-full bg-white border border-gray-200/80 text-gray-800 font-bold text-xs tracking-widest uppercase mb-4 shadow-sm">
+              JOIN THE COMMUNITY
+            </span>
+            
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-[#111827] leading-[1.2] mb-4">
+              It takes a village to <br className="hidden md:block"/> raise a child.
+            </h2>
           </div>
-          <div className="absolute bottom-12 right-12 opacity-60 w-10 h-10 rotate-12">
-             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3v6" />
-            </svg>
+          
+          <div className="relative w-full max-w-[1250px] mx-auto mt-4 mb-8 aspect-[1464/497] scale-105 sm:scale-110">
+            <Image 
+              src="/cta.png" 
+              alt="Call to Action Illustration" 
+              fill 
+              className="object-contain object-top" 
+              priority
+            />
           </div>
 
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="font-headline text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[1.05] mb-8">
-              Ready to Transform <br/>
-              <span className="inline-block bg-white px-5 py-2 rounded-3xl -rotate-2 mt-2 shadow-sm text-[#ff6e79]">Education?</span>
-            </h2>
-            <p className="text-xl md:text-2xl text-[#111827]/80 font-medium mb-12 leading-relaxed">
-              Whether you're a school, a parent, or a passionate volunteer — there's a place for you in the Vetaas village.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/products" className="w-full sm:w-auto bg-[#111827] text-white font-bold text-lg px-8 py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors shadow-lg hover:-translate-y-1">
-                Get Started <ArrowRight size={20} strokeWidth={2.5} />
-              </Link>
-              <Link href="/contact" className="w-full sm:w-auto bg-white text-[#111827] font-bold text-lg px-8 py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors shadow-sm hover:-translate-y-1">
-                <MessageCircle size={20} strokeWidth={2.5} /> Talk to Us
-              </Link>
-            </div>
+          <div className="z-20">
+            <Link 
+              href="/contact" 
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 sm:px-8 sm:py-3 bg-[#0B1523] text-white font-bold text-sm sm:text-base rounded-full hover:bg-gray-800 hover:scale-105 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+            >
+              Join the tribe
+              <ArrowRight size={18} strokeWidth={2} />
+            </Link>
           </div>
         </motion.div>
       </div>
     </section>
   );
 }
+

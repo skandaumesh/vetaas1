@@ -97,7 +97,7 @@ export default function OfferingsSection() {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, delay: i * 0.15 }}
               whileHover={{ y: -10 }}
-              className={`relative ${item.color} p-8 lg:p-10 rounded-[3rem] shadow-xl border border-black/5 transition-all duration-500 flex flex-col min-h-[560px] overflow-hidden group ${item.marginTop}`}
+              className={`relative ${item.color} p-7 lg:p-8 rounded-[2.5rem] shadow-xl border border-black/5 transition-all duration-500 flex flex-col min-h-[480px] overflow-hidden group ${item.marginTop === 'mt-16' ? 'md:mt-12' : 'mt-0'}`}
             >
               
               {/* Animated Inner Blobs */}
@@ -121,33 +121,33 @@ export default function OfferingsSection() {
               />
 
               {/* Top Left Icon Container */}
-              <div className="relative z-10 w-24 h-24 mb-10 flex items-center justify-start transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+              <div className="relative z-10 w-20 h-20 mb-6 flex items-center justify-start transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
                 <Image 
                   src={item.image} 
                   alt={item.title} 
-                  width={96} 
-                  height={96} 
+                  width={80} 
+                  height={80} 
                   className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-lg" 
                 />
               </div>
 
               {/* Content Header */}
-              <div className="relative z-10 text-[9px] font-black uppercase tracking-[0.2em] mb-3 text-[#111827]/70">
+              <div className="relative z-10 text-[9px] font-black uppercase tracking-[0.2em] mb-2 text-[#111827]/70">
                 {item.subtitle}
               </div>
-              <h3 className="relative z-10 font-headline text-4xl lg:text-5xl font-bold text-[#111827] mb-6 tracking-tight group-hover:-translate-y-1 transition-transform duration-500">
+              <h3 className="relative z-10 font-headline text-3xl lg:text-4xl font-bold text-[#111827] mb-4 tracking-tight group-hover:-translate-y-1 transition-transform duration-500">
                 {item.title}
               </h3>
               
               {/* Points List */}
               <div className="relative z-10 flex-grow group-hover:-translate-y-1 transition-transform duration-500 delay-75">
-                <p className="text-sm lg:text-base text-[#111827] font-bold leading-relaxed mb-4">
+                <p className="text-xs lg:text-sm text-[#111827] font-bold leading-relaxed mb-3">
                   {item.intro}
                 </p>
-                <ul className="space-y-3">
+                <ul className="space-y-2">
                   {item.points.map((point, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-base lg:text-lg text-[#111827]/80 font-medium leading-tight">
-                      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[#111827] shrink-0" />
+                    <li key={idx} className="flex items-start gap-2.5 text-sm lg:text-base text-[#111827]/80 font-medium leading-tight">
+                      <span className="mt-1.5 w-1 h-1 rounded-full bg-[#111827] shrink-0" />
                       {point}
                     </li>
                   ))}
@@ -157,9 +157,9 @@ export default function OfferingsSection() {
               {/* Learn More Button */}
               <Link 
                 href={item.link} 
-                className={`relative z-10 mt-10 inline-flex items-center gap-2 font-bold text-sm text-[#111827] ${item.btnColor} px-6 py-3 rounded-full w-fit shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300`}
+                className={`relative z-10 mt-8 inline-flex items-center gap-2 font-bold text-xs text-[#111827] ${item.btnColor} px-5 py-2.5 rounded-full w-fit shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300`}
               >
-                Learn More <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                Learn More <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               
             </motion.div>

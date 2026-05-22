@@ -8,12 +8,21 @@
   --color-gold: #ffd166;
   --color-sky: #b4e0f9;
   --color-dark: #111827;
-  --color-canvas: #f8fafc;
+  --color-canvas: #ffffff;
   --color-white: #ffffff;
 
   /* Font families */
   --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
   --font-playfair: var(--font-playfair), serif;
+
+  /* Header height fallbacks (Navbar + EventBanner) */
+  --header-height: 122px;
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --header-height: 104px;
+  }
 }
 
 /* ── Base ── */
@@ -152,14 +161,72 @@ body {
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-/* ── Floating animation ── */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
+/* ── Theme Animations ── */
+@theme {
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-float-slow: float-slow 6s ease-in-out infinite;
+  --animate-float-reverse: float-reverse 5s ease-in-out infinite;
+  --animate-spin-slow: spin-slow 15s linear infinite;
+  --animate-pulse-slow: pulse-slow 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(3deg); }
+  }
+  @keyframes float-reverse {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(12px); }
+  }
+  @keyframes spin-slow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(1.1); }
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  --animate-drift: drift 20s ease-in-out infinite;
+  --animate-drift-reverse: drift-reverse 25s ease-in-out infinite;
+  --animate-morph: morph 12s ease-in-out infinite;
+  --animate-orbit: orbit 30s linear infinite;
+
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(30px, -20px) rotate(2deg); }
+    50% { transform: translate(-15px, 15px) rotate(-1deg); }
+    75% { transform: translate(20px, 10px) rotate(1deg); }
+  }
+  @keyframes drift-reverse {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-25px, 15px) rotate(-2deg); }
+    50% { transform: translate(20px, -20px) rotate(1deg); }
+    75% { transform: translate(-10px, -10px) rotate(-1deg); }
+  }
+  @keyframes morph {
+    0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    50% { border-radius: 50% 60% 40% 60% / 30% 50% 70% 50%; }
+    75% { border-radius: 40% 60% 50% 40% / 60% 40% 60% 30%; }
+  }
+  @keyframes orbit {
+    0% { transform: rotate(0deg) translateX(40px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
+  }
 }
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(3deg); }
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
-.animate-float { animation: float 4s ease-in-out infinite; }
-.animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+
+

@@ -6,9 +6,9 @@ import Image from "next/image";
 export default function ParentsHero() {
   return (
     <div className="w-full relative z-10 flex flex-col items-center text-center mt-12 md:mt-20 mb-24">
-      
+
       {/* Decorative Doodles matching homepage hero */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 0.8, scale: 1 }}
         transition={{ delay: 0.4 }}
@@ -16,7 +16,7 @@ export default function ParentsHero() {
       >
         <Image src="/star.jpeg" alt="Star decoration" fill className="object-contain mix-blend-multiply grayscale contrast-[1.2]" />
       </motion.div>
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 0.8, scale: 1 }}
         transition={{ delay: 0.5 }}
@@ -25,7 +25,7 @@ export default function ParentsHero() {
         <Image src="/arrow.jpeg" alt="Arrow decoration" fill className="object-contain mix-blend-multiply grayscale contrast-[1.2]" />
       </motion.div>
 
-      <motion.h1 
+      <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
@@ -33,8 +33,8 @@ export default function ParentsHero() {
       >
         SEL For <span className="inline-block bg-[#ffa3c9] text-white px-6 py-2 rounded-[2rem] -rotate-2 shadow-sm ml-2">Parents</span>
       </motion.h1>
-      
-      <motion.p 
+
+      <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -44,7 +44,7 @@ export default function ParentsHero() {
       </motion.p>
 
       {/* Hero Image Container */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3 }}
@@ -53,7 +53,7 @@ export default function ParentsHero() {
         {/* Playful background shapes */}
         <div className="absolute inset-0 bg-[#fef6fb] rounded-[2.5rem] -rotate-2 z-0 shadow-sm border border-black/5"></div>
         <div className="absolute inset-0 bg-[#0CB0D8]/5 rounded-[2.5rem] rotate-1 z-0 border border-black/5"></div>
-        
+
         {/* The child illustration */}
         <div className="relative w-[280px] md:w-[400px] h-full z-10">
           <Image src="/child.png" alt="SEL For Parents" fill className="object-contain drop-shadow-xl" priority />

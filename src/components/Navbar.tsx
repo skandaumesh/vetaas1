@@ -9,8 +9,11 @@ import { Menu, X } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
   { label: "Products", href: "/products" },
   { label: "Services", href: "/services" },
+  { label: "Teachers", href: "/teachers" },
+  { label: "Events", href: "/events" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -23,18 +26,18 @@ export default function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-0 inset-x-0 z-50 w-full"
+      className="w-full bg-white/70 backdrop-blur-lg border-b border-white/20"
     >
-      <div className="w-full max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 h-24 md:h-28 flex items-center justify-between">
+      <div className="w-full max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 h-16 md:h-20 flex items-center justify-between">
 
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0 relative z-10">
           <Image
             src="/logo.webp"
             alt="Vetaas — The Tree of Hope"
-            width={80}
-            height={80}
-            className="object-contain w-14 md:w-16 lg:w-[70px] h-auto"
+            width={60}
+            height={60}
+            className="object-contain w-10 md:w-12 lg:w-14 h-auto"
             priority
           />
         </Link>
