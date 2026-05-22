@@ -12,6 +12,8 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   Share2,
   Check,
 } from "lucide-react";
@@ -105,7 +107,7 @@ export default function EventsPage() {
       </div>
 
       {/* ── Main Content ── */}
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-16 lg:gap-24">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-16 lg:gap-20">
 
         {/* Left: Events */}
         <div>
@@ -117,39 +119,64 @@ export default function EventsPage() {
             empty={upcomingEvents.length === 0}
             emptyLabel="No upcoming events right now. Stay tuned!"
           >
-            {upcomingEvents.map((event, i) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                index={i}
-                isHighlighted={event.id === highlightedId}
-              />
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {upcomingEvents.map((event, i) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  index={i}
+                  isHighlighted={event.id === highlightedId}
+                />
+              ))}
+            </div>
           </Section>
 
-          {/* Past */}
-          <Section
-            label="Memories"
-            loading={loading}
-            empty={pastEvents.length === 0}
-            emptyLabel="No past events yet."
-            className="mt-20"
-          >
-            {pastEvents.map((event, i) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                index={i}
-                isHighlighted={event.id === highlightedId}
-                muted
-              />
-            ))}
-          </Section>
+          {/* Mobile Calendar (visible only on mobile/tablet) */}
+          <div className="block lg:hidden mt-16">
+            <div className="flex items-center gap-4 mb-8">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">
+                Calendar
+              </span>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+            <RealCalendar events={events} />
+          </div>
+
+          {/* Past — Card Grid */}
+          <div className="mt-20">
+            <div className="flex items-center gap-4 mb-10">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">
+                Memories
+              </span>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="animate-pulse rounded-2xl bg-gray-100 h-72" />
+                ))}
+              </div>
+            ) : pastEvents.length === 0 ? (
+              <p className="text-gray-400 font-medium py-8">No past events yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pastEvents.map((event, i) => (
+                  <MemoryCard
+                    key={event.id}
+                    event={event}
+                    index={i}
+                    isHighlighted={event.id === highlightedId}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
 
         </div>
 
         {/* Right: Calendar */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block border-l-2 border-[#ff6e79]/20 pl-8">
           <div className="sticky top-32">
             <RealCalendar events={events} />
           </div>
@@ -210,7 +237,7 @@ function Section({
 }
 
 /* ── Share Button ── */
-function ShareButton({ event }: { event: any }) {
+function ShareButton({ event, variant = "light" }: { event: any; variant?: "light" | "dark" }) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = (e: React.MouseEvent) => {
@@ -227,16 +254,20 @@ function ShareButton({ event }: { event: any }) {
     });
   };
 
+  const baseClass = variant === "dark"
+    ? "inline-flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white transition-colors p-1"
+    : "inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[#36ba98] transition-colors p-1";
+
   return (
     <button
       onClick={handleShare}
-      className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[#36ba98] transition-colors p-1"
+      className={baseClass}
       title="Copy registration link"
     >
       {copied ? (
         <>
-          <Check size={13} className="text-[#36ba98]" />
-          <span className="text-[10px] text-[#36ba98] uppercase tracking-wider font-bold">Copied</span>
+          <Check size={13} className="text-[#7ddfc3]" />
+          <span className="text-[10px] text-[#7ddfc3] uppercase tracking-wider font-bold">Copied</span>
         </>
       ) : (
         <>
@@ -289,96 +320,77 @@ function EventCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      className="w-full h-full"
     >
-      {/* Divider top */}
-      <div className="h-px bg-gray-100 w-full" />
-
-      <div className={`group flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6 py-6 sm:py-7 px-4 -mx-4 rounded-3xl cursor-default transition-all duration-500 ${
-        isHighlighted ? "bg-[#36ba98]/5 ring-2 ring-[#36ba98]/20" : ""
+      <div className={`group flex flex-col h-full p-5 rounded-3xl border border-[#36ba98]/25 shadow-[0_4px_20px_rgba(54,186,152,0.03)] bg-gradient-to-br from-white to-[#36ba98]/5 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#36ba98]/5 hover:border-[#36ba98]/40 ${
+        isHighlighted ? "ring-2 ring-[#36ba98]/40 shadow-lg shadow-[#36ba98]/5 bg-[#36ba98]/5 border-[#36ba98]/30" : ""
       }`}>
+        {/* Card Image */}
+        {event.image && (
+          <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0">
+            <Image
+              src={event.image}
+              alt={event.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              sizes="(max-width: 640px) 100vw, 350px"
+            />
+          </div>
+        )}
 
-        {/* Date, Title, Image Row */}
-        <div className="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0">
-          {/* Big date numerals */}
-          <div className="shrink-0 w-14 sm:w-20 text-center select-none">
-            <p
-              className="font-headline leading-none font-black text-3xl sm:text-5xl md:text-6xl"
-              style={{
-                color: muted ? "#d1d5db" : "#111827",
-                transition: "color 0.3s",
-              }}
-            >
-              {day}
-            </p>
-            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mt-1">
-              {monthStr}
-            </p>
-            <p className="text-[9px] sm:text-[10px] font-medium text-gray-300 mt-0.5 sm:mt-1">{yearStr}</p>
+        {/* Card Body */}
+        <div className="flex gap-4 flex-1">
+          {/* Left: Date Badge */}
+          <div className="shrink-0 w-10 text-center bg-gradient-to-br from-[#36ba98] to-[#2a9d7e] rounded-xl py-2 flex flex-col justify-center h-fit select-none shadow-sm shadow-[#36ba98]/10 group-hover:scale-105 transition-all duration-300">
+            <span className="font-headline text-lg sm:text-xl font-bold text-white leading-none">{day}</span>
+            <span className="text-[7px] font-black uppercase tracking-[0.05em] text-white/90 mt-1">{monthStr}</span>
+            <span className="text-[6.5px] font-semibold text-white/75 mt-0.5">{yearStr}</span>
           </div>
 
-          {/* Vertical rule */}
-          <div className="hidden sm:block w-px self-stretch bg-gray-100 group-hover:bg-[#36ba98] transition-colors duration-300" />
-
-          {/* Thumbnail (if image exists) */}
-          {event.image && (
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 relative border border-gray-100 sm:order-none order-last ml-auto sm:ml-0">
-              <Image
-                src={event.image}
-                alt={event.title}
-                fill
-                className="object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-            </div>
-          )}
-
-          {/* Details */}
-          <div className="flex-1 min-w-0">
-            {/* Status badge */}
-            <span
-              className={`inline-block text-[9px] font-black uppercase tracking-[0.25em] mb-1.5 px-2 py-0.5 rounded-full ${
+          {/* Right: Event Details */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            <div className="mb-2">
+              <span className={`inline-block text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full ${
                 isCompleted
                   ? "bg-gray-100 text-gray-400"
                   : "bg-[#36ba98]/10 text-[#2a9d7e]"
-              }`}
-            >
-              {isCompleted ? "Completed" : "Upcoming"}
-            </span>
+              }`}>
+                {isCompleted ? "Completed" : "Upcoming"}
+              </span>
+            </div>
 
-            <h3
-              className="font-headline text-lg sm:text-xl md:text-2xl text-[#111827] mb-1.5 leading-snug group-hover:text-[#36ba98] transition-colors duration-300 line-clamp-2 sm:truncate"
-              title={event.title}
-            >
+            <h3 className="font-headline text-base sm:text-lg text-[#111827] font-bold leading-snug mb-2 line-clamp-2 group-hover:text-[#36ba98] transition-colors duration-300">
               {event.title}
             </h3>
 
-            <div className="flex flex-col sm:flex-row sm:items-center sm:flex-wrap gap-1 sm:gap-x-5 text-xs font-medium text-gray-400">
-              <span className="flex items-center gap-1.5">
-                <Calendar size={13} />
-                {formattedFull}
-              </span>
+            <div className="mt-auto flex flex-col gap-1.5 text-[11px] font-medium text-gray-500">
               {event.location && (
                 <span className="flex items-center gap-1.5">
-                  <MapPin size={13} />
-                  {event.location}
+                  <MapPin size={11} className="text-gray-400 shrink-0" />
+                  <span className="truncate">{event.location}</span>
                 </span>
               )}
+              <span className="flex items-center gap-1.5">
+                <Calendar size={11} className="text-gray-400 shrink-0" />
+                <span className="truncate">{formattedFull}</span>
+              </span>
             </div>
           </div>
         </div>
 
-        {/* CTA Container */}
-        <div className="flex flex-row items-center justify-between sm:flex-col sm:items-end sm:justify-center gap-3 pt-4 sm:pt-0 border-t border-gray-50 sm:border-t-0 sm:shrink-0">
+        {/* CTA Actions */}
+        <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between shrink-0">
           {isCompleted ? (
             event.highlightsUrl ? (
               <a
                 href={event.highlightsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-[#111827] border-b-2 border-[#111827] pb-0.5 hover:text-[#36ba98] hover:border-[#36ba98] transition-colors duration-200"
+                className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#111827] border-b border-[#111827] pb-0.5 hover:text-[#36ba98] hover:border-[#36ba98] transition-colors"
               >
-                Highlights <ExternalLink size={12} />
+                Highlights <ExternalLink size={10} />
               </a>
-            ) : null
+            ) : <div />
           ) : (
             <>
               {event.registrationUrl ? (
@@ -386,16 +398,16 @@ function EventCard({
                   href={event.registrationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-[#36ba98] border-b-2 border-[#36ba98] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors duration-200"
+                  className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#36ba98] border-b-2 border-[#36ba98] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors"
                 >
-                  Register <ExternalLink size={12} />
+                  Register <ExternalLink size={10} />
                 </a>
               ) : (
                 <Link
                   href={`/contact?event=${encodeURIComponent(event.title)}`}
-                  className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-[#36ba98] border-b-2 border-[#36ba98] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors duration-200"
+                  className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#36ba98] border-b-2 border-[#36ba98] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors"
                 >
-                  Register <ArrowRight size={12} />
+                  Register <ArrowRight size={10} />
                 </Link>
               )}
               <ShareButton event={event} />
@@ -403,27 +415,147 @@ function EventCard({
           )}
         </div>
       </div>
+    </motion.div>
+  );
+}
 
-      {/* Divider bottom (last item) */}
-      <div className="h-px bg-gray-100 w-full" />
+/* ── Memory Card (completed events) ── */
+function MemoryCard({
+  event,
+  index,
+  isHighlighted = false,
+}: {
+  event: any;
+  index: number;
+  isHighlighted?: boolean;
+}) {
+  let day = "01";
+  let monthStr = "Jan";
+  let yearStr = "";
+  let formattedFull = event.date;
+
+  try {
+    const dateObj = new Date(event.date);
+    if (!isNaN(dateObj.getTime())) {
+      day = String(dateObj.getDate()).padStart(2, "0");
+      monthStr = dateObj
+        .toLocaleString("default", { month: "short" })
+        .toUpperCase();
+      yearStr = String(dateObj.getFullYear());
+      formattedFull = dateObj.toLocaleString("default", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    }
+  } catch (_e) {}
+
+  return (
+    <motion.div
+      id={event.id}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{
+        duration: 0.5,
+        delay: index * 0.06,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      className={`group relative rounded-2xl overflow-hidden cursor-default transition-all duration-500 ${
+        isHighlighted ? "ring-2 ring-[#36ba98]/40 shadow-lg shadow-[#36ba98]/10" : ""
+      }`}
+    >
+      {/* Image background */}
+      <div className="relative w-full h-72 sm:h-80 bg-gray-100">
+        {event.image ? (
+          <Image
+            src={event.image}
+            alt={event.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-100 flex items-center justify-center">
+            <Calendar size={40} className="text-gray-300" />
+          </div>
+        )}
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+        {/* Date badge */}
+        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1.5 text-center shadow-sm">
+          <p className="font-headline text-lg font-bold text-[#111827] leading-none">
+            {day}
+          </p>
+          <p className="text-[7px] font-black uppercase tracking-[0.1em] text-[#36ba98] mt-0.5">
+            {monthStr}
+          </p>
+          <p className="text-[7px] font-medium text-gray-400 leading-none">
+            {yearStr}
+          </p>
+        </div>
+
+        {/* Completed badge */}
+        <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-sm rounded-full px-3 py-1">
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/80">
+            Completed
+          </span>
+        </div>
+
+        {/* Bottom content overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <h3 className="font-headline text-lg sm:text-xl text-white font-bold leading-snug mb-1.5 line-clamp-2 group-hover:text-[#7ddfc3] transition-colors duration-300">
+            {event.title}
+          </h3>
+
+          <div className="flex items-center gap-3 text-white/70 text-[11px] font-medium mb-3">
+            <span className="flex items-center gap-1">
+              <Calendar size={11} />
+              {formattedFull}
+            </span>
+            {event.location && (
+              <span className="flex items-center gap-1">
+                <MapPin size={11} />
+                <span className="truncate max-w-[140px]">{event.location}</span>
+              </span>
+            )}
+          </div>
+
+          {/* Action row */}
+          <div className="flex items-center gap-3">
+            {event.highlightsUrl ? (
+              <a
+                href={event.highlightsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white bg-white/15 backdrop-blur-sm hover:bg-white/25 rounded-full px-4 py-2 transition-all duration-200"
+              >
+                Highlights <ExternalLink size={10} />
+              </a>
+            ) : null}
+            <ShareButton event={event} variant="dark" />
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 }
 
 /* ── Calendar ── */
-function RealCalendar({ events }: { events: any[] }) {
-  const [currentDate, setCurrentDate] = useState(new Date());
-
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+function MonthGrid({ date, events }: { date: Date; events: any[] }) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const startDay = new Date(year, month, 1).getDay();
 
   const monthNames = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
   ];
-  const days = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const activeDays = events.reduce((acc, event) => {
     try {
@@ -436,8 +568,7 @@ function RealCalendar({ events }: { events: any[] }) {
   }, [] as number[]);
 
   const today = new Date();
-  const isCurrentMonth =
-    today.getFullYear() === year && today.getMonth() === month;
+  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
   const todayDay = today.getDate();
 
   const cells = [];
@@ -452,10 +583,10 @@ function RealCalendar({ events }: { events: any[] }) {
       <div
         key={`day-${i}`}
         className={`
-          flex items-center justify-center w-9 h-9 mx-auto rounded-full text-xs font-bold transition-all duration-200
-          ${isActive ? "bg-[#111827] text-white shadow-lg scale-110" : ""}
-          ${isToday && !isActive ? "ring-2 ring-[#36ba98] text-[#111827]" : ""}
-          ${!isActive && !isToday ? "text-gray-500 hover:bg-gray-100" : ""}
+          flex items-center justify-center w-[22px] h-[22px] mx-auto rounded-full text-[10px] font-bold transition-all duration-200
+          ${isActive ? "bg-[#ffd166] text-[#111827] shadow-sm font-black" : ""}
+          ${isToday && !isActive ? "ring-[1px] ring-[#ff6e79] text-[#111827]" : ""}
+          ${!isActive && !isToday ? "text-gray-700 hover:bg-black/5" : ""}
         `}
       >
         {i}
@@ -467,43 +598,95 @@ function RealCalendar({ events }: { events: any[] }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-        <button
-          onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
-          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-700"
-        >
-          <ChevronLeft size={16} />
-        </button>
-        <span className="text-sm font-black text-[#111827] uppercase tracking-widest">
-          {monthNames[month]} {year}
-        </span>
-        <button
-          onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
-          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-700"
-        >
-          <ChevronRight size={16} />
-        </button>
+    <div className="py-0.5">
+      {/* Month Label */}
+      <div className="text-[12px] font-bold text-[#ff6e79] text-center mb-2.5">
+        {monthNames[month]} {year}
       </div>
 
       {/* Grid */}
-      <div className="p-5">
-        <div className="grid grid-cols-7 gap-y-3 gap-x-1 text-center">
-          {days.map((d) => (
-            <div key={d} className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-1">
-              {d}
-            </div>
-          ))}
-          {cells}
-        </div>
+      <div className="grid grid-cols-7 gap-y-1 gap-x-0.5 text-center">
+        {days.map((d) => (
+          <div key={d} className="text-[8px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+            {d}
+          </div>
+        ))}
+        {cells}
+      </div>
+    </div>
+  );
+}
 
-        {/* Legend */}
-        <div className="mt-5 pt-4 border-t border-gray-100 flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#111827]" />
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Event day</span>
+function RealCalendar({ events }: { events: any[] }) {
+  const [centerMonth, setCenterMonth] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
+
+  const prevMonth = new Date(centerMonth.getFullYear(), centerMonth.getMonth() - 1, 1);
+  const nextMonth = new Date(centerMonth.getFullYear(), centerMonth.getMonth() + 1, 1);
+
+  const handlePrev = () => {
+    setCenterMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNext = () => {
+    setCenterMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-3 w-full">
+      {/* Mobile Controls Row */}
+      <div className="flex lg:hidden items-center justify-between w-full px-2 mb-1">
+        <button
+          onClick={handlePrev}
+          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#ff6e79] hover:text-[#e8604c]"
+          aria-label="Previous Month"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+          Navigate
+        </span>
+        <button
+          onClick={handleNext}
+          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#ff6e79] hover:text-[#e8604c]"
+          aria-label="Next Month"
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+
+      {/* Up Chevron (desktop only) */}
+      <button
+        onClick={handlePrev}
+        className="hidden lg:flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#ff6e79] hover:text-[#e8604c]"
+        title="Previous Month"
+      >
+        <ChevronUp size={20} />
+      </button>
+
+      {/* Three Months stacked vertically on desktop, horizontally scrollable on mobile */}
+      <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory gap-4 pb-1 lg:pb-0 scroll-smooth w-full">
+        <div className="min-w-[180px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 snap-center bg-white border border-[#ff6e79]/15 rounded-2xl p-3.5 shadow-sm shadow-[#ff6e79]/3">
+          <MonthGrid date={prevMonth} events={events} />
+        </div>
+        <div className="min-w-[180px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 snap-center bg-white border border-[#ff6e79]/25 rounded-2xl p-3.5 shadow-sm shadow-[#ff6e79]/5 ring-1 ring-[#ff6e79]/10">
+          <MonthGrid date={centerMonth} events={events} />
+        </div>
+        <div className="min-w-[180px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 snap-center bg-white border border-[#ff6e79]/15 rounded-2xl p-3.5 shadow-sm shadow-[#ff6e79]/3">
+          <MonthGrid date={nextMonth} events={events} />
         </div>
       </div>
+
+      {/* Down Chevron (desktop only) */}
+      <button
+        onClick={handleNext}
+        className="hidden lg:flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#ff6e79] hover:text-[#e8604c]"
+        title="Next Month"
+      >
+        <ChevronDown size={20} />
+      </button>
     </div>
   );
 }

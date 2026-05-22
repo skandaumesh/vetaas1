@@ -154,13 +154,13 @@ export default function HeroSection() {
       </div>
 
       {/* Right Column: Image Pane with Dynamic Wavy Divider */}
-      <div className="w-full md:w-[45%] h-[350px] sm:h-[450px] md:h-auto relative z-10 overflow-hidden">
-        {/* Child Photo cropped from finalhero.png (Shifted to object-top to display face and drawing fully) */}
+      <div className="w-full md:w-[45%] h-[420px] sm:h-[520px] md:h-auto relative z-10 overflow-hidden">
+        {/* Child Photo cropped from finalhero.png (Shifted to object-[62%_20%] on mobile to display face and drawing fully) */}
         <Image 
           src="/finalhero.png" 
           alt="Nurturing Hope and Life" 
           fill 
-          className="object-cover object-[62%_0%] md:object-[62%_0%]" 
+          className="object-cover object-[62%_20%] md:object-[62%_0%]" 
           priority
         />
 
@@ -239,7 +239,7 @@ export default function HeroSection() {
           <svg
             viewBox="0 0 600 120"
             preserveAspectRatio="none"
-            className="w-full h-full text-[#1a4895]"
+            className="w-full h-full text-[#faf9f6]"
           >
             <path
               d="M 0,90 C 80,110 160,115 220,105 C 300,90 400,60 480,70 C 520,75 560,95 600,90 L 600,120 L 0,120 Z"
