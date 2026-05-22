@@ -21,7 +21,7 @@ export default function HeroSection() {
 
       {/* Left Column: Content Pane (Uses Left side of finalhero.png for exact background decor & doodles) */}
       <div 
-        className="w-full md:w-[55%] flex flex-col justify-center px-6 sm:px-12 md:pl-20 md:pr-8 lg:pl-28 lg:pr-12 xl:pl-36 xl:pr-16 pt-28 pb-12 md:py-0 relative z-10"
+        className="w-full md:w-[55%] flex flex-col justify-center px-6 sm:px-12 md:pl-20 md:pr-8 lg:pl-28 lg:pr-12 xl:pl-36 xl:pr-16 pt-16 pb-16 md:py-0 relative z-10"
         style={{ fontFamily: 'var(--font-poppins), sans-serif' }}
       >
         {/* Cream background is styled on the parent section */}
@@ -29,7 +29,7 @@ export default function HeroSection() {
         {/* --- Mockup Background Elements --- */}
 
         {/* Paper Airplane with Yellow Dashed Loop - Top Left */}
-        <div className="absolute top-[6%] left-[4%] w-36 h-36 pointer-events-none -z-10">
+        <div className="absolute top-[2%] left-[2%] md:top-[6%] md:left-[4%] w-28 h-28 md:w-36 md:h-36 pointer-events-none -z-10">
           <svg viewBox="0 0 150 150" fill="none" className="w-full h-full">
             {/* Yellow Dashed Loop */}
             <path 
@@ -58,7 +58,7 @@ export default function HeroSection() {
         </div>
 
         {/* Navy Blue Dot Grid (4x3) - Top Right */}
-        <div className="absolute top-[8%] right-[10%] opacity-85 pointer-events-none -z-10">
+        <div className="absolute top-[4%] right-[5%] md:top-[8%] md:right-[10%] opacity-85 pointer-events-none -z-10 scale-75 md:scale-100">
           <svg width="48" height="36" viewBox="0 0 80 60" fill="#1a4895">
             <circle cx="10" cy="10" r="3.5" />
             <circle cx="30" cy="10" r="3.5" />
@@ -76,21 +76,21 @@ export default function HeroSection() {
         </div>
 
         {/* Yellow Sun - Left Boundary */}
-        <div className="absolute top-[60%] left-0 -translate-x-[50%] w-16 h-16 pointer-events-none -z-10">
+        <div className="hidden md:block absolute top-[60%] left-0 -translate-x-[50%] w-16 h-16 pointer-events-none -z-10">
           <svg viewBox="0 0 100 100" fill="#ffd166" className="w-full h-full">
             <circle cx="50" cy="50" r="50" />
           </svg>
         </div>
 
         {/* Blue Zig-zag Line - Bottom Left */}
-        <div className="absolute top-[72%] left-[6%] w-16 h-8 pointer-events-none -z-10">
+        <div className="hidden md:block absolute top-[72%] left-[6%] w-16 h-8 pointer-events-none -z-10">
           <svg viewBox="0 0 80 30" fill="none" stroke="#1a4895" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="w-full h-full">
             <path d="M 0,15 L 12,5 L 24,25 L 36,5 L 48,25 L 60,5 L 72,15" />
           </svg>
         </div>
 
         {/* Coral/Pink Dot Grid (3x3) - Bottom Left */}
-        <div className="absolute bottom-[16%] left-[8%] opacity-85 pointer-events-none -z-10">
+        <div className="hidden md:block absolute bottom-[16%] left-[8%] opacity-85 pointer-events-none -z-10">
           <svg width="36" height="36" viewBox="0 0 60 60" fill="#ff6e79">
             <circle cx="10" cy="10" r="3.5" />
             <circle cx="30" cy="10" r="3.5" />
@@ -105,7 +105,7 @@ export default function HeroSection() {
         </div>
 
         {/* Large Navy Blue Bottom Wave */}
-        <div className="absolute bottom-0 left-0 w-full h-[90px] sm:h-[110px] md:h-[130px] pointer-events-none -z-10">
+        <div className="hidden md:block absolute bottom-0 left-0 w-full h-[90px] sm:h-[110px] md:h-[130px] pointer-events-none -z-10">
           <svg viewBox="0 0 600 120" preserveAspectRatio="none" className="w-full h-full text-[#1a4895]">
             <path 
               d="M 0,90 C 80,110 160,115 220,105 C 300,90 400,60 480,70 C 520,75 560,95 600,90 L 600,120 L 0,120 Z" 
@@ -146,7 +146,7 @@ export default function HeroSection() {
             <Link href="/teachers" className="w-full sm:w-auto bg-[#1a4895] text-white font-semibold text-sm px-8 py-4 rounded-full flex items-center justify-center gap-2 hover:bg-[#153a7a] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
               SEL for Teachers <Zap size={16} fill="currentColor" />
             </Link>
-            <Link href="/services" className="w-full sm:w-auto bg-white text-[#111827] font-semibold text-sm px-8 py-4 rounded-full border border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5">
+            <Link href="/services" className="w-full sm:w-auto bg-white text-[#111827] font-semibold text-sm px-8 py-4 rounded-full border border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center justify-center">
               SEL for Parents
             </Link>
           </div>
@@ -230,6 +230,20 @@ export default function HeroSection() {
               stroke="#ffd166"
               strokeWidth="4"
               strokeLinecap="round"
+            />
+          </svg>
+        </div>
+
+        {/* Mobile Bottom Wave (Sits on the bottom edge of Right pane to mask transition to next section) */}
+        <div className="block md:hidden absolute bottom-0 left-0 w-full h-[50px] z-20 pointer-events-none">
+          <svg
+            viewBox="0 0 600 120"
+            preserveAspectRatio="none"
+            className="w-full h-full text-[#1a4895]"
+          >
+            <path
+              d="M 0,90 C 80,110 160,115 220,105 C 300,90 400,60 480,70 C 520,75 560,95 600,90 L 600,120 L 0,120 Z"
+              fill="currentColor"
             />
           </svg>
         </div>
