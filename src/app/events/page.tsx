@@ -293,79 +293,81 @@ function EventCard({
       {/* Divider top */}
       <div className="h-px bg-gray-100 w-full" />
 
-      <div className={`group flex flex-col sm:flex-row sm:items-center gap-6 py-7 px-4 -mx-4 rounded-3xl cursor-default transition-all duration-500 ${
+      <div className={`group flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6 py-6 sm:py-7 px-4 -mx-4 rounded-3xl cursor-default transition-all duration-500 ${
         isHighlighted ? "bg-[#36ba98]/5 ring-2 ring-[#36ba98]/20" : ""
       }`}>
 
-        {/* Big date numerals */}
-        <div className="shrink-0 w-20 text-center select-none">
-          <p
-            className="font-headline leading-none font-black"
-            style={{
-              fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
-              color: muted ? "#d1d5db" : "#111827",
-              transition: "color 0.3s",
-            }}
-          >
-            {day}
-          </p>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mt-1">
-            {monthStr}
-          </p>
-          <p className="text-[10px] font-medium text-gray-300 mt-0.5">{yearStr}</p>
-        </div>
-
-        {/* Vertical rule */}
-        <div className="hidden sm:block w-px self-stretch bg-gray-100 group-hover:bg-[#36ba98] transition-colors duration-300" />
-
-        {/* Thumbnail (if image exists) */}
-        {event.image && (
-          <div className="hidden sm:block w-16 h-16 rounded-2xl overflow-hidden shrink-0 relative border border-gray-100">
-            <Image
-              src={event.image}
-              alt={event.title}
-              fill
-              className="object-cover group-hover:scale-110 transition-transform duration-500"
-            />
+        {/* Date, Title, Image Row */}
+        <div className="flex items-start sm:items-center gap-4 sm:gap-6 flex-1 min-w-0">
+          {/* Big date numerals */}
+          <div className="shrink-0 w-14 sm:w-20 text-center select-none">
+            <p
+              className="font-headline leading-none font-black text-3xl sm:text-5xl md:text-6xl"
+              style={{
+                color: muted ? "#d1d5db" : "#111827",
+                transition: "color 0.3s",
+              }}
+            >
+              {day}
+            </p>
+            <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mt-1">
+              {monthStr}
+            </p>
+            <p className="text-[9px] sm:text-[10px] font-medium text-gray-300 mt-0.5 sm:mt-1">{yearStr}</p>
           </div>
-        )}
 
-        {/* Details */}
-        <div className="flex-1 min-w-0">
-          {/* Status badge */}
-          <span
-            className={`inline-block text-[9px] font-black uppercase tracking-[0.25em] mb-2 px-2 py-1 rounded-full ${
-              isCompleted
-                ? "bg-gray-100 text-gray-400"
-                : "bg-[#36ba98]/10 text-[#2a9d7e]"
-            }`}
-          >
-            {isCompleted ? "Completed" : "Upcoming"}
-          </span>
+          {/* Vertical rule */}
+          <div className="hidden sm:block w-px self-stretch bg-gray-100 group-hover:bg-[#36ba98] transition-colors duration-300" />
 
-          <h3
-            className="font-headline text-xl md:text-2xl text-[#111827] mb-2 leading-snug truncate group-hover:text-[#36ba98] transition-colors duration-300"
-            title={event.title}
-          >
-            {event.title}
-          </h3>
+          {/* Thumbnail (if image exists) */}
+          {event.image && (
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shrink-0 relative border border-gray-100 sm:order-none order-last ml-auto sm:ml-0">
+              <Image
+                src={event.image}
+                alt={event.title}
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+              />
+            </div>
+          )}
 
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs font-medium text-gray-400">
-            <span className="flex items-center gap-1.5">
-              <Calendar size={13} />
-              {formattedFull}
+          {/* Details */}
+          <div className="flex-1 min-w-0">
+            {/* Status badge */}
+            <span
+              className={`inline-block text-[9px] font-black uppercase tracking-[0.25em] mb-1.5 px-2 py-0.5 rounded-full ${
+                isCompleted
+                  ? "bg-gray-100 text-gray-400"
+                  : "bg-[#36ba98]/10 text-[#2a9d7e]"
+              }`}
+            >
+              {isCompleted ? "Completed" : "Upcoming"}
             </span>
-            {event.location && (
+
+            <h3
+              className="font-headline text-lg sm:text-xl md:text-2xl text-[#111827] mb-1.5 leading-snug group-hover:text-[#36ba98] transition-colors duration-300 line-clamp-2 sm:truncate"
+              title={event.title}
+            >
+              {event.title}
+            </h3>
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:flex-wrap gap-1 sm:gap-x-5 text-xs font-medium text-gray-400">
               <span className="flex items-center gap-1.5">
-                <MapPin size={13} />
-                {event.location}
+                <Calendar size={13} />
+                {formattedFull}
               </span>
-            )}
+              {event.location && (
+                <span className="flex items-center gap-1.5">
+                  <MapPin size={13} />
+                  {event.location}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="shrink-0 flex flex-col items-end gap-2.5">
+        {/* CTA Container */}
+        <div className="flex flex-row items-center justify-between sm:flex-col sm:items-end sm:justify-center gap-3 pt-4 sm:pt-0 border-t border-gray-50 sm:border-t-0 sm:shrink-0">
           {isCompleted ? (
             event.highlightsUrl ? (
               <a
