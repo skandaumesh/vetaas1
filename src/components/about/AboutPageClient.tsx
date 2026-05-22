@@ -7,6 +7,12 @@ import { motion } from "framer-motion";
 import { ArrowRight, Mail, Sparkles, Smile, Sprout, Check, BookOpen, Heart, ChevronRight } from "lucide-react";
 import AboutHero from "@/components/about/AboutHero";
 
+const LinkedinIcon = ({ size = 14 }: { size?: number }) => (
+  <svg width={size} height={size} fill="currentColor" viewBox="0 0 24 24" className="inline-block shrink-0">
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+  </svg>
+);
+
 const TEAM = [
   {
     name: "Sameer Bansal",
@@ -19,8 +25,9 @@ const TEAM = [
     bgHover: "hover:bg-[#45bcf6]/5",
     activeBg: "bg-[#eff6ff]",
     activeBorder: "border-[#45bcf6]/30",
-    image: "/team_sameer.png",
-    roleTags: ["Co-Founder", "Doctor", "Guitarist"]
+    image: "/sameer.webp",
+    roleTags: ["Co-Founder", "Doctor", "Guitarist"],
+    linkedin: "https://www.linkedin.com/in/sameer-bansal-5498a831/?originalSubdomain=in"
   },
   {
     name: "Kirti Krishna",
@@ -33,22 +40,24 @@ const TEAM = [
     bgHover: "hover:bg-[#ff7f68]/5",
     activeBg: "bg-[#fff5f5]",
     activeBorder: "border-[#ff7f68]/30",
-    image: "/team_kirti.png",
-    roleTags: ["Co-Founder", "Teacher Educator", "Esperantist"]
+    image: "/kirti.webp",
+    roleTags: ["Co-Founder", "Teacher Educator", "Esperantist"],
+    linkedin: "https://www.linkedin.com/in/kirti-k-9a1729227/?originalSubdomain=in"
   },
   {
-    name: "Charan",
-    initials: "C",
-    role: "Curriculum developer | Tech support",
-    bio: "I work at the crossroads of education and technology. I love turning big, brainy concepts into fun, interactive experiences that make learning exciting. With a foot in both teaching and tech, I build everything from websites to creative learning tools, all aimed at making things click (sometimes literally).",
+    name: "Tanisha",
+    initials: "T",
+    role: "Social Media Head | OneZeroLabs",
+    bio: "Representing OneZeroLabs, I lead the social media presence and digital campaigns for Vetaas. I specialize in creative storytelling, visual communication, and building interactive online communities to spread awareness about Social Emotional Learning (SEL) in early childhood.",
     gradient: "from-[#36ba98] to-[#1f7860]",
     borderColor: "border-[#36ba98]",
     textColor: "text-[#1f7860]",
     bgHover: "hover:bg-[#36ba98]/5",
     activeBg: "bg-[#f0fdf4]",
     activeBorder: "border-[#36ba98]/30",
-    image: "/team_charan.png",
-    roleTags: ["Curriculum Developer", "Tech Support"]
+    image: "/tanisha.jpeg",
+    roleTags: ["Social Media Head", "OneZeroLabs"],
+    linkedin: "https://www.linkedin.com/in/tanisha-karve/"
   },
 ];
 
@@ -60,66 +69,144 @@ export default function AboutPageClient() {
       
       <AboutHero />
 
-      {/* ── THE FORMULA: BOLD & ICONIC ── */}
-      <section id="formula-section" className="py-24 bg-white relative overflow-hidden rounded-[3rem] mx-6 border border-gray-200">
+      {/* ── THE FORMULA: PREMIUM REDESIGN ── */}
+      <section id="formula-section" className="py-24 bg-[#fafaf9] relative overflow-hidden rounded-[3.5rem] mx-4 md:mx-8 border border-gray-100 shadow-[inset_0_0_80px_rgba(0,0,0,0.01)]">
         
-        {/* Background Grid Pattern */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40" style={{
-          backgroundSize: '30px 30px',
-          backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px)`,
-        }} />
+        {/* Glowing blur background blobs */}
+        <div className="absolute top-[10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-[#36ba98]/4 blur-[100px] pointer-events-none z-0" />
+        <div className="absolute bottom-[10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-[#ff7f68]/4 blur-[100px] pointer-events-none z-0" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#1a4895]/3 blur-[120px] pointer-events-none z-0" />
 
-        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 text-center mb-16 flex flex-col items-center">
-          <div className="inline-flex items-center justify-center bg-[#1a4895] text-white px-4 py-1.5 rounded-full mb-4 shadow-sm rotate-1">
-            <span className="text-xs font-semibold uppercase tracking-wider">The Framework</span>
+        {/* Refined Dot Grid Pattern */}
+        <div 
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.25]"
+          style={{
+            backgroundSize: '40px 40px',
+            backgroundImage: `radial-gradient(circle, #cbd5e1 1.2px, transparent 1.2px)`
+          }}
+        />
+
+        <div className="max-w-4xl mx-auto px-6 relative z-10 text-center mb-16 flex flex-col items-center">
+          <div className="inline-flex items-center gap-2 bg-[#1a4895]/10 text-[#1a4895] px-4.5 py-1.5 rounded-full mb-6 shadow-sm border border-[#1a4895]/5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1a4895] animate-pulse shrink-0" />
+            <span className="text-[10px] font-black uppercase tracking-[0.25em]">The Framework</span>
           </div>
-          <h2 className="text-3xl md:text-5xl lg:text-6xl text-[#111827] font-bold tracking-tight leading-[1.2] mb-5">
-            The Magic <span className="inline-block bg-[#ff7a43] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold">Formula.</span>
+
+          <h2 className="text-4xl md:text-5xl lg:text-6xl text-[#111827] font-extrabold tracking-tight leading-[1.15] mb-6">
+            The Magic{" "}
+            <span className="relative inline-block px-5 py-1.5 ml-1">
+              {/* Slanted backdrop badge */}
+              <span className="absolute inset-0 bg-gradient-to-r from-[#ff7a43] to-[#ff9800] rounded-2xl -rotate-1 shadow-md shadow-orange-500/10" />
+              <span className="relative text-white font-serif italic font-medium">Formula.</span>
+            </span>
           </h2>
           
-          <div className="max-w-3xl mx-auto space-y-4 text-base md:text-lg font-medium text-gray-600 leading-relaxed">
-            <p>
+          <div className="max-w-2xl mx-auto">
+            <p className="text-gray-500 font-semibold text-base md:text-lg leading-relaxed">
               Social Emotional Learning (SEL) is the most progressive framework we have to perceive education holistically.
             </p>
-            <p className="text-[#36ba98] font-bold">
+            <div className="w-12 h-1 bg-[#36ba98]/40 rounded-full mx-auto my-6" />
+            <p className="text-[#36ba98] font-extrabold text-lg md:text-xl tracking-tight leading-relaxed max-w-lg mx-auto">
               And what best time to embrace this framework than early childhood education?
             </p>
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto px-6 grid md:grid-cols-2 gap-8 relative z-10">
+        <div className="max-w-5xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 relative z-10">
           
           {/* Card 1: Reimagining */}
           <motion.div 
-            whileHover={{ y: -6, scale: 1.02 }}
+            whileHover={{ y: -8, scale: 1.01 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="p-8 md:p-10 bg-[#fbfdfa] rounded-[2.5rem] border border-[#36ba98]/10 shadow-[0_15px_30px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-300 relative -rotate-1 flex flex-col justify-between"
+            className="group relative p-8 md:p-10 bg-white/70 backdrop-blur-md rounded-[3rem] border border-[#36ba98]/10 shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-xl hover:shadow-[#36ba98]/5 hover:border-[#36ba98]/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
+            {/* Subtle card accent pattern */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#36ba98]/5 to-transparent rounded-bl-full pointer-events-none" />
+
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-[#eefcf7] flex items-center justify-center text-[#36ba98] mb-6">
-                <Sparkles size={24} />
+              <div className="flex justify-between items-start mb-8">
+                {/* Icon wrapper */}
+                <div className="w-16 h-16 rounded-[1.5rem] bg-[#eefcf7] flex items-center justify-center text-[#36ba98] shadow-inner relative group-hover:scale-105 transition-transform duration-300">
+                  <Sparkles size={26} className="transition-transform duration-700 group-hover:rotate-45" />
+                </div>
+                
+                {/* Badge */}
+                <span className="bg-[#36ba98]/10 text-[#2a9d7e] text-[9px] font-black uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-full border border-[#36ba98]/5 shadow-sm">
+                  Curriculum
+                </span>
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-[#36ba98]">Reimagining</h3>
-              <p className="text-gray-500 font-medium leading-relaxed text-sm md:text-base">
+
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 tracking-tight group-hover:text-[#36ba98] transition-colors duration-300">
+                Reimagining
+              </h3>
+              
+              <p className="text-gray-500 font-semibold leading-relaxed text-sm md:text-base mb-8">
                 Vetaas strives to reimagine the early childhood education curriculum from the lens of SEL.
               </p>
+
+              {/* Checklist details */}
+              <ul className="space-y-3.5 border-t border-dashed border-gray-100 pt-6">
+                {[
+                  "Social-emotional framework integration",
+                  "Age-appropriate ECE learning journeys",
+                  "Holistic milestones and growth mapping"
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-[#36ba98]/10 flex items-center justify-center text-[#36ba98] shrink-0 mt-0.5">
+                      <Check size={12} strokeWidth={3} />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-600">{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </motion.div>
           
           {/* Card 2: Empowering */}
           <motion.div 
-            whileHover={{ y: -6, scale: 1.02 }}
+            whileHover={{ y: -8, scale: 1.01 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="p-8 md:p-10 bg-[#fffbfa] rounded-[2.5rem] border border-[#ff7f68]/10 shadow-[0_15px_30px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-300 relative rotate-1 flex flex-col justify-between"
+            className="group relative p-8 md:p-10 bg-white/70 backdrop-blur-md rounded-[3rem] border border-[#ff7f68]/10 shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-xl hover:shadow-[#ff7f68]/5 hover:border-[#ff7f68]/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
+            {/* Subtle card accent pattern */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#ff7f68]/5 to-transparent rounded-bl-full pointer-events-none" />
+
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-[#fff0f1] flex items-center justify-center text-[#ff7f68] mb-6">
-                <Smile size={24} />
+              <div className="flex justify-between items-start mb-8">
+                {/* Icon wrapper */}
+                <div className="w-16 h-16 rounded-[1.5rem] bg-[#fff0f1] flex items-center justify-center text-[#ff7f68] shadow-inner relative group-hover:scale-105 transition-transform duration-300">
+                  <Smile size={26} className="transition-transform duration-500 group-hover:scale-110" />
+                </div>
+
+                {/* Badge */}
+                <span className="bg-[#ff7f68]/10 text-[#ff7f68] text-[9px] font-black uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-full border border-[#ff7f68]/5 shadow-sm">
+                  Enablement
+                </span>
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-[#ff7f68]">Empowering</h3>
-              <p className="text-gray-500 font-medium leading-relaxed text-sm md:text-base">
+
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 tracking-tight group-hover:text-[#ff7f68] transition-colors duration-300">
+                Empowering
+              </h3>
+              
+              <p className="text-gray-500 font-semibold leading-relaxed text-sm md:text-base mb-8">
                 Empowering teachers and parents with skills, knowledge and perspectives for their journeys.
               </p>
+
+              {/* Checklist details */}
+              <ul className="space-y-3.5 border-t border-dashed border-gray-100 pt-6">
+                {[
+                  "SEL 101 course for educators' capacity",
+                  "Playful parenting workshop frameworks",
+                  "Dedicated parent & school support groups"
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-[#ff7f68]/10 flex items-center justify-center text-[#ff7f68] shrink-0 mt-0.5">
+                      <Check size={12} strokeWidth={3} />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-600">{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </motion.div>
 
@@ -367,12 +454,14 @@ export default function AboutPageClient() {
                             {member.bio}
                           </p>
 
-                          <Link 
-                            href="/contact" 
+                          <a 
+                            href={member.linkedin} 
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className={`inline-flex items-center gap-2 font-bold text-xs uppercase tracking-wider ${member.textColor} hover:gap-3 transition-all pb-1 border-b-2 border-transparent hover:border-current`}
                           >
-                            Let&apos;s Connect <Mail size={14} />
-                          </Link>
+                            Let&apos;s Connect <LinkedinIcon size={14} />
+                          </a>
                         </div>
 
                       </div>

@@ -36,7 +36,7 @@ export default function OfferingsSection() {
         "SEL for teachers' wellbeing.",
         "Creating a SEL-supportive classroom environment."
       ],
-      link: "/teachers",
+      link: "/services",
       marginTop: "mt-0", 
     },
     {

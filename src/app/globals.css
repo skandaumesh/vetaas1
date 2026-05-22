@@ -16,12 +16,12 @@
   --font-playfair: var(--font-playfair), serif;
 
   /* Header height fallbacks (Navbar + EventBanner) */
-  --header-height: 122px;
+  --header-height: 106px;
 }
 
 @media (max-width: 1023px) {
   :root {
-    --header-height: 104px;
+    --header-height: 96px;
   }
 }
 

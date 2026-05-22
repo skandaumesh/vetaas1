@@ -10,9 +10,7 @@ import { Menu, X } from "lucide-react";
 const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Products", href: "/products" },
   { label: "Services", href: "/services" },
-  { label: "Teachers", href: "/teachers" },
   { label: "Events", href: "/events" },
   { label: "Contact", href: "/contact" },
 ];
@@ -28,7 +26,7 @@ export default function Navbar() {
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className="w-full bg-white/70 backdrop-blur-lg border-b border-white/20"
     >
-      <div className="w-full max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 h-16 md:h-20 flex items-center justify-between">
+      <div className="w-full max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 h-14 md:h-16 flex items-center justify-between">
 
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0 relative z-10">
@@ -37,20 +35,20 @@ export default function Navbar() {
             alt="Vetaas — The Tree of Hope"
             width={60}
             height={60}
-            className="object-contain w-10 md:w-12 lg:w-14 h-auto"
+            className="object-contain w-9 md:w-11 lg:w-12 h-auto"
             priority
           />
         </Link>
 
         {/* Desktop Links — Right aligned */}
-        <nav className="hidden lg:flex items-center gap-14">
+        <nav className="hidden lg:flex items-center gap-10">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-[1.25rem] font-semibold transition-colors ${
+                className={`text-base lg:text-[1.1rem] font-semibold transition-colors ${
                   isActive
                     ? "text-[#0CB0D8]"
                     : "text-[#111827] hover:text-[#0CB0D8]"

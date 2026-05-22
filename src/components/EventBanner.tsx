@@ -92,12 +92,12 @@ export default function EventBanner() {
           className="overflow-hidden w-full z-[60] relative"
           style={{ fontFamily: "var(--font-poppins), sans-serif" }}
         >
-          <div className="bg-[#e8604c] w-full px-4 py-2.5 flex items-center justify-center gap-3 relative">
+          <div className="bg-[#e8604c] w-full pl-4 pr-11 sm:px-6 py-2.5 flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 sm:gap-3 relative">
             {/* Calendar icon */}
             <Calendar size={14} className="text-white/80 shrink-0" />
 
             {/* Text */}
-            <p className="text-white text-sm font-semibold text-center leading-tight">
+            <p className="text-white text-xs sm:text-sm font-semibold text-center leading-tight">
               {event.date && (
                 <span className="opacity-75 mr-2">
                   {formatShortDate(event.date)} ·
@@ -124,14 +124,14 @@ export default function EventBanner() {
                   href={event.registrationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block bg-[#ffd166] text-[#111827] text-xs font-black uppercase tracking-wide px-4 py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap"
+                  className="block bg-[#ffd166] text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap"
                 >
                   Register Now
                 </a>
               ) : (
                 <Link
                   href={event.id === "fallback" ? `/contact?event=${encodeURIComponent(event.title)}` : `/events#${event.id}`}
-                  className="block bg-[#ffd166] text-[#111827] text-xs font-black uppercase tracking-wide px-4 py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap"
+                  className="block bg-[#ffd166] text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap"
                 >
                   Register Now
                 </Link>
@@ -142,7 +142,7 @@ export default function EventBanner() {
             <button
               onClick={handleDismiss}
               aria-label="Dismiss banner"
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors p-1"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-1.5 cursor-pointer shrink-0"
             >
               <X size={15} />
             </button>

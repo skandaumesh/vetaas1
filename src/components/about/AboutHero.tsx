@@ -124,7 +124,7 @@ export default function AboutHero() {
               className="relative w-full h-full p-4 flex items-center justify-center"
             >
               <Image
-                src="/about_hero_tree.png"
+                src="/about.png"
                 alt="Vetaas - The Tree of Hope Illustration"
                 width={420}
                 height={420}

@@ -47,8 +47,8 @@ export default function Footer() {
             <ul className="space-y-4">
               {[
                 { label: "Home", href: "/" },
-                { label: "Products", href: "/products" },
                 { label: "Services", href: "/services" },
+                { label: "Events", href: "/events" },
                 { label: "Contact", href: "/contact" },
               ].map((link) => (
                 <li key={link.href}>
@@ -64,8 +64,8 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-3">
             <h3 className="text-sm font-bold uppercase tracking-widest text-[#4285F4] mb-6">Programs</h3>
             <ul className="space-y-4">
-              <li><Link href="/products" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">SEL Curriculum</Link></li>
-              <li><Link href="/products" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">Parent Toolkits</Link></li>
+              <li><Link href="/services" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">SEL Curriculum</Link></li>
+              <li><Link href="/services" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">Parent Toolkits</Link></li>
               <li><Link href="/services" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">Teacher Training</Link></li>
               <li><Link href="/services" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">School Partnerships</Link></li>
             </ul>

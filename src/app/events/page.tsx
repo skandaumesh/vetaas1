@@ -39,10 +39,10 @@ export default function EventsPage() {
           }
         }, 100);
 
-        // Auto clear highlight after 3 seconds
+        // Auto clear highlight after 8 seconds (longer duration so it attracts and is readable)
         const timer = setTimeout(() => {
           setHighlightedId(null);
-        }, 3000);
+        }, 8000);
         return () => clearTimeout(timer);
       }
     };
@@ -320,10 +320,23 @@ function EventCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full h-full"
+      className="w-full h-full relative"
+      animate={isHighlighted ? {
+        scale: [1, 1.04, 1.02],
+        y: -6,
+      } : { scale: 1, y: 0 }}
     >
-      <div className={`group flex flex-col h-full p-5 rounded-3xl border border-[#36ba98]/25 shadow-[0_4px_20px_rgba(54,186,152,0.03)] bg-gradient-to-br from-white to-[#36ba98]/5 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#36ba98]/5 hover:border-[#36ba98]/40 ${
-        isHighlighted ? "ring-2 ring-[#36ba98]/40 shadow-lg shadow-[#36ba98]/5 bg-[#36ba98]/5 border-[#36ba98]/30" : ""
+      {/* Floating Highlight Badge */}
+      {isHighlighted && (
+        <div className="absolute -top-3 -right-2 z-30 flex items-center gap-1.5 bg-[#ff7f68] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-lg shadow-[#ff7f68]/30 border-2 border-white animate-pulse">
+          <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+          Selected Event
+        </div>
+      )}
+      <div className={`group flex flex-col h-full p-5 rounded-3xl border transition-all duration-500 hover:-translate-y-1 hover:shadow-xl ${
+        isHighlighted
+          ? "ring-4 ring-[#ff7f68] border-[#ff7f68] bg-gradient-to-br from-white to-[#ff7f68]/5 shadow-[0_15px_40px_rgba(255,127,104,0.3)]"
+          : "border-[#36ba98]/25 bg-gradient-to-br from-white to-[#36ba98]/5 shadow-[0_4px_20px_rgba(54,186,152,0.03)] hover:border-[#36ba98]/40"
       }`}>
         {/* Card Image */}
         {event.image && (
@@ -462,82 +475,94 @@ function MemoryCard({
         delay: index * 0.06,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className={`group relative rounded-2xl overflow-hidden cursor-default transition-all duration-500 ${
-        isHighlighted ? "ring-2 ring-[#36ba98]/40 shadow-lg shadow-[#36ba98]/10" : ""
-      }`}
+      className="w-full h-full relative"
+      animate={isHighlighted ? {
+        scale: [1, 1.04, 1.02],
+        y: -6,
+      } : { scale: 1, y: 0 }}
     >
-      {/* Image background */}
-      <div className="relative w-full h-72 sm:h-80 bg-gray-100">
-        {event.image ? (
-          <Image
-            src={event.image}
-            alt={event.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-100 flex items-center justify-center">
-            <Calendar size={40} className="text-gray-300" />
+      {/* Floating Highlight Badge */}
+      {isHighlighted && (
+        <div className="absolute -top-3 -right-2 z-30 flex items-center gap-1.5 bg-[#ff7f68] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-lg shadow-[#ff7f68]/30 border-2 border-white animate-pulse">
+          <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+          Selected Event
+        </div>
+      )}
+      <div className={`group flex flex-col h-full p-5 rounded-3xl border transition-all duration-500 hover:-translate-y-1 hover:shadow-xl ${
+        isHighlighted
+          ? "ring-4 ring-[#ff7f68] border-[#ff7f68] bg-gradient-to-br from-white to-[#ff7f68]/5 shadow-[0_15px_40px_rgba(255,127,104,0.3)]"
+          : "border-gray-200/60 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-gray-300"
+      }`}>
+        {/* Card Image */}
+        <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0">
+          {event.image ? (
+            <Image
+              src={event.image}
+              alt={event.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
+              <Calendar size={32} className="text-gray-300" />
+            </div>
+          )}
+
+          {/* Date badge */}
+          <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1 text-center shadow-sm">
+            <p className="font-headline text-base font-bold text-[#111827] leading-none">
+              {day}
+            </p>
+            <p className="text-[7px] font-black uppercase tracking-[0.1em] text-[#36ba98] mt-0.5">
+              {monthStr}
+            </p>
+            <p className="text-[6px] font-semibold text-gray-400 mt-0.5">
+              {yearStr}
+            </p>
           </div>
-        )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-        {/* Date badge */}
-        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1.5 text-center shadow-sm">
-          <p className="font-headline text-lg font-bold text-[#111827] leading-none">
-            {day}
-          </p>
-          <p className="text-[7px] font-black uppercase tracking-[0.1em] text-[#36ba98] mt-0.5">
-            {monthStr}
-          </p>
-          <p className="text-[7px] font-medium text-gray-400 leading-none">
-            {yearStr}
-          </p>
+          {/* Completed badge */}
+          <div className="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm rounded-full px-2.5 py-0.5">
+            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/90">
+              Completed
+            </span>
+          </div>
         </div>
 
-        {/* Completed badge */}
-        <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-sm rounded-full px-3 py-1">
-          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/80">
-            Completed
-          </span>
-        </div>
-
-        {/* Bottom content overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h3 className="font-headline text-lg sm:text-xl text-white font-bold leading-snug mb-1.5 line-clamp-2 group-hover:text-[#7ddfc3] transition-colors duration-300">
+        {/* Card Body */}
+        <div className="flex-1 flex flex-col">
+          <h3 className="font-headline text-base sm:text-lg text-[#111827] font-bold leading-snug mb-2 line-clamp-2 group-hover:text-[#36ba98] transition-colors duration-300">
             {event.title}
           </h3>
 
-          <div className="flex items-center gap-3 text-white/70 text-[11px] font-medium mb-3">
-            <span className="flex items-center gap-1">
-              <Calendar size={11} />
-              {formattedFull}
-            </span>
+          <div className="mt-auto flex flex-col gap-1.5 text-[11px] font-medium text-gray-500">
             {event.location && (
-              <span className="flex items-center gap-1">
-                <MapPin size={11} />
-                <span className="truncate max-w-[140px]">{event.location}</span>
+              <span className="flex items-center gap-1.5">
+                <MapPin size={11} className="text-gray-400 shrink-0" />
+                <span className="truncate">{event.location}</span>
               </span>
             )}
+            <span className="flex items-center gap-1.5">
+              <Calendar size={11} className="text-gray-400 shrink-0" />
+              <span className="truncate">{formattedFull}</span>
+            </span>
           </div>
+        </div>
 
-          {/* Action row */}
-          <div className="flex items-center gap-3">
-            {event.highlightsUrl ? (
-              <a
-                href={event.highlightsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-white bg-white/15 backdrop-blur-sm hover:bg-white/25 rounded-full px-4 py-2 transition-all duration-200"
-              >
-                Highlights <ExternalLink size={10} />
-              </a>
-            ) : null}
-            <ShareButton event={event} variant="dark" />
-          </div>
+        {/* Action row */}
+        <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between shrink-0">
+          {event.highlightsUrl ? (
+            <a
+              href={event.highlightsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#111827] border-b border-[#111827] pb-0.5 hover:text-[#36ba98] hover:border-[#36ba98] transition-colors"
+            >
+              Highlights <ExternalLink size={10} />
+            </a>
+          ) : <div />}
+          <ShareButton event={event} variant="light" />
         </div>
       </div>
     </motion.div>
@@ -576,24 +601,53 @@ function MonthGrid({ date, events }: { date: Date; events: any[] }) {
     cells.push(<div key={`empty-${i}`} />);
   }
   for (let i = 1; i <= daysInMonth; i++) {
-    const isActive = activeDays.includes(i);
+    const dayEvents = events.filter((event) => {
+      try {
+        const d = new Date(event.date);
+        return d.getFullYear() === year && d.getMonth() === month && d.getDate() === i;
+      } catch (e) {
+        return false;
+      }
+    });
+    
+    const isActive = dayEvents.length > 0;
     const isToday = isCurrentMonth && i === todayDay;
 
+    const handleDayClick = (e: React.MouseEvent) => {
+      if (isActive && dayEvents[0]?.id) {
+        e.preventDefault();
+        const id = dayEvents[0].id;
+        window.location.hash = id;
+        
+        // Scroll to element
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+    };
+
     cells.push(
-      <div
-        key={`day-${i}`}
-        className={`
-          flex items-center justify-center w-[22px] h-[22px] mx-auto rounded-full text-[10px] font-bold transition-all duration-200
-          ${isActive ? "bg-[#ffd166] text-[#111827] shadow-sm font-black" : ""}
-          ${isToday && !isActive ? "ring-[1px] ring-[#ff6e79] text-[#111827]" : ""}
-          ${!isActive && !isToday ? "text-gray-700 hover:bg-black/5" : ""}
-        `}
-      >
-        {i}
-        {isActive && (
-          <span className="sr-only"> (event)</span>
-        )}
-      </div>
+      isActive && dayEvents[0] ? (
+        <button
+          key={`day-${i}`}
+          onClick={handleDayClick}
+          title={`Click to view: ${dayEvents[0].title}`}
+          className="flex items-center justify-center w-[22px] h-[22px] mx-auto rounded-full text-[10px] font-black transition-all duration-200 bg-[#ffd166] text-[#111827] shadow-sm hover:scale-125 hover:shadow-md cursor-pointer border border-[#ffd166] outline-none"
+        >
+          {i}
+        </button>
+      ) : (
+        <div
+          key={`day-${i}`}
+          className={`
+            flex items-center justify-center w-[22px] h-[22px] mx-auto rounded-full text-[10px] font-bold transition-all duration-200
+            ${isToday ? "ring-[1px] ring-[#ff6e79] text-[#111827]" : "text-gray-700 hover:bg-black/5"}
+          `}
+        >
+          {i}
+        </div>
+      )
     );
   }
 

@@ -1,9 +1,22 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { X } from "lucide-react";
 
-const TESTIMONIALS = [
+interface Testimonial {
+  quote: string;
+  name: string;
+  role: string;
+  color: string;
+  textColor: string;
+  pColor: string;
+  roleColor: string;
+  image: string;
+}
+
+const TESTIMONIALS: Testimonial[] = [
   {
     quote: "Kavita ma’am’s session provided valuable insights into recognising and managing our emotions in specific moments. I learned more about the crucial role emotions play in our daily lives.",
     name: "Afrin Maqsood",
@@ -57,8 +70,11 @@ const TESTIMONIALS = [
 ];
 
 export default function TestimonialsSection() {
+  const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
+  
   // Two sets for seamless infinite loop
   const marqueeItems = [...TESTIMONIALS, ...TESTIMONIALS];
+  const MAX_LENGTH = 130;
 
   return (
     <section 
@@ -69,11 +85,11 @@ export default function TestimonialsSection() {
       <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-[#ff6e79]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
       <div className="absolute top-[-5%] left-[-8%] w-[400px] h-[400px] rounded-full bg-[#4285F4]/4 blur-[110px] animate-pulse-slow pointer-events-none z-0" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[350px] h-[350px] rounded-full bg-[#36ba98]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
-
+ 
       {/* Morphing organic blobs */}
       <div className="absolute top-[15%] right-[8%] w-[220px] h-[220px] bg-gradient-to-br from-[#ff6e79]/6 to-[#ffd166]/5 animate-morph pointer-events-none z-0 blur-[50px]" />
       <div className="absolute bottom-[10%] left-[5%] w-[260px] h-[260px] bg-gradient-to-tr from-[#4285F4]/6 to-[#36ba98]/5 animate-morph pointer-events-none z-0 blur-[55px]" style={{ animationDelay: '-6s' }} />
-
+ 
       {/* Drifting geometric rings */}
       <div className="absolute top-[8%] left-[12%] w-[100px] h-[100px] rounded-full border-2 border-[#ff6e79]/8 animate-drift pointer-events-none z-0" />
       <div className="absolute bottom-[20%] right-[15%] w-[70px] h-[70px] rounded-full border-2 border-[#36ba98]/10 animate-drift-reverse pointer-events-none z-0" />
@@ -115,7 +131,7 @@ export default function TestimonialsSection() {
           <circle cx="800" cy="50" r="25" stroke="#36ba98" strokeWidth="1.5" opacity="0.05" />
         </svg>
       </div>
-
+ 
       <div className="max-w-[1400px] mx-auto px-6 mb-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -131,49 +147,151 @@ export default function TestimonialsSection() {
           </h2>
         </motion.div>
       </div>
-
+ 
       {/* Marquee Wrapper */}
       <div className="relative overflow-hidden py-10 z-10 select-none w-full">
         <div className="flex flex-row gap-10 px-5 w-max flex-shrink-0 animate-marquee">
-          {marqueeItems.map((item, i) => (
-            <motion.div 
-              key={i}
-              whileHover={{ y: -5, scale: 1.02 }}
-              className={`relative flex-shrink-0 w-[290px] sm:w-[420px] md:w-[500px] lg:w-[550px] xl:w-[600px] ${item.color} border-2 border-black rounded-[2rem] p-6 sm:p-8 md:p-10 flex flex-col shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] group select-none transition-all duration-300`}
+          {marqueeItems.map((item, i) => {
+            const isLong = item.quote.length > MAX_LENGTH;
+            const displayQuote = isLong ? `“${item.quote.slice(0, MAX_LENGTH)}...”` : `“${item.quote}”`;
+            
+            return (
+              <motion.div 
+                key={i}
+                whileHover={{ y: -5, scale: 1.02 }}
+                className={`relative flex-shrink-0 w-[290px] sm:w-[420px] md:w-[460px] lg:w-[480px] min-h-[250px] sm:min-h-0 ${item.color} border-2 border-black rounded-[2rem] p-6 sm:p-8 flex flex-col shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] group transition-all duration-300`}
+              >
+                <div className="relative z-20 flex flex-col h-full justify-between gap-4">
+                  
+                  {/* Header: Avatar + Info */}
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-black flex-shrink-0 bg-white shadow-sm">
+                      <Image 
+                        src={item.image} 
+                        alt={item.name} 
+                        fill 
+                        className="object-cover object-center scale-[1.15]" 
+                        draggable={false}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`text-lg sm:text-lg md:text-xl font-bold ${item.textColor} leading-tight tracking-tight mb-0.5 truncate`}>
+                        {item.name}
+                      </h3>
+                      <div className={`${item.roleColor} text-[10px] md:text-[11px] font-bold uppercase tracking-widest leading-snug truncate`}>
+                        {item.role}
+                      </div>
+                    </div>
+                  </div>
+ 
+                  {/* Quote & Button */}
+                  <div className="flex flex-col flex-1 justify-between">
+                    {/* Mobile version (truncated) */}
+                    <div className="block sm:hidden flex flex-col flex-1 justify-between">
+                      <p className={`${item.pColor} text-base font-medium leading-relaxed italic`}>
+                        {displayQuote}
+                      </p>
+                      {isLong && (
+                        <button
+                          onClick={() => setSelectedTestimonial(item)}
+                          className="mt-3 text-xs font-black text-[#36ba98] hover:text-[#2d9e81] transition-colors flex items-center gap-1 cursor-pointer self-start"
+                        >
+                          Read More <span>→</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Desktop version (full text) */}
+                    <div className="hidden sm:block">
+                      <p className={`${item.pColor} text-base md:text-lg font-medium leading-relaxed italic`}>
+                        “{item.quote}”
+                      </p>
+                    </div>
+                  </div>
+                  
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Testimonial Detail Modal */}
+      <AnimatePresence>
+        {selectedTestimonial && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedTestimonial(null)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.4 }}
+              className="relative bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 p-8 md:p-10 w-full max-w-xl overflow-hidden z-10"
             >
-              <div className="relative z-20 pointer-events-none flex flex-col h-full justify-between gap-6">
-                
+              {/* Top Accent Gradient Border */}
+              <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#ff6e79] to-[#36ba98]" />
+              
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedTestimonial(null)}
+                className="absolute top-5 right-5 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex flex-col gap-6 font-body">
                 {/* Header: Avatar + Info */}
-                <div className="flex items-center gap-5">
-                  <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-black flex-shrink-0 bg-white shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-black bg-white shadow-sm shrink-0">
                     <Image 
-                      src={item.image} 
-                      alt={item.name} 
-                      fill 
+                      src={selectedTestimonial.image} 
+                      alt={selectedTestimonial.name} 
+                      fill
                       className="object-cover object-center scale-[1.15]" 
                       draggable={false}
                     />
                   </div>
-                  <div className="flex-1">
-                    <h3 className={`text-xl md:text-2xl font-bold ${item.textColor} leading-tight tracking-tight mb-1`}>
-                      {item.name}
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
+                      {selectedTestimonial.name}
                     </h3>
-                    <div className={`${item.roleColor} text-[11px] md:text-xs font-bold uppercase tracking-widest leading-snug`}>
-                      {item.role}
+                    <div className="text-[#36ba98] text-xs font-bold uppercase tracking-widest mt-1">
+                      {selectedTestimonial.role}
                     </div>
                   </div>
                 </div>
 
                 {/* Quote */}
-                <p className={`${item.pColor} text-lg md:text-xl font-medium leading-relaxed italic`}>
-                  "{item.quote}"
-                </p>
+                <div className="relative mt-2">
+                  <span className="absolute -top-8 -left-4 text-7xl text-gray-100 font-serif leading-none select-none">“</span>
+                  <p className="text-gray-700 text-lg md:text-xl font-medium leading-relaxed italic relative z-10 pr-2">
+                    {selectedTestimonial.quote}
+                  </p>
+                  <span className="absolute -bottom-10 right-2 text-7xl text-gray-100 font-serif leading-none select-none">”</span>
+                </div>
                 
+                {/* OK Button */}
+                <button
+                  onClick={() => setSelectedTestimonial(null)}
+                  className="mt-6 py-3 px-6 bg-[#36ba98] hover:bg-[#2d9e81] text-white font-bold rounded-xl transition shadow-lg shadow-teal-500/10 cursor-pointer self-end"
+                >
+                  Close
+                </button>
               </div>
             </motion.div>
-          ))}
-        </div>
-      </div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
+
