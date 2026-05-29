@@ -63,20 +63,20 @@ export default function WhySELSection() {
       style={{ fontFamily: 'var(--font-poppins), sans-serif' }}
     >
       {/* Background Decor — Layered Premium */}
-      <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#00CDBA]/5 blur-[120px] animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute bottom-[10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-[#FFC107]/5 blur-[130px] animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#00CDBA]/5 blur-[120px] md:animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute bottom-[10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-[#FFC107]/5 blur-[130px] md:animate-pulse-slow pointer-events-none z-0" />
 
       {/* Morphing organic blob — top right */}
-      <div className="absolute top-[5%] right-[5%] w-[280px] h-[280px] bg-gradient-to-br from-[#00CDBA]/8 to-[#1E90FF]/6 animate-morph pointer-events-none z-0 blur-[60px]" />
+      <div className="absolute top-[5%] right-[5%] w-[280px] h-[280px] bg-gradient-to-br from-[#00CDBA]/8 to-[#1E90FF]/6 md:animate-morph pointer-events-none z-0 blur-[60px]" />
       {/* Morphing organic blob — bottom left */}
-      <div className="absolute bottom-[8%] left-[3%] w-[320px] h-[320px] bg-gradient-to-tr from-[#FFC107]/8 to-[#ff7a43]/6 animate-morph pointer-events-none z-0 blur-[70px]" style={{ animationDelay: '-4s' }} />
+      <div className="absolute bottom-[8%] left-[3%] w-[320px] h-[320px] bg-gradient-to-tr from-[#FFC107]/8 to-[#ff7a43]/6 md:animate-morph pointer-events-none z-0 blur-[70px]" style={{ animationDelay: '-4s' }} />
 
       {/* Drifting geometric ring accent — top left */}
-      <div className="absolute top-[12%] left-[8%] w-[120px] h-[120px] rounded-full border-2 border-[#00CDBA]/10 animate-drift pointer-events-none z-0" />
+      <div className="absolute top-[12%] left-[8%] w-[120px] h-[120px] rounded-full border-2 border-[#00CDBA]/10 md:animate-drift pointer-events-none z-0" />
       {/* Drifting geometric ring accent — bottom right */}
-      <div className="absolute bottom-[15%] right-[10%] w-[90px] h-[90px] rounded-full border-2 border-[#FFC107]/12 animate-drift-reverse pointer-events-none z-0" />
+      <div className="absolute bottom-[15%] right-[10%] w-[90px] h-[90px] rounded-full border-2 border-[#FFC107]/12 md:animate-drift-reverse pointer-events-none z-0" />
       {/* Small orbiting dot */}
-      <div className="absolute top-[30%] right-[20%] w-[10px] h-[10px] rounded-full bg-[#1E90FF]/15 animate-orbit pointer-events-none z-0" />
+      <div className="absolute top-[30%] right-[20%] w-[10px] h-[10px] rounded-full bg-[#1E90FF]/15 md:animate-orbit pointer-events-none z-0" />
 
       {/* Layered SVG journey lines */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -144,21 +144,21 @@ export default function WhySELSection() {
             <div className="w-full h-full bg-gradient-to-b from-[#00CDBA]/15 via-[#1E90FF]/12 to-[#FFC107]/15 rounded-full" />
           </div>
 
-          {/* Mobile-only floating accents scattered between card positions */}
-          <div className="absolute left-[10%] top-[12%] w-[40px] h-[40px] rounded-full border-2 border-[#00CDBA]/15 animate-drift pointer-events-none z-[1] md:hidden" />
-          <div className="absolute right-[8%] top-[25%] w-[28px] h-[28px] rounded-full bg-gradient-to-br from-[#1E90FF]/12 to-[#00CDBA]/8 animate-float pointer-events-none z-[1] md:hidden" />
-          <div className="absolute left-[5%] top-[40%] w-[22px] h-[22px] rounded-full border border-[#ff7a43]/15 animate-drift-reverse pointer-events-none z-[1] md:hidden" />
-          <div className="absolute right-[12%] top-[55%] w-[35px] h-[35px] rounded-full border-2 border-[#FFC107]/15 animate-drift pointer-events-none z-[1] md:hidden" />
-          <div className="absolute left-[8%] top-[70%] w-[18px] h-[18px] rounded-full bg-gradient-to-br from-[#ff7a43]/10 to-[#FF5C7A]/8 animate-float-reverse pointer-events-none z-[1] md:hidden" />
-          <div className="absolute right-[6%] top-[85%] w-[30px] h-[30px] rounded-full border border-[#7C3AED]/12 animate-drift-reverse pointer-events-none z-[1] md:hidden" />
+          {/* Mobile-only floating accents scattered between card positions (stationary on mobile for performance) */}
+          <div className="absolute left-[10%] top-[12%] w-[40px] h-[40px] rounded-full border-2 border-[#00CDBA]/15 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute right-[8%] top-[25%] w-[28px] h-[28px] rounded-full bg-gradient-to-br from-[#1E90FF]/12 to-[#00CDBA]/8 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute left-[5%] top-[40%] w-[22px] h-[22px] rounded-full border border-[#ff7a43]/15 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute right-[12%] top-[55%] w-[35px] h-[35px] rounded-full border-2 border-[#FFC107]/15 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute left-[8%] top-[70%] w-[18px] h-[18px] rounded-full bg-gradient-to-br from-[#ff7a43]/10 to-[#FF5C7A]/8 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute right-[6%] top-[85%] w-[30px] h-[30px] rounded-full border border-[#7C3AED]/12 pointer-events-none z-[1] md:hidden" />
 
-          {/* Mobile-only small dots — scattered like confetti */}
-          <div className="absolute left-[18%] top-[8%] w-[8px] h-[8px] rounded-full bg-[#00CDBA]/20 animate-pulse-slow pointer-events-none z-[1] md:hidden" />
-          <div className="absolute right-[20%] top-[18%] w-[6px] h-[6px] rounded-full bg-[#1E90FF]/18 animate-pulse-slow pointer-events-none z-[1] md:hidden" style={{ animationDelay: '-2s' }} />
-          <div className="absolute left-[15%] top-[35%] w-[10px] h-[10px] rounded-full bg-[#ff7a43]/15 animate-pulse-slow pointer-events-none z-[1] md:hidden" style={{ animationDelay: '-4s' }} />
-          <div className="absolute right-[15%] top-[48%] w-[7px] h-[7px] rounded-full bg-[#FFC107]/20 animate-pulse-slow pointer-events-none z-[1] md:hidden" style={{ animationDelay: '-3s' }} />
-          <div className="absolute left-[20%] top-[62%] w-[9px] h-[9px] rounded-full bg-[#7C3AED]/15 animate-pulse-slow pointer-events-none z-[1] md:hidden" style={{ animationDelay: '-5s' }} />
-          <div className="absolute right-[18%] top-[78%] w-[8px] h-[8px] rounded-full bg-[#00CDBA]/18 animate-pulse-slow pointer-events-none z-[1] md:hidden" style={{ animationDelay: '-6s' }} />
+          {/* Mobile-only small dots — scattered like confetti (stationary on mobile for performance) */}
+          <div className="absolute left-[18%] top-[8%] w-[8px] h-[8px] rounded-full bg-[#00CDBA]/20 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute right-[20%] top-[18%] w-[6px] h-[6px] rounded-full bg-[#1E90FF]/18 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute left-[15%] top-[35%] w-[10px] h-[10px] rounded-full bg-[#ff7a43]/15 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute right-[15%] top-[48%] w-[7px] h-[7px] rounded-full bg-[#FFC107]/20 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute left-[20%] top-[62%] w-[9px] h-[9px] rounded-full bg-[#7C3AED]/15 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute right-[18%] top-[78%] w-[8px] h-[8px] rounded-full bg-[#00CDBA]/18 pointer-events-none z-[1] md:hidden" />
 
           {/* Mobile SVG curves between cards */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-[1] md:hidden" preserveAspectRatio="none" viewBox="0 0 400 1200" fill="none">
@@ -189,7 +189,7 @@ export default function WhySELSection() {
                 <Image src={pillar.pin} alt="Pin decoration" fill className="object-contain" />
               </div>
 
-              <div className={`${i % 2 === 0 ? 'animate-float' : 'animate-float-reverse'} h-full flex flex-col justify-between relative`}>
+              <div className={`${i % 2 === 0 ? 'md:animate-float' : 'md:animate-float-reverse'} h-full flex flex-col justify-between relative`}>
                 <div className="pt-0">
                   <h3 className="font-bold text-lg lg:text-xl mb-3 tracking-tight leading-none">
                     {pillar.title}

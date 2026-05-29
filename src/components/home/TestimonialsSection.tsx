@@ -82,20 +82,20 @@ export default function TestimonialsSection() {
       style={{ fontFamily: 'var(--font-poppins), sans-serif' }}
     >
       {/* Background Decor — Layered Premium */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-[#FF5C7A]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute top-[-5%] left-[-8%] w-[400px] h-[400px] rounded-full bg-[#1E90FF]/4 blur-[110px] animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[350px] h-[350px] rounded-full bg-[#00CDBA]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-[#FF5C7A]/4 blur-[100px] md:animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[-5%] left-[-8%] w-[400px] h-[400px] rounded-full bg-[#1E90FF]/4 blur-[110px] md:animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[350px] h-[350px] rounded-full bg-[#00CDBA]/4 blur-[100px] md:animate-pulse-slow pointer-events-none z-0" />
  
       {/* Morphing organic blobs */}
-      <div className="absolute top-[15%] right-[8%] w-[220px] h-[220px] bg-gradient-to-br from-[#FF5C7A]/6 to-[#FFC107]/5 animate-morph pointer-events-none z-0 blur-[50px]" />
-      <div className="absolute bottom-[10%] left-[5%] w-[260px] h-[260px] bg-gradient-to-tr from-[#1E90FF]/6 to-[#00CDBA]/5 animate-morph pointer-events-none z-0 blur-[55px]" style={{ animationDelay: '-6s' }} />
+      <div className="absolute top-[15%] right-[8%] w-[220px] h-[220px] bg-gradient-to-br from-[#FF5C7A]/6 to-[#FFC107]/5 md:animate-morph pointer-events-none z-0 blur-[50px]" />
+      <div className="absolute bottom-[10%] left-[5%] w-[260px] h-[260px] bg-gradient-to-tr from-[#1E90FF]/6 to-[#00CDBA]/5 md:animate-morph pointer-events-none z-0 blur-[55px]" style={{ animationDelay: '-6s' }} />
  
       {/* Drifting geometric rings */}
-      <div className="absolute top-[8%] left-[12%] w-[100px] h-[100px] rounded-full border-2 border-[#FF5C7A]/8 animate-drift pointer-events-none z-0" />
-      <div className="absolute bottom-[20%] right-[15%] w-[70px] h-[70px] rounded-full border-2 border-[#00CDBA]/10 animate-drift-reverse pointer-events-none z-0" />
-      <div className="absolute top-[50%] left-[3%] w-[50px] h-[50px] rounded-full border border-[#FFC107]/12 animate-drift pointer-events-none z-0" style={{ animationDelay: '-8s' }} />
+      <div className="absolute top-[8%] left-[12%] w-[100px] h-[100px] rounded-full border-2 border-[#FF5C7A]/8 md:animate-drift pointer-events-none z-0" />
+      <div className="absolute bottom-[20%] right-[15%] w-[70px] h-[70px] rounded-full border-2 border-[#00CDBA]/10 md:animate-drift-reverse pointer-events-none z-0" />
+      <div className="absolute top-[50%] left-[3%] w-[50px] h-[50px] rounded-full border border-[#FFC107]/12 md:animate-drift pointer-events-none z-0" style={{ animationDelay: '-8s' }} />
       {/* Orbiting dot */}
-      <div className="absolute top-[25%] left-[25%] w-[8px] h-[8px] rounded-full bg-[#FF5C7A]/12 animate-orbit pointer-events-none z-0" />
+      <div className="absolute top-[25%] left-[25%] w-[8px] h-[8px] rounded-full bg-[#FF5C7A]/12 md:animate-orbit pointer-events-none z-0" />
       
       {/* Layered SVG journey lines */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -150,7 +150,7 @@ export default function TestimonialsSection() {
  
       {/* Marquee Wrapper */}
       <div className="relative overflow-hidden py-10 z-10 select-none w-full">
-        <div className="flex flex-row gap-10 px-5 w-max flex-shrink-0 animate-marquee">
+        <div className="flex flex-row gap-10 px-5 w-max flex-shrink-0 animate-marquee" style={{ willChange: 'transform' }}>
           {marqueeItems.map((item, i) => {
             const isLong = item.quote.length > MAX_LENGTH;
             const displayQuote = isLong ? `“${item.quote.slice(0, MAX_LENGTH)}...”` : `“${item.quote}”`;

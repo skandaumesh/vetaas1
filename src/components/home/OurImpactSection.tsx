@@ -68,17 +68,17 @@ export default function OurImpactSection() {
 
 
       {/* Morphing organic blobs */}
-      <div className="absolute top-[10%] right-[5%] w-[300px] h-[300px] bg-gradient-to-br from-[#00CDBA]/6 to-[#1E90FF]/5 animate-morph pointer-events-none z-0 blur-[65px]" />
-      <div className="absolute bottom-[5%] left-[8%] w-[280px] h-[280px] bg-gradient-to-tr from-[#FF5C7A]/6 to-[#FFC107]/5 animate-morph pointer-events-none z-0 blur-[60px]" style={{ animationDelay: '-5s' }} />
-      <div className="absolute top-[40%] left-[50%] w-[200px] h-[200px] bg-gradient-to-br from-[#FFC107]/5 to-[#ff7a43]/4 animate-morph pointer-events-none z-0 blur-[50px]" style={{ animationDelay: '-9s' }} />
+      <div className="absolute top-[10%] right-[5%] w-[300px] h-[300px] bg-gradient-to-br from-[#00CDBA]/6 to-[#1E90FF]/5 md:animate-morph pointer-events-none z-0 blur-[65px]" />
+      <div className="absolute bottom-[5%] left-[8%] w-[280px] h-[280px] bg-gradient-to-tr from-[#FF5C7A]/6 to-[#FFC107]/5 md:animate-morph pointer-events-none z-0 blur-[60px]" style={{ animationDelay: '-5s' }} />
+      <div className="absolute top-[40%] left-[50%] w-[200px] h-[200px] bg-gradient-to-br from-[#FFC107]/5 to-[#ff7a43]/4 md:animate-morph pointer-events-none z-0 blur-[50px]" style={{ animationDelay: '-9s' }} />
 
       {/* Drifting geometric rings */}
-      <div className="absolute top-[15%] right-[12%] w-[110px] h-[110px] rounded-full border-2 border-[#00CDBA]/8 animate-drift pointer-events-none z-0" />
-      <div className="absolute bottom-[18%] left-[15%] w-[80px] h-[80px] rounded-full border-2 border-[#FF5C7A]/10 animate-drift-reverse pointer-events-none z-0" />
-      <div className="absolute top-[60%] right-[5%] w-[60px] h-[60px] rounded-full border border-[#1E90FF]/8 animate-drift pointer-events-none z-0" style={{ animationDelay: '-10s' }} />
+      <div className="absolute top-[15%] right-[12%] w-[110px] h-[110px] rounded-full border-2 border-[#00CDBA]/8 md:animate-drift pointer-events-none z-0" />
+      <div className="absolute bottom-[18%] left-[15%] w-[80px] h-[80px] rounded-full border-2 border-[#FF5C7A]/10 md:animate-drift-reverse pointer-events-none z-0" />
+      <div className="absolute top-[60%] right-[5%] w-[60px] h-[60px] rounded-full border border-[#1E90FF]/8 md:animate-drift pointer-events-none z-0" style={{ animationDelay: '-10s' }} />
       {/* Orbiting dots */}
-      <div className="absolute top-[20%] left-[30%] w-[10px] h-[10px] rounded-full bg-[#00CDBA]/12 animate-orbit pointer-events-none z-0" />
-      <div className="absolute bottom-[30%] right-[25%] w-[7px] h-[7px] rounded-full bg-[#FFC107]/15 animate-orbit pointer-events-none z-0" style={{ animationDelay: '-15s' }} />
+      <div className="absolute top-[20%] left-[30%] w-[10px] h-[10px] rounded-full bg-[#00CDBA]/12 md:animate-orbit pointer-events-none z-0" />
+      <div className="absolute bottom-[30%] right-[25%] w-[7px] h-[7px] rounded-full bg-[#FFC107]/15 md:animate-orbit pointer-events-none z-0" style={{ animationDelay: '-15s' }} />
 
       {/* Layered SVG journey lines */}
       <div className="absolute inset-0 pointer-events-none z-0">

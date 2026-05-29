@@ -8,22 +8,22 @@ export default function MissionVisionSection() {
   return (
     <section className="pt-12 pb-10 lg:pt-16 lg:pb-12 bg-[#faf9f6] relative overflow-hidden font-sans">
       {/* Background Decor — Layered Premium */}
-      <div className="absolute top-[-10%] left-[-10%] w-[450px] h-[450px] rounded-full bg-[#00CDBA]/6 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#ff7a43]/6 blur-[120px] animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute top-[30%] right-[-5%] w-[380px] h-[380px] rounded-full bg-[#1E90FF]/4 blur-[110px] animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[-10%] left-[-10%] w-[450px] h-[450px] rounded-full bg-[#00CDBA]/6 blur-[100px] md:animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#ff7a43]/6 blur-[120px] md:animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[30%] right-[-5%] w-[380px] h-[380px] rounded-full bg-[#1E90FF]/4 blur-[110px] md:animate-pulse-slow pointer-events-none z-0" />
 
       {/* Morphing organic blobs */}
-      <div className="absolute top-[5%] right-[10%] w-[260px] h-[260px] bg-gradient-to-br from-[#00CDBA]/7 to-[#1E90FF]/5 animate-morph pointer-events-none z-0 blur-[55px]" />
-      <div className="absolute bottom-[10%] left-[5%] w-[300px] h-[300px] bg-gradient-to-tr from-[#ff7a43]/6 to-[#FFC107]/5 animate-morph pointer-events-none z-0 blur-[65px]" style={{ animationDelay: '-4s' }} />
-      <div className="absolute top-[45%] left-[45%] w-[200px] h-[200px] bg-gradient-to-br from-[#ffa3c9]/5 to-[#ff7a43]/4 animate-morph pointer-events-none z-0 blur-[45px]" style={{ animationDelay: '-8s' }} />
+      <div className="absolute top-[5%] right-[10%] w-[260px] h-[260px] bg-gradient-to-br from-[#00CDBA]/7 to-[#1E90FF]/5 md:animate-morph pointer-events-none z-0 blur-[55px]" />
+      <div className="absolute bottom-[10%] left-[5%] w-[300px] h-[300px] bg-gradient-to-tr from-[#ff7a43]/6 to-[#FFC107]/5 md:animate-morph pointer-events-none z-0 blur-[65px]" style={{ animationDelay: '-4s' }} />
+      <div className="absolute top-[45%] left-[45%] w-[200px] h-[200px] bg-gradient-to-br from-[#ffa3c9]/5 to-[#ff7a43]/4 md:animate-morph pointer-events-none z-0 blur-[45px]" style={{ animationDelay: '-8s' }} />
 
       {/* Drifting geometric rings */}
-      <div className="absolute top-[10%] left-[15%] w-[110px] h-[110px] rounded-full border-2 border-[#00CDBA]/8 animate-drift pointer-events-none z-0" />
-      <div className="absolute bottom-[12%] right-[12%] w-[85px] h-[85px] rounded-full border-2 border-[#ff7a43]/10 animate-drift-reverse pointer-events-none z-0" />
-      <div className="absolute top-[55%] left-[3%] w-[65px] h-[65px] rounded-full border border-[#1E90FF]/8 animate-drift pointer-events-none z-0" style={{ animationDelay: '-10s' }} />
+      <div className="absolute top-[10%] left-[15%] w-[110px] h-[110px] rounded-full border-2 border-[#00CDBA]/8 md:animate-drift pointer-events-none z-0" />
+      <div className="absolute bottom-[12%] right-[12%] w-[85px] h-[85px] rounded-full border-2 border-[#ff7a43]/10 md:animate-drift-reverse pointer-events-none z-0" />
+      <div className="absolute top-[55%] left-[3%] w-[65px] h-[65px] rounded-full border border-[#1E90FF]/8 md:animate-drift pointer-events-none z-0" style={{ animationDelay: '-10s' }} />
       {/* Orbiting dots */}
-      <div className="absolute top-[20%] right-[25%] w-[10px] h-[10px] rounded-full bg-[#00CDBA]/12 animate-orbit pointer-events-none z-0" />
-      <div className="absolute bottom-[25%] left-[30%] w-[8px] h-[8px] rounded-full bg-[#ff7a43]/15 animate-orbit pointer-events-none z-0" style={{ animationDelay: '-15s' }} />
+      <div className="absolute top-[20%] right-[25%] w-[10px] h-[10px] rounded-full bg-[#00CDBA]/12 md:animate-orbit pointer-events-none z-0" />
+      <div className="absolute bottom-[25%] left-[30%] w-[8px] h-[8px] rounded-full bg-[#ff7a43]/15 md:animate-orbit pointer-events-none z-0" style={{ animationDelay: '-15s' }} />
 
       {/* Layered SVG journey lines */}
       <div className="absolute inset-0 pointer-events-none z-0">

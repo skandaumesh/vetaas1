@@ -191,8 +191,8 @@ body {
     50% { opacity: 0.35; transform: scale(1.1); }
   }
   @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
   }
 
   --animate-drift: drift 20s ease-in-out infinite;
