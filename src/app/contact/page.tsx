@@ -26,7 +26,7 @@ function ContactFormContent() {
         <svg viewBox="0 0 150 150" fill="none" className="w-full h-full">
           <path
             d="M 15,110 C 10,80 60,70 50,50 C 40,30 15,45 30,65 C 45,85 85,55 105,40"
-            stroke="#ffd166"
+            stroke="#FFC107"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeDasharray="6 6"
@@ -35,18 +35,18 @@ function ContactFormContent() {
             <path
               d="M 0,15 L 30,0 L 20,30 L 12,20 Z"
               fill="none"
-              stroke="#1a4895"
+              stroke="#7C3AED"
               strokeWidth="2.2"
               strokeLinejoin="round"
             />
-            <path d="M 30,0 L 12,20" stroke="#1a4895" strokeWidth="1.5" />
+            <path d="M 30,0 L 12,20" stroke="#7C3AED" strokeWidth="1.5" />
           </g>
         </svg>
       </div>
 
       {/* Navy dot grid — top right */}
       <div className="absolute top-[10%] right-[6%] opacity-80 pointer-events-none z-0">
-        <svg width="56" height="42" viewBox="0 0 80 60" fill="#1a4895">
+        <svg width="56" height="42" viewBox="0 0 80 60" fill="#7C3AED">
           {[10, 30, 50, 70].map((cx) =>
             [10, 30, 50].map((cy) => (
               <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="3.5" />
@@ -57,7 +57,7 @@ function ContactFormContent() {
 
       {/* Coral dot grid — mid left */}
       <div className="absolute top-[50%] left-[3%] opacity-75 pointer-events-none z-0">
-        <svg width="36" height="36" viewBox="0 0 60 60" fill="#ff6e79">
+        <svg width="36" height="36" viewBox="0 0 60 60" fill="#FF5C7A">
           {[10, 30, 50].map((cx) =>
             [10, 30, 50].map((cy) => (
               <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="3.5" />
@@ -71,7 +71,7 @@ function ContactFormContent() {
         <svg
           viewBox="0 0 80 30"
           fill="none"
-          stroke="#1a4895"
+          stroke="#7C3AED"
           strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -83,7 +83,7 @@ function ContactFormContent() {
 
       {/* Half-circle yellow sun — right boundary */}
       <div className="absolute top-[65%] right-0 translate-x-[50%] w-20 h-20 pointer-events-none z-0">
-        <svg viewBox="0 0 100 100" fill="#ffd166" className="w-full h-full">
+        <svg viewBox="0 0 100 100" fill="#FFC107" className="w-full h-full">
           <circle cx="50" cy="50" r="50" />
         </svg>
       </div>
@@ -99,14 +99,14 @@ function ContactFormContent() {
         >
           <path
             d="M-50,300 C300,500 700,100 1100,380 C1250,470 1380,220 1500,300"
-            stroke="#1a4895"
+            stroke="#7C3AED"
             strokeWidth="2"
             strokeLinecap="round"
             opacity="0.05"
           />
           <path
             d="M-50,500 C200,300 550,600 900,400 C1150,250 1350,500 1500,440"
-            stroke="#36ba98"
+            stroke="#00CDBA"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeDasharray="10 8"
@@ -120,7 +120,7 @@ function ContactFormContent() {
         <svg
           viewBox="0 0 600 120"
           preserveAspectRatio="none"
-          className="w-full h-full text-[#1a4895]"
+          className="w-full h-full text-[#7C3AED]"
         >
           <path
             d="M 0,90 C 80,110 160,115 220,105 C 300,90 400,60 480,70 C 520,75 560,95 600,90 L 600,120 L 0,120 Z"
@@ -140,13 +140,13 @@ function ContactFormContent() {
           className="mb-16 md:mb-20 text-center md:text-left"
         >
           {/* Pill badge */}
-          <span className="inline-block py-1.5 px-5 rounded-full bg-white border border-[#1a4895]/10 text-[#1a4895] font-bold text-[10px] tracking-[0.2em] uppercase shadow-sm mb-5">
+          <span className="inline-block py-1.5 px-5 rounded-full bg-white border border-[#7C3AED]/10 text-[#7C3AED] font-bold text-[10px] tracking-[0.2em] uppercase shadow-sm mb-5">
             Get in Touch
           </span>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.05] text-[#111827] tracking-tight mb-5">
             Let's Build the{" "}
-            <span className="text-[#36ba98]">Village</span>
+            <span className="text-[#00CDBA]">Village</span>
             <br className="hidden sm:block" /> Together.
           </h1>
           <p className="text-gray-500 text-base sm:text-lg font-medium max-w-xl mx-auto md:mx-0 leading-relaxed">
@@ -164,33 +164,12 @@ function ContactFormContent() {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col gap-6"
           >
-            <InfoCard
-              icon={<Phone size={22} />}
-              color="#1a4895"
-              label="Call Us"
-              href="tel:+918951004160"
-              value="+91 89510 04160"
-            />
-            <InfoCard
-              icon={<Mail size={22} />}
-              color="#36ba98"
-              label="Email Us"
-              href="mailto:kirti.vetaas@gmail.com"
-              value="kirti.vetaas@gmail.com"
-            />
-            <InfoCard
-              icon={<MapPin size={22} />}
-              color="#ff6e79"
-              label="Visit Us"
-              value="Bangalore, India"
-            />
-
             {/* Decorative quote */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-4 bg-[#1a4895] text-white rounded-3xl p-8 relative overflow-hidden"
+              className="mb-2 bg-[#7C3AED] text-white rounded-3xl p-8 relative overflow-hidden"
             >
               {/* inner doodle */}
               <div className="absolute -top-4 -right-4 w-24 h-24 opacity-10">
@@ -205,6 +184,27 @@ function ContactFormContent() {
                 — African Proverb &amp; our founding belief
               </p>
             </motion.div>
+
+            <InfoCard
+              icon={<Phone size={22} />}
+              color="#7C3AED"
+              label="Call Us"
+              href="tel:+918951004160"
+              value="+91 89510 04160"
+            />
+            <InfoCard
+              icon={<Mail size={22} />}
+              color="#00CDBA"
+              label="Email Us"
+              href="mailto:kirti.vetaas@gmail.com"
+              value="kirti.vetaas@gmail.com"
+            />
+            <InfoCard
+              icon={<MapPin size={22} />}
+              color="#FF5C7A"
+              label="Visit Us"
+              value="Bangalore, India"
+            />
           </motion.div>
 
           {/* ── RIGHT: Form ── */}
@@ -216,7 +216,7 @@ function ContactFormContent() {
             <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100">
               {/* Form header */}
               <div className="mb-8">
-                <span className="inline-block py-1 px-4 rounded-full bg-[#36ba98]/10 text-[#2a9d7e] text-[10px] font-black uppercase tracking-[0.2em] mb-3">
+                <span className="inline-block py-1 px-4 rounded-full bg-[#00CDBA]/10 text-[#2a9d7e] text-[10px] font-black uppercase tracking-[0.2em] mb-3">
                   Send a Message
                 </span>
                 <h2 className="text-3xl font-bold text-[#111827] leading-tight">
@@ -230,7 +230,7 @@ function ContactFormContent() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex flex-col items-center justify-center py-16 gap-4 text-center"
                 >
-                  <div className="w-16 h-16 rounded-full bg-[#36ba98]/10 flex items-center justify-center text-[#36ba98] text-3xl mb-2">
+                  <div className="w-16 h-16 rounded-full bg-[#00CDBA]/10 flex items-center justify-center text-[#00CDBA] text-3xl mb-2">
                     ✓
                   </div>
                   <h3 className="text-2xl font-bold text-[#111827]">Message Sent!</h3>
@@ -239,7 +239,7 @@ function ContactFormContent() {
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}
-                    className="mt-4 text-sm font-bold text-[#1a4895] underline underline-offset-4 hover:text-[#36ba98] transition-colors"
+                    className="mt-4 text-sm font-bold text-[#7C3AED] underline underline-offset-4 hover:text-[#00CDBA] transition-colors"
                   >
                     Send another message
                   </button>
@@ -262,7 +262,7 @@ function ContactFormContent() {
 
                   <button
                     type="submit"
-                    className="w-full bg-[#1a4895] text-white font-bold text-sm py-4 px-8 rounded-full flex items-center justify-center gap-2 hover:bg-[#153a7a] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 mt-2"
+                    className="w-full bg-[#7C3AED] text-white font-bold text-sm py-4 px-8 rounded-full flex items-center justify-center gap-2 hover:bg-[#153a7a] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 mt-2"
                   >
                     Send Message <Send size={16} />
                   </button>
@@ -334,7 +334,7 @@ function Field({
   defaultValue?: string;
 }) {
   const base =
-    "w-full bg-[#faf9f6] border border-gray-200 rounded-2xl px-5 py-4 text-sm font-semibold text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a4895]/20 focus:border-[#1a4895]/30 transition-all";
+    "w-full bg-[#faf9f6] border border-gray-200 rounded-2xl px-5 py-4 text-sm font-semibold text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED]/30 transition-all";
 
   return (
     <div className="flex flex-col gap-2">
@@ -382,8 +382,8 @@ function ContactLoading() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#faf9f6] flex items-center justify-center z-10" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
       <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-[#1a4895]/20 border-t-[#1a4895] animate-spin" />
-        <p className="text-sm font-bold text-[#1a4895] uppercase tracking-[0.2em] animate-pulse">Loading Contact Form...</p>
+        <div className="w-12 h-12 rounded-full border-4 border-[#7C3AED]/20 border-t-[#7C3AED] animate-spin" />
+        <p className="text-sm font-bold text-[#7C3AED] uppercase tracking-[0.2em] animate-pulse">Loading Contact Form...</p>
       </div>
     </main>
   );

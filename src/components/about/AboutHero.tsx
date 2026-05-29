@@ -23,7 +23,7 @@ export default function AboutHero() {
         <motion.div
           animate={{ y: [0, -12, 0], rotate: [0, 8, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-[5%] top-[20%] text-[#ffd166] opacity-75"
+          className="absolute left-[5%] top-[20%] text-[#FFC107] opacity-75"
         >
           <Star size={36} fill="currentColor" />
         </motion.div>
@@ -37,14 +37,14 @@ export default function AboutHero() {
         <motion.div
           animate={{ y: [0, -8, 0], rotate: [0, 15, 0] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-[3%] bottom-[20%] text-[#36ba98] opacity-75"
+          className="absolute left-[3%] bottom-[20%] text-[#00CDBA] opacity-75"
         >
           <Palette size={36} />
         </motion.div>
         <motion.div
           animate={{ y: [0, 12, 0], rotate: [0, -4, 0] }}
           transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute right-[5%] bottom-[20%] text-[#4285F4] opacity-80"
+          className="absolute right-[5%] bottom-[20%] text-[#1E90FF] opacity-80"
         >
           <Smile size={36} />
         </motion.div>
@@ -63,7 +63,7 @@ export default function AboutHero() {
             className="mb-6"
           >
             <span className="inline-flex items-center gap-2 bg-[#f8fafc] border border-gray-200 text-[#1e293b] text-xs font-semibold px-5 py-2.5 rounded-full shadow-sm">
-              <Sprout size={14} className="text-[#36ba98]" />
+              <Sprout size={14} className="text-[#00CDBA]" />
               Holistic Early Childhood Education
             </span>
           </motion.div>
@@ -76,7 +76,7 @@ export default function AboutHero() {
             className="w-full mb-6"
           >
             <h1 className="font-headline text-4xl md:text-5xl lg:text-6xl leading-[1.15] text-[#111827] tracking-tight">
-              Nurturing <span className="inline-block bg-[#36ba98] text-white px-5 py-1 rounded-2xl -rotate-1 shadow-sm mx-1.5 font-bold font-sans">Hope</span> And Life
+              Nurturing <span className="inline-block bg-[#00CDBA] text-white px-5 py-1 rounded-2xl -rotate-1 shadow-sm mx-1.5 font-bold font-sans">Hope</span> And Life
             </h1>
           </motion.div>
 
@@ -98,7 +98,7 @@ export default function AboutHero() {
           >
             <a 
               href="#formula-section"
-              className="inline-flex items-center gap-2 bg-[#36ba98] hover:bg-[#2da182] text-white font-semibold text-sm px-8 py-4 rounded-full hover:scale-105 transition-all shadow-md active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 bg-[#00CDBA] hover:bg-[#2da182] text-white font-semibold text-sm px-8 py-4 rounded-full hover:scale-105 transition-all shadow-md active:scale-95 cursor-pointer"
             >
               Explore Our Story <ArrowRight size={16} />
             </a>
@@ -115,7 +115,7 @@ export default function AboutHero() {
             className="relative w-full max-w-[400px] lg:max-w-[450px] aspect-square flex items-center justify-center"
           >
             {/* Background glowing gradients */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#36ba98]/10 via-[#eff6ff]/10 to-[#ff7a43]/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#00CDBA]/10 via-[#eff6ff]/10 to-[#ff7a43]/5 rounded-full blur-2xl pointer-events-none" />
             
             {/* Floating illustration container */}
             <motion.div

@@ -11,8 +11,8 @@ const STORY_STEPS = [
     title: "Morning Check-In",
     emoji: "🌅",
     icon: Sunrise,
-    color: "#ffd166",
-    bgColor: "#ffd166",
+    color: "#FFC107",
+    bgColor: "#FFC107",
     description: "Priya walks into class. Instead of jumping straight to textbooks, her teacher asks: \"How are you feeling today?\" Using a feelings chart, Priya identifies she's nervous about a test. Her teacher acknowledges it — and suddenly, the anxiety feels smaller.",
     sel_skill: "Self-Awareness",
   },
@@ -22,8 +22,8 @@ const STORY_STEPS = [
     emoji: "📚",
     title: "Story Time with Purpose",
     icon: BookHeart,
-    color: "#36ba98",
-    bgColor: "#36ba98",
+    color: "#00CDBA",
+    bgColor: "#00CDBA",
     description: "The class reads a story about a fox who feels left out. The teacher pauses: \"Have you ever felt like this?\" Students discuss, share, and realize they're not alone. Empathy grows through stories.",
     sel_skill: "Social Awareness",
   },
@@ -33,8 +33,8 @@ const STORY_STEPS = [
     emoji: "🤝",
     title: "Collaborative Project",
     icon: Users,
-    color: "#1a4895",
-    bgColor: "#1a4895",
+    color: "#7C3AED",
+    bgColor: "#7C3AED",
     description: "During group work, two students disagree. Instead of the teacher solving it, the kids use the 'I-message' technique: \"I feel frustrated when...\" They resolve it themselves. Conflict becomes a learning moment.",
     sel_skill: "Relationship Skills",
   },
@@ -44,8 +44,8 @@ const STORY_STEPS = [
     emoji: "✨",
     title: "Reflection & Gratitude",
     icon: Sparkles,
-    color: "#ff6e79",
-    bgColor: "#ff6e79",
+    color: "#FF5C7A",
+    bgColor: "#FF5C7A",
     description: "Before going home, each child writes one thing they're grateful for and one kind act they witnessed. Priya writes: \"Ravi shared his crayons when mine broke.\" The day ends with connection, not just knowledge.",
     sel_skill: "Responsible Decision-Making",
   },
@@ -66,7 +66,7 @@ export default function StorySection() {
           transition={{ duration: 0.8 }}
           className="text-center max-w-3xl mx-auto mb-16"
         >
-          <span className="text-[#1a4895] font-semibold text-sm uppercase tracking-widest mb-4 block">Interactive Storytelling</span>
+          <span className="text-[#7C3AED] font-semibold text-sm uppercase tracking-widest mb-4 block">Interactive Storytelling</span>
           <h2 className="font-headline text-4xl md:text-5xl text-[#111827] tracking-tight leading-tight mb-4">
             A Day in an SEL Classroom
           </h2>

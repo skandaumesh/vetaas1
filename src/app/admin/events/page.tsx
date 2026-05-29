@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage, auth } from "@/lib/firebase";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from "firebase/auth";
 import { CheckCircle2, XCircle, AlertTriangle, LogOut, Lock, Mail, Loader2, Sparkles, AlertCircle, X } from "lucide-react";
@@ -35,7 +35,8 @@ export default function AdminEventsPage() {
     location: "",
     highlightsUrl: "",
     registrationUrl: "",
-    status: "upcoming"
+    status: "upcoming",
+    manualImageUrl: ""
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -153,24 +154,60 @@ export default function AdminEventsPage() {
       let imageUrl = "";
 
       if (imageFile) {
-        const storageRef = ref(storage, `events/${Date.now()}_${imageFile.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, imageFile);
-        
-        await new Promise((resolve, reject) => {
-          uploadTask.on(
-            "state_changed",
-            null,
-            (error) => reject(error),
-            async () => {
-              imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
-              resolve(imageUrl);
-            }
-          );
+        // Since Firebase Storage is blocked, we will compress the image and convert it to Base64 
+        // to store it directly in Firestore (limit is 1MB per document).
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(imageFile);
+          reader.onload = (event) => {
+            const img = new window.Image();
+            img.src = event.target?.result as string;
+            img.onload = () => {
+              const canvas = document.createElement("canvas");
+              const MAX_WIDTH = 800;
+              const MAX_HEIGHT = 800;
+              let width = img.width;
+              let height = img.height;
+
+              if (width > height) {
+                if (width > MAX_WIDTH) {
+                  height *= MAX_WIDTH / width;
+                  width = MAX_WIDTH;
+                }
+              } else {
+                if (height > MAX_HEIGHT) {
+                  width *= MAX_HEIGHT / height;
+                  height = MAX_HEIGHT;
+                }
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext("2d");
+              if (ctx) {
+                ctx.drawImage(img, 0, 0, width, height);
+                // Compress to 70% quality JPEG to ensure it fits well under Firestore's 1MB limit
+                const base64Url = canvas.toDataURL("image/jpeg", 0.7);
+                resolve(base64Url);
+              } else {
+                resolve(event.target?.result as string);
+              }
+            };
+            img.onerror = (err) => reject(err);
+          };
+          reader.onerror = (err) => reject(err);
         });
+      } else if (formData.manualImageUrl) {
+        imageUrl = formData.manualImageUrl;
       }
 
       const eventData = {
-        ...formData,
+        title: formData.title,
+        date: formData.date,
+        location: formData.location,
+        highlightsUrl: formData.highlightsUrl,
+        registrationUrl: formData.registrationUrl,
+        status: formData.status,
         image: imageUrl,
         createdAt: new Date().toISOString()
       };
@@ -184,7 +221,8 @@ export default function AdminEventsPage() {
         location: "",
         highlightsUrl: "",
         registrationUrl: "",
-        status: "upcoming"
+        status: "upcoming",
+        manualImageUrl: ""
       });
       setImageFile(null);
       if (imagePreview) {
@@ -197,9 +235,9 @@ export default function AdminEventsPage() {
 
       fetchEvents();
       showToast("Event added successfully!", "success");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding event: ", error);
-      showToast("Failed to add event.", "error");
+      showToast(`Failed to add event: ${error.message || "Unknown error"}`, "error");
     } finally {
       setUploading(false);
     }
@@ -533,13 +571,19 @@ export default function AdminEventsPage() {
               </div>
 
               <div>
-                <label htmlFor="registrationUrl" className="block text-sm font-medium text-gray-700 mb-1">Registration URL (e.g. Google Form)</label>
-                <input type="url" id="registrationUrl" name="registrationUrl" value={formData.registrationUrl} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0CB0D8] outline-none" placeholder="https://..." />
+                <label htmlFor="registrationUrl" className="block text-sm font-medium text-gray-700 mb-1">Registration Link or Luma Embed Code</label>
+                <input type="text" id="registrationUrl" name="registrationUrl" value={formData.registrationUrl} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0CB0D8] outline-none" placeholder="e.g. https://forms.gle/... or Luma HTML code" />
               </div>
 
-              <div>
-                <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">Thumbnail Image</label>
-                <input type="file" id="image" accept="image/*" onChange={handleImageChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#0CB0D8]/10 file:text-[#0CB0D8] hover:file:bg-[#0CB0D8]/20 cursor-pointer" />
+              <div className="pt-4 border-t border-gray-100">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Event Thumbnail</label>
+                
+                <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                  <div>
+                    <input type="file" id="image" accept="image/*" onChange={handleImageChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#0CB0D8]/10 file:text-[#0CB0D8] hover:file:bg-[#0CB0D8]/20 cursor-pointer" />
+                    <p className="text-[10px] text-gray-400 mt-2">Images are automatically compressed and saved instantly. No Firebase Storage quota issues!</p>
+                  </div>
+                </div>
                 
                 <AnimatePresence>
                   {imagePreview && (

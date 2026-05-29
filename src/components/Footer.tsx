@@ -16,11 +16,62 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-4">
             <Link href="/" className="flex items-center gap-3 mb-6 w-max">
               <Image src="/logo.webp" alt="Vetaas" width={50} height={50} className="object-contain" />
-              <span className="text-2xl font-bold tracking-tight text-[#111827]">Vetaas</span>
             </Link>
             <p className="text-gray-600 font-medium leading-relaxed max-w-xs mb-8">
               Nurturing Social Emotional Learning in early childhood. Building resilient, empathetic communities across India.
             </p>
+          </div>
+
+          {/* Navigation */}
+          <div className="col-span-1 md:col-span-2">
+            <h3 className="text-xl font-headline font-bold text-[#1E90FF] mb-6 tracking-wide">Pages</h3>
+            <ul className="space-y-4">
+              {[
+                { label: "Home", href: "/" },
+                { label: "Services", href: "/services" },
+                { label: "Events", href: "/events" },
+                { label: "Contact", href: "/contact" },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Our Work */}
+          <div className="col-span-1 md:col-span-3">
+            <h3 className="text-xl font-headline font-bold text-[#1E90FF] mb-6 tracking-wide">Our Work</h3>
+            <ul className="space-y-4">
+              <li><Link href="/teachers" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Teachers</Link></li>
+              <li><Link href="/parents" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Parents</Link></li>
+              <li><Link href="/children" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Children</Link></li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div className="col-span-1 md:col-span-3">
+            <h3 className="text-xl font-headline font-bold text-[#1E90FF] mb-6 tracking-wide">Contact</h3>
+            <ul className="space-y-5 mb-8">
+              <li className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-[#7C3AED]">
+                  <Phone size={16} />
+                </div>
+                <a href="tel:+918951004160" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold">
+                  +91 89510 04160
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-[#7C3AED]">
+                  <Mail size={16} />
+                </div>
+                <a href="mailto:kirti.vetaas@gmail.com" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold break-all">
+                  kirti.vetaas@gmail.com
+                </a>
+              </li>
+            </ul>
             <div className="flex items-center gap-4">
               <a
                 href="https://www.instagram.com/vetaas_education/"
@@ -34,64 +85,11 @@ export default function Footer() {
                 href="https://www.linkedin.com/company/vetaas/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center text-[#111827] hover:text-white hover:bg-[#1a4895] transition-colors"
+                className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center text-[#111827] hover:text-white hover:bg-[#7C3AED] transition-colors"
               >
                 <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
               </a>
             </div>
-          </div>
-
-          {/* Navigation */}
-          <div className="col-span-1 md:col-span-2">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-[#4285F4] mb-6">Pages</h3>
-            <ul className="space-y-4">
-              {[
-                { label: "Home", href: "/" },
-                { label: "Services", href: "/services" },
-                { label: "Events", href: "/events" },
-                { label: "Contact", href: "/contact" },
-              ].map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Programs */}
-          <div className="col-span-1 md:col-span-3">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-[#4285F4] mb-6">Programs</h3>
-            <ul className="space-y-4">
-              <li><Link href="/services" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">SEL Curriculum</Link></li>
-              <li><Link href="/services" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">Parent Toolkits</Link></li>
-              <li><Link href="/services" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">Teacher Training</Link></li>
-              <li><Link href="/services" className="text-gray-700 hover:text-[#4285F4] transition-colors font-semibold">School Partnerships</Link></li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div className="col-span-1 md:col-span-3">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-[#4285F4] mb-6">Contact</h3>
-            <ul className="space-y-5">
-              <li className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-[#1a4895]">
-                  <Phone size={16} />
-                </div>
-                <a href="tel:+918951004160" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold">
-                  +91 89510 04160
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-[#1a4895]">
-                  <Mail size={16} />
-                </div>
-                <a href="mailto:kirti.vetaas@gmail.com" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold break-all">
-                  kirti.vetaas@gmail.com
-                </a>
-              </li>
-            </ul>
           </div>
 
         </div>

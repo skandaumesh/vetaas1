@@ -8,8 +8,8 @@ export default function ServicesPage() {
   return (
     <main className="bg-white min-h-screen relative overflow-hidden font-sans pb-32 pt-[calc(var(--header-height)+2rem)]">
       {/* Background Decor — Premium Gradients */}
-      <div className="absolute top-[10%] left-[-15%] w-[500px] h-[500px] rounded-full bg-[#1a4895]/3 blur-[120px] pointer-events-none z-0" />
-      <div className="absolute bottom-[10%] right-[-15%] w-[500px] h-[500px] rounded-full bg-[#ff6e79]/3 blur-[120px] pointer-events-none z-0" />
+      <div className="absolute top-[10%] left-[-15%] w-[500px] h-[500px] rounded-full bg-[#7C3AED]/3 blur-[120px] pointer-events-none z-0" />
+      <div className="absolute bottom-[10%] right-[-15%] w-[500px] h-[500px] rounded-full bg-[#FF5C7A]/3 blur-[120px] pointer-events-none z-0" />
       
       {/* Subtle Background Grid Pattern */}
       <div 
@@ -46,7 +46,7 @@ export default function ServicesPage() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#111827] tracking-tight mb-6"
           >
-            Our <span className="inline-block bg-[#1a4895] text-white px-5 py-1 rounded-2xl rotate-1 shadow-sm font-semibold">Services.</span>
+            Our <span className="inline-block bg-[#7C3AED] text-white px-5 py-1 rounded-2xl rotate-1 shadow-sm font-semibold">Services.</span>
           </motion.h1>
           
           <motion.p 

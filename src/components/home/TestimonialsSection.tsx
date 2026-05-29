@@ -82,20 +82,20 @@ export default function TestimonialsSection() {
       style={{ fontFamily: 'var(--font-poppins), sans-serif' }}
     >
       {/* Background Decor — Layered Premium */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-[#ff6e79]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute top-[-5%] left-[-8%] w-[400px] h-[400px] rounded-full bg-[#4285F4]/4 blur-[110px] animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[350px] h-[350px] rounded-full bg-[#36ba98]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-[#FF5C7A]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[-5%] left-[-8%] w-[400px] h-[400px] rounded-full bg-[#1E90FF]/4 blur-[110px] animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[350px] h-[350px] rounded-full bg-[#00CDBA]/4 blur-[100px] animate-pulse-slow pointer-events-none z-0" />
  
       {/* Morphing organic blobs */}
-      <div className="absolute top-[15%] right-[8%] w-[220px] h-[220px] bg-gradient-to-br from-[#ff6e79]/6 to-[#ffd166]/5 animate-morph pointer-events-none z-0 blur-[50px]" />
-      <div className="absolute bottom-[10%] left-[5%] w-[260px] h-[260px] bg-gradient-to-tr from-[#4285F4]/6 to-[#36ba98]/5 animate-morph pointer-events-none z-0 blur-[55px]" style={{ animationDelay: '-6s' }} />
+      <div className="absolute top-[15%] right-[8%] w-[220px] h-[220px] bg-gradient-to-br from-[#FF5C7A]/6 to-[#FFC107]/5 animate-morph pointer-events-none z-0 blur-[50px]" />
+      <div className="absolute bottom-[10%] left-[5%] w-[260px] h-[260px] bg-gradient-to-tr from-[#1E90FF]/6 to-[#00CDBA]/5 animate-morph pointer-events-none z-0 blur-[55px]" style={{ animationDelay: '-6s' }} />
  
       {/* Drifting geometric rings */}
-      <div className="absolute top-[8%] left-[12%] w-[100px] h-[100px] rounded-full border-2 border-[#ff6e79]/8 animate-drift pointer-events-none z-0" />
-      <div className="absolute bottom-[20%] right-[15%] w-[70px] h-[70px] rounded-full border-2 border-[#36ba98]/10 animate-drift-reverse pointer-events-none z-0" />
-      <div className="absolute top-[50%] left-[3%] w-[50px] h-[50px] rounded-full border border-[#ffd166]/12 animate-drift pointer-events-none z-0" style={{ animationDelay: '-8s' }} />
+      <div className="absolute top-[8%] left-[12%] w-[100px] h-[100px] rounded-full border-2 border-[#FF5C7A]/8 animate-drift pointer-events-none z-0" />
+      <div className="absolute bottom-[20%] right-[15%] w-[70px] h-[70px] rounded-full border-2 border-[#00CDBA]/10 animate-drift-reverse pointer-events-none z-0" />
+      <div className="absolute top-[50%] left-[3%] w-[50px] h-[50px] rounded-full border border-[#FFC107]/12 animate-drift pointer-events-none z-0" style={{ animationDelay: '-8s' }} />
       {/* Orbiting dot */}
-      <div className="absolute top-[25%] left-[25%] w-[8px] h-[8px] rounded-full bg-[#ff6e79]/12 animate-orbit pointer-events-none z-0" />
+      <div className="absolute top-[25%] left-[25%] w-[8px] h-[8px] rounded-full bg-[#FF5C7A]/12 animate-orbit pointer-events-none z-0" />
       
       {/* Layered SVG journey lines */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -103,7 +103,7 @@ export default function TestimonialsSection() {
           {/* Primary coral curve */}
           <path 
             d="M-50,250 C300,450 600,100 1000,350 C1200,450 1350,250 1500,300" 
-            stroke="#ff6e79" 
+            stroke="#FF5C7A" 
             strokeWidth="3" 
             strokeLinecap="round" 
             opacity="0.07"
@@ -111,7 +111,7 @@ export default function TestimonialsSection() {
           {/* Secondary teal curve */}
           <path 
             d="M-50,180 C250,380 550,50 950,300 C1150,400 1300,180 1500,230" 
-            stroke="#36ba98" 
+            stroke="#00CDBA" 
             strokeWidth="2" 
             strokeLinecap="round" 
             opacity="0.05"
@@ -119,16 +119,16 @@ export default function TestimonialsSection() {
           {/* Dashed accent */}
           <path 
             d="M-50,400 C200,300 500,500 800,320 C1100,180 1350,400 1500,350" 
-            stroke="#ffd166" 
+            stroke="#FFC107" 
             strokeWidth="1.5" 
             strokeLinecap="round" 
             strokeDasharray="10 6"
             opacity="0.06"
           />
           {/* Decorative SVG circles */}
-          <circle cx="150" cy="100" r="45" stroke="#ff6e79" strokeWidth="1" opacity="0.04" />
-          <circle cx="1300" cy="450" r="55" stroke="#4285F4" strokeWidth="1" opacity="0.04" />
-          <circle cx="800" cy="50" r="25" stroke="#36ba98" strokeWidth="1.5" opacity="0.05" />
+          <circle cx="150" cy="100" r="45" stroke="#FF5C7A" strokeWidth="1" opacity="0.04" />
+          <circle cx="1300" cy="450" r="55" stroke="#1E90FF" strokeWidth="1" opacity="0.04" />
+          <circle cx="800" cy="50" r="25" stroke="#00CDBA" strokeWidth="1.5" opacity="0.05" />
         </svg>
       </div>
  
@@ -139,11 +139,11 @@ export default function TestimonialsSection() {
           viewport={{ once: true }}
           className="text-center"
         >
-          <div className="inline-flex items-center justify-center bg-[#ff6e79] text-white px-5 py-2 rounded-full mb-4 shadow-sm rotate-1">
+          <div className="inline-flex items-center justify-center bg-[#FF5C7A] text-white px-5 py-2 rounded-full mb-4 shadow-sm rotate-1">
             <span className="text-sm font-semibold uppercase tracking-wider">Testimonials</span>
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl text-[#111827] font-bold tracking-tight leading-[1.2]">
-            Voices from <span className="text-[#36ba98]">Our Village</span>
+            Voices from <span className="text-[#00CDBA]">Our Village</span>
           </h2>
         </motion.div>
       </div>
@@ -158,14 +158,14 @@ export default function TestimonialsSection() {
             return (
               <motion.div 
                 key={i}
-                whileHover={{ y: -5, scale: 1.02 }}
-                className={`relative flex-shrink-0 w-[290px] sm:w-[420px] md:w-[460px] lg:w-[480px] min-h-[250px] sm:min-h-0 ${item.color} border-2 border-black rounded-[2rem] p-6 sm:p-8 flex flex-col shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] group transition-all duration-300`}
+                whileHover={{ y: -3, scale: 1.01 }}
+                className={`relative flex-shrink-0 w-[240px] sm:w-[300px] md:w-[320px] lg:w-[340px] min-h-[160px] sm:min-h-0 ${item.color} border-2 border-black rounded-3xl p-4 sm:p-5 flex flex-col shadow-[0_4px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.06)] group transition-all duration-300`}
               >
                 <div className="relative z-20 flex flex-col h-full justify-between gap-4">
                   
                   {/* Header: Avatar + Info */}
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-black flex-shrink-0 bg-white shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-black flex-shrink-0 bg-white shadow-sm">
                       <Image 
                         src={item.image} 
                         alt={item.name} 
@@ -175,26 +175,26 @@ export default function TestimonialsSection() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className={`text-lg sm:text-lg md:text-xl font-bold ${item.textColor} leading-tight tracking-tight mb-0.5 truncate`}>
+                      <h3 className={`text-sm md:text-base font-bold ${item.textColor} leading-tight tracking-tight mb-0.5 truncate`}>
                         {item.name}
                       </h3>
-                      <div className={`${item.roleColor} text-[10px] md:text-[11px] font-bold uppercase tracking-widest leading-snug truncate`}>
+                      <div className={`${item.roleColor} text-[8px] md:text-[9px] font-bold uppercase tracking-widest leading-snug truncate`}>
                         {item.role}
                       </div>
                     </div>
                   </div>
  
                   {/* Quote & Button */}
-                  <div className="flex flex-col flex-1 justify-between">
+                  <div className="flex flex-col flex-1 justify-between mt-2">
                     {/* Mobile version (truncated) */}
                     <div className="block sm:hidden flex flex-col flex-1 justify-between">
-                      <p className={`${item.pColor} text-base font-medium leading-relaxed italic`}>
+                      <p className={`${item.pColor} text-[13px] font-medium leading-relaxed italic`}>
                         {displayQuote}
                       </p>
                       {isLong && (
                         <button
                           onClick={() => setSelectedTestimonial(item)}
-                          className="mt-3 text-xs font-black text-[#36ba98] hover:text-[#2d9e81] transition-colors flex items-center gap-1 cursor-pointer self-start"
+                          className="mt-2 text-[11px] font-black text-[#00CDBA] hover:text-[#2d9e81] transition-colors flex items-center gap-1 cursor-pointer self-start"
                         >
                           Read More <span>→</span>
                         </button>
@@ -203,7 +203,7 @@ export default function TestimonialsSection() {
 
                     {/* Desktop version (full text) */}
                     <div className="hidden sm:block">
-                      <p className={`${item.pColor} text-base md:text-lg font-medium leading-relaxed italic`}>
+                      <p className={`${item.pColor} text-[13px] md:text-sm font-medium leading-relaxed italic`}>
                         “{item.quote}”
                       </p>
                     </div>
@@ -238,7 +238,7 @@ export default function TestimonialsSection() {
               className="relative bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 p-8 md:p-10 w-full max-w-xl overflow-hidden z-10"
             >
               {/* Top Accent Gradient Border */}
-              <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#ff6e79] to-[#36ba98]" />
+              <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#FF5C7A] to-[#00CDBA]" />
               
               {/* Close Button */}
               <button
@@ -264,7 +264,7 @@ export default function TestimonialsSection() {
                     <h3 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
                       {selectedTestimonial.name}
                     </h3>
-                    <div className="text-[#36ba98] text-xs font-bold uppercase tracking-widest mt-1">
+                    <div className="text-[#00CDBA] text-xs font-bold uppercase tracking-widest mt-1">
                       {selectedTestimonial.role}
                     </div>
                   </div>
@@ -282,7 +282,7 @@ export default function TestimonialsSection() {
                 {/* OK Button */}
                 <button
                   onClick={() => setSelectedTestimonial(null)}
-                  className="mt-6 py-3 px-6 bg-[#36ba98] hover:bg-[#2d9e81] text-white font-bold rounded-xl transition shadow-lg shadow-teal-500/10 cursor-pointer self-end"
+                  className="mt-6 py-3 px-6 bg-[#00CDBA] hover:bg-[#2d9e81] text-white font-bold rounded-xl transition shadow-lg shadow-teal-500/10 cursor-pointer self-end"
                 >
                   Close
                 </button>

@@ -2,10 +2,10 @@
 
 :root {
   /* ── Brand Palette ── */
-  --color-teal: #36ba98;
-  --color-blue: #1a4895;
-  --color-coral: #ff6e79;
-  --color-gold: #ffd166;
+  --color-teal: #00CDBA;
+  --color-blue: #7C3AED;
+  --color-coral: #FF5C7A;
+  --color-gold: #FFC107;
   --color-sky: #b4e0f9;
   --color-dark: #111827;
   --color-canvas: #ffffff;
@@ -56,16 +56,16 @@ body {
 
 /* ── Gradient Utilities ── */
 .gradient-teal-blue {
-  background: linear-gradient(135deg, #36ba98 0%, #1a4895 100%);
+  background: linear-gradient(135deg, #00CDBA 0%, #7C3AED 100%);
 }
 .gradient-coral-gold {
-  background: linear-gradient(135deg, #ff6e79 0%, #ffd166 100%);
+  background: linear-gradient(135deg, #FF5C7A 0%, #FFC107 100%);
 }
 .gradient-blue-sky {
-  background: linear-gradient(135deg, #1a4895 0%, #b4e0f9 100%);
+  background: linear-gradient(135deg, #7C3AED 0%, #b4e0f9 100%);
 }
 .text-gradient-teal {
-  background: linear-gradient(135deg, #36ba98 0%, #1a4895 100%);
+  background: linear-gradient(135deg, #00CDBA 0%, #7C3AED 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

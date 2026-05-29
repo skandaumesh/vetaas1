@@ -25,7 +25,7 @@ export default function OfferingsSection() {
     },
     {
       image: "/flow2.png",
-      color: "bg-[#36ba98]", // Emerald Green
+      color: "bg-[#00CDBA]", // Emerald Green
       iconBg: "bg-[#7fd9bc]",
       btnColor: "bg-[#2da182]",
       title: "Teacher Engagement",

@@ -6,6 +6,7 @@ import { db } from "@/lib/firebase";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar } from "lucide-react";
+import { parseLumaUrl, initLumaCheckout } from "@/lib/luma";
 
 interface Event {
   id: string;
@@ -27,13 +28,6 @@ export default function EventBanner() {
       return;
     }
 
-    const FALLBACK_EVENT: Event = {
-      id: "fallback",
-      title: "Upcoming Retreat for Teachers",
-      date: "",
-      status: "upcoming",
-    };
-
     const fetchEvents = async () => {
       try {
         const snapshot = await getDocs(collection(db, "events"));
@@ -53,17 +47,23 @@ export default function EventBanner() {
             (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
           );
 
-        // Use nearest Firestore event, or fall back to the static one
-        setEvent(upcoming.length > 0 ? upcoming[0] : FALLBACK_EVENT);
+        // Use nearest Firestore event
+        setEvent(upcoming.length > 0 ? upcoming[0] : null);
       } catch (err) {
         console.error("EventBanner: failed to fetch events", err);
-        // Still show the fallback even if Firestore fails
-        setEvent(FALLBACK_EVENT);
+        setEvent(null);
       }
     };
 
     fetchEvents();
   }, []);
+
+  // Initialize Luma checkout widget and dynamic script binding
+  useEffect(() => {
+    if (event && !dismissed) {
+      initLumaCheckout();
+    }
+  }, [event, dismissed]);
 
   const handleDismiss = () => {
     setDismissed(true);
@@ -92,7 +92,7 @@ export default function EventBanner() {
           className="overflow-hidden w-full z-[60] relative"
           style={{ fontFamily: "var(--font-poppins), sans-serif" }}
         >
-          <div className="bg-[#e8604c] w-full pl-4 pr-11 sm:px-6 py-2.5 flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 sm:gap-3 relative">
+          <div className="bg-[#FF5C7A] w-full pl-4 pr-11 sm:px-6 py-2.5 flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 sm:gap-3 relative">
             {/* Calendar icon */}
             <Calendar size={14} className="text-white/80 shrink-0" />
 
@@ -120,18 +120,30 @@ export default function EventBanner() {
               className="shrink-0 rounded-full"
             >
               {event.registrationUrl ? (
-                <a
-                  href={event.registrationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block bg-[#ffd166] text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap"
-                >
-                  Register Now
-                </a>
+                (() => {
+                  const finalUrl = parseLumaUrl(event.registrationUrl)!;
+                  const isLuma = finalUrl.includes("lu.ma");
+                  const eventIdMatch = finalUrl.match(/evt-[a-zA-Z0-9]+/);
+                  const lumaEventId = isLuma && eventIdMatch ? eventIdMatch[0] : undefined;
+                  return (
+                    <a
+                      href={finalUrl}
+                      target={isLuma ? undefined : "_blank"}
+                      rel="noopener noreferrer"
+                      className={`block bg-[#FFC107] text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap ${
+                        isLuma ? "luma-checkout--button" : ""
+                      }`}
+                      data-luma-action={isLuma ? "checkout" : undefined}
+                      data-luma-event-id={lumaEventId}
+                    >
+                      Register Now
+                    </a>
+                  );
+                })()
               ) : (
                 <Link
-                  href={event.id === "fallback" ? `/contact?event=${encodeURIComponent(event.title)}` : `/events#${event.id}`}
-                  className="block bg-[#ffd166] text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap"
+                  href={`/events#${event.id}`}
+                  className="block bg-[#FFC107] text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap"
                 >
                   Register Now
                 </Link>

@@ -41,7 +41,7 @@ export default function ImpactSection() {
       label: "Parents Empowered", 
       description: "Through workshops and home SEL programs",
       icon: HeartHandshake,
-      color: "#ff6e79" // Coral
+      color: "#FF5C7A" // Coral
     },
     { 
       number: 50, 
@@ -49,7 +49,7 @@ export default function ImpactSection() {
       label: "Teachers Trained", 
       description: "With SEL integration toolkits",
       icon: GraduationCap,
-      color: "#ffd166" // Gold
+      color: "#FFC107" // Gold
     },
     { 
       number: 300, 
@@ -57,7 +57,7 @@ export default function ImpactSection() {
       label: "Children Reached", 
       description: "Across schools in Bangalore",
       icon: Users,
-      color: "#36ba98" // Teal
+      color: "#00CDBA" // Teal
     },
     { 
       number: 15, 
@@ -72,9 +72,9 @@ export default function ImpactSection() {
   return (
     <section className="relative py-24 lg:py-32 bg-[#111827] overflow-hidden text-white">
       {/* Dynamic Background Elements */}
-      <div className="absolute top-0 right-0 w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-[#1a4895]/40 blur-[120px] pointer-events-none translate-x-1/3 -translate-y-1/3" />
-      <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-[#36ba98]/20 blur-[100px] pointer-events-none -translate-x-1/3 translate-y-1/3" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-[#ff6e79]/10 blur-[150px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-[#7C3AED]/40 blur-[120px] pointer-events-none translate-x-1/3 -translate-y-1/3" />
+      <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-[#00CDBA]/20 blur-[100px] pointer-events-none -translate-x-1/3 translate-y-1/3" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full bg-[#FF5C7A]/10 blur-[150px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <motion.div
@@ -84,12 +84,12 @@ export default function ImpactSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-20"
         >
-          <span className="inline-block py-1.5 px-4 rounded-full bg-white/10 border border-white/20 text-[#ffd166] font-semibold text-sm uppercase tracking-widest mb-6 backdrop-blur-sm shadow-sm">
+          <span className="inline-block py-1.5 px-4 rounded-full bg-white/10 border border-white/20 text-[#FFC107] font-semibold text-sm uppercase tracking-widest mb-6 backdrop-blur-sm shadow-sm">
             Our Impact
           </span>
           <h2 className="font-headline text-5xl md:text-6xl lg:text-7xl tracking-tight leading-tight">
             Numbers That Tell <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffd166] to-[#ff6e79]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFC107] to-[#FF5C7A]">
               Our Story
             </span>
           </h2>

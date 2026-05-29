@@ -18,6 +18,7 @@ import {
   Check,
 } from "lucide-react";
 import Image from "next/image";
+import { parseLumaUrl, initLumaCheckout } from "@/lib/luma";
 
 export default function EventsPage() {
   const [events, setEvents] = useState<any[]>([]);
@@ -79,6 +80,13 @@ export default function EventsPage() {
   const upcomingEvents = events.filter((e) => e.status === "upcoming");
   const pastEvents = events.filter((e) => e.status === "completed");
 
+  // Initialize Luma checkout widget and dynamic script binding
+  useEffect(() => {
+    if (!loading && events.length > 0) {
+      initLumaCheckout();
+    }
+  }, [loading, events]);
+
   return (
     <div className="min-h-screen bg-[#faf9f7] pt-[calc(var(--header-height)+3rem)] pb-24 relative z-10 font-sans">
 
@@ -90,7 +98,7 @@ export default function EventsPage() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* Eyebrow */}
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-[#36ba98] mb-5">
+          <p className="text-xs font-black uppercase tracking-[0.25em] text-[#00CDBA] mb-5">
             What's happening
           </p>
 
@@ -176,7 +184,7 @@ export default function EventsPage() {
         </div>
 
         {/* Right: Calendar */}
-        <div className="hidden lg:block border-l-2 border-[#ff6e79]/20 pl-8">
+        <div className="hidden lg:block border-l-2 border-[#FF5C7A]/20 pl-8">
           <div className="sticky top-32">
             <RealCalendar events={events} />
           </div>
@@ -256,7 +264,7 @@ function ShareButton({ event, variant = "light" }: { event: any; variant?: "ligh
 
   const baseClass = variant === "dark"
     ? "inline-flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white transition-colors p-1"
-    : "inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[#36ba98] transition-colors p-1";
+    : "inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-[#00CDBA] transition-colors p-1";
 
   return (
     <button
@@ -280,6 +288,7 @@ function ShareButton({ event, variant = "light" }: { event: any; variant?: "ligh
 }
 
 /* ── Editorial Event Card ── */
+
 function EventCard({
   event,
   index,
@@ -336,7 +345,7 @@ function EventCard({
       <div className={`group flex flex-col h-full p-5 rounded-3xl border transition-all duration-500 hover:-translate-y-1 hover:shadow-xl ${
         isHighlighted
           ? "ring-4 ring-[#ff7f68] border-[#ff7f68] bg-gradient-to-br from-white to-[#ff7f68]/5 shadow-[0_15px_40px_rgba(255,127,104,0.3)]"
-          : "border-[#36ba98]/25 bg-gradient-to-br from-white to-[#36ba98]/5 shadow-[0_4px_20px_rgba(54,186,152,0.03)] hover:border-[#36ba98]/40"
+          : "border-[#00CDBA]/25 bg-gradient-to-br from-white to-[#00CDBA]/5 shadow-[0_4px_20px_rgba(54,186,152,0.03)] hover:border-[#00CDBA]/40"
       }`}>
         {/* Card Image */}
         {event.image && (
@@ -354,7 +363,7 @@ function EventCard({
         {/* Card Body */}
         <div className="flex gap-4 flex-1">
           {/* Left: Date Badge */}
-          <div className="shrink-0 w-10 text-center bg-gradient-to-br from-[#36ba98] to-[#2a9d7e] rounded-xl py-2 flex flex-col justify-center h-fit select-none shadow-sm shadow-[#36ba98]/10 group-hover:scale-105 transition-all duration-300">
+          <div className="shrink-0 w-10 text-center bg-gradient-to-br from-[#00CDBA] to-[#2a9d7e] rounded-xl py-2 flex flex-col justify-center h-fit select-none shadow-sm shadow-[#00CDBA]/10 group-hover:scale-105 transition-all duration-300">
             <span className="font-headline text-lg sm:text-xl font-bold text-white leading-none">{day}</span>
             <span className="text-[7px] font-black uppercase tracking-[0.05em] text-white/90 mt-1">{monthStr}</span>
             <span className="text-[6.5px] font-semibold text-white/75 mt-0.5">{yearStr}</span>
@@ -366,13 +375,13 @@ function EventCard({
               <span className={`inline-block text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full ${
                 isCompleted
                   ? "bg-gray-100 text-gray-400"
-                  : "bg-[#36ba98]/10 text-[#2a9d7e]"
+                  : "bg-[#00CDBA]/10 text-[#2a9d7e]"
               }`}>
                 {isCompleted ? "Completed" : "Upcoming"}
               </span>
             </div>
 
-            <h3 className="font-headline text-base sm:text-lg text-[#111827] font-bold leading-snug mb-2 line-clamp-2 group-hover:text-[#36ba98] transition-colors duration-300">
+            <h3 className="font-headline text-base sm:text-lg text-[#111827] font-bold leading-snug mb-2 line-clamp-2 group-hover:text-[#00CDBA] transition-colors duration-300">
               {event.title}
             </h3>
 
@@ -399,7 +408,7 @@ function EventCard({
                 href={event.highlightsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#111827] border-b border-[#111827] pb-0.5 hover:text-[#36ba98] hover:border-[#36ba98] transition-colors"
+                className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#111827] border-b border-[#111827] pb-0.5 hover:text-[#00CDBA] hover:border-[#00CDBA] transition-colors"
               >
                 Highlights <ExternalLink size={10} />
               </a>
@@ -407,18 +416,30 @@ function EventCard({
           ) : (
             <>
               {event.registrationUrl ? (
-                <a
-                  href={event.registrationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#36ba98] border-b-2 border-[#36ba98] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors"
-                >
-                  Register <ExternalLink size={10} />
-                </a>
+                (() => {
+                  const finalUrl = parseLumaUrl(event.registrationUrl)!;
+                  const isLuma = finalUrl.includes("lu.ma");
+                  const eventIdMatch = finalUrl.match(/evt-[a-zA-Z0-9]+/);
+                  const lumaEventId = isLuma && eventIdMatch ? eventIdMatch[0] : undefined;
+                  return (
+                    <a
+                      href={finalUrl}
+                      target={isLuma ? undefined : "_blank"}
+                      rel="noopener noreferrer"
+                      className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#00CDBA] border-b-2 border-[#00CDBA] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors ${
+                        isLuma ? "luma-checkout--button" : ""
+                      }`}
+                      data-luma-action={isLuma ? "checkout" : undefined}
+                      data-luma-event-id={lumaEventId}
+                    >
+                      Register <ExternalLink size={10} />
+                    </a>
+                  );
+                })()
               ) : (
                 <Link
                   href={`/contact?event=${encodeURIComponent(event.title)}`}
-                  className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#36ba98] border-b-2 border-[#36ba98] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors"
+                  className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#00CDBA] border-b-2 border-[#00CDBA] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors"
                 >
                   Register <ArrowRight size={10} />
                 </Link>
@@ -514,7 +535,7 @@ function MemoryCard({
             <p className="font-headline text-base font-bold text-[#111827] leading-none">
               {day}
             </p>
-            <p className="text-[7px] font-black uppercase tracking-[0.1em] text-[#36ba98] mt-0.5">
+            <p className="text-[7px] font-black uppercase tracking-[0.1em] text-[#00CDBA] mt-0.5">
               {monthStr}
             </p>
             <p className="text-[6px] font-semibold text-gray-400 mt-0.5">
@@ -522,17 +543,19 @@ function MemoryCard({
             </p>
           </div>
 
-          {/* Completed badge */}
-          <div className="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm rounded-full px-2.5 py-0.5">
-            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/90">
-              Completed
-            </span>
-          </div>
         </div>
 
         {/* Card Body */}
         <div className="flex-1 flex flex-col">
-          <h3 className="font-headline text-base sm:text-lg text-[#111827] font-bold leading-snug mb-2 line-clamp-2 group-hover:text-[#36ba98] transition-colors duration-300">
+          <div className="mb-2.5">
+            <div className="inline-flex items-center gap-1.5 bg-gray-50 rounded-full px-2.5 py-1 border border-gray-100">
+              <Check size={10} strokeWidth={3} className="text-[#00CDBA]" />
+              <span className="text-[9px] font-black uppercase tracking-[0.15em] text-gray-600">
+                Completed
+              </span>
+            </div>
+          </div>
+          <h3 className="font-headline text-base sm:text-lg text-[#111827] font-bold leading-snug mb-2 line-clamp-2 group-hover:text-[#00CDBA] transition-colors duration-300">
             {event.title}
           </h3>
 
@@ -557,7 +580,7 @@ function MemoryCard({
               href={event.highlightsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#111827] border-b border-[#111827] pb-0.5 hover:text-[#36ba98] hover:border-[#36ba98] transition-colors"
+              className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#111827] border-b border-[#111827] pb-0.5 hover:text-[#00CDBA] hover:border-[#00CDBA] transition-colors"
             >
               Highlights <ExternalLink size={10} />
             </a>
@@ -633,7 +656,7 @@ function MonthGrid({ date, events }: { date: Date; events: any[] }) {
           key={`day-${i}`}
           onClick={handleDayClick}
           title={`Click to view: ${dayEvents[0].title}`}
-          className="flex items-center justify-center w-[22px] h-[22px] mx-auto rounded-full text-[10px] font-black transition-all duration-200 bg-[#ffd166] text-[#111827] shadow-sm hover:scale-125 hover:shadow-md cursor-pointer border border-[#ffd166] outline-none"
+          className="flex items-center justify-center w-[22px] h-[22px] mx-auto rounded-full text-[10px] font-black transition-all duration-200 bg-[#FFC107] text-[#111827] shadow-sm hover:scale-125 hover:shadow-md cursor-pointer border border-[#FFC107] outline-none"
         >
           {i}
         </button>
@@ -642,7 +665,7 @@ function MonthGrid({ date, events }: { date: Date; events: any[] }) {
           key={`day-${i}`}
           className={`
             flex items-center justify-center w-[22px] h-[22px] mx-auto rounded-full text-[10px] font-bold transition-all duration-200
-            ${isToday ? "ring-[1px] ring-[#ff6e79] text-[#111827]" : "text-gray-700 hover:bg-black/5"}
+            ${isToday ? "ring-[1px] ring-[#FF5C7A] text-[#111827]" : "text-gray-700 hover:bg-black/5"}
           `}
         >
           {i}
@@ -654,7 +677,7 @@ function MonthGrid({ date, events }: { date: Date; events: any[] }) {
   return (
     <div className="py-0.5">
       {/* Month Label */}
-      <div className="text-[12px] font-bold text-[#ff6e79] text-center mb-2.5">
+      <div className="text-[12px] font-bold text-[#FF5C7A] text-center mb-2.5">
         {monthNames[month]} {year}
       </div>
 
@@ -694,7 +717,7 @@ function RealCalendar({ events }: { events: any[] }) {
       <div className="flex lg:hidden items-center justify-between w-full px-2 mb-1">
         <button
           onClick={handlePrev}
-          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#ff6e79] hover:text-[#e8604c]"
+          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#FF5C7A] hover:text-[#FF5C7A]"
           aria-label="Previous Month"
         >
           <ChevronLeft size={20} />
@@ -704,7 +727,7 @@ function RealCalendar({ events }: { events: any[] }) {
         </span>
         <button
           onClick={handleNext}
-          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#ff6e79] hover:text-[#e8604c]"
+          className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#FF5C7A] hover:text-[#FF5C7A]"
           aria-label="Next Month"
         >
           <ChevronRight size={20} />
@@ -714,7 +737,7 @@ function RealCalendar({ events }: { events: any[] }) {
       {/* Up Chevron (desktop only) */}
       <button
         onClick={handlePrev}
-        className="hidden lg:flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#ff6e79] hover:text-[#e8604c]"
+        className="hidden lg:flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#FF5C7A] hover:text-[#FF5C7A]"
         title="Previous Month"
       >
         <ChevronUp size={20} />
@@ -722,13 +745,13 @@ function RealCalendar({ events }: { events: any[] }) {
 
       {/* Three Months stacked vertically on desktop, horizontally scrollable on mobile */}
       <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible snap-x snap-mandatory gap-4 pb-1 lg:pb-0 scroll-smooth w-full">
-        <div className="min-w-[180px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 snap-center bg-white border border-[#ff6e79]/15 rounded-2xl p-3.5 shadow-sm shadow-[#ff6e79]/3">
+        <div className="min-w-[180px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 snap-center bg-white border border-[#FF5C7A]/15 rounded-2xl p-3.5 shadow-sm shadow-[#FF5C7A]/3">
           <MonthGrid date={prevMonth} events={events} />
         </div>
-        <div className="min-w-[180px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 snap-center bg-white border border-[#ff6e79]/25 rounded-2xl p-3.5 shadow-sm shadow-[#ff6e79]/5 ring-1 ring-[#ff6e79]/10">
+        <div className="min-w-[180px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 snap-center bg-white border border-[#FF5C7A]/25 rounded-2xl p-3.5 shadow-sm shadow-[#FF5C7A]/5 ring-1 ring-[#FF5C7A]/10">
           <MonthGrid date={centerMonth} events={events} />
         </div>
-        <div className="min-w-[180px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 snap-center bg-white border border-[#ff6e79]/15 rounded-2xl p-3.5 shadow-sm shadow-[#ff6e79]/3">
+        <div className="min-w-[180px] sm:min-w-[200px] lg:min-w-0 flex-1 shrink-0 snap-center bg-white border border-[#FF5C7A]/15 rounded-2xl p-3.5 shadow-sm shadow-[#FF5C7A]/3">
           <MonthGrid date={nextMonth} events={events} />
         </div>
       </div>
@@ -736,7 +759,7 @@ function RealCalendar({ events }: { events: any[] }) {
       {/* Down Chevron (desktop only) */}
       <button
         onClick={handleNext}
-        className="hidden lg:flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#ff6e79] hover:text-[#e8604c]"
+        className="hidden lg:flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 transition-colors text-[#FF5C7A] hover:text-[#FF5C7A]"
         title="Next Month"
       >
         <ChevronDown size={20} />

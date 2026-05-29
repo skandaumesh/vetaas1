@@ -19,9 +19,9 @@ const TEAM = [
     initials: "SB",
     role: "Co-Founder | Pulmonologist | Guitar Player",
     bio: "As a dedicated doctor and passionate advocate for education, I believe that health and education are fundamental human rights. Through Vetaas, I employ my strengths and skills to create environments where learning never stops and where growth and well-being are at the heart of everything we do. At Vetaas we focus on early childhood so that there are greater chances of the children becoming well-rounded adults.",
-    gradient: "from-[#45bcf6] to-[#1a4895]",
+    gradient: "from-[#45bcf6] to-[#7C3AED]",
     borderColor: "border-[#45bcf6]",
-    textColor: "text-[#1a4895]",
+    textColor: "text-[#7C3AED]",
     bgHover: "hover:bg-[#45bcf6]/5",
     activeBg: "bg-[#eff6ff]",
     activeBorder: "border-[#45bcf6]/30",
@@ -49,15 +49,32 @@ const TEAM = [
     initials: "T",
     role: "Social Media Head | OneZeroLabs",
     bio: "Representing OneZeroLabs, I lead the social media presence and digital campaigns for Vetaas. I specialize in creative storytelling, visual communication, and building interactive online communities to spread awareness about Social Emotional Learning (SEL) in early childhood.",
-    gradient: "from-[#36ba98] to-[#1f7860]",
-    borderColor: "border-[#36ba98]",
+    gradient: "from-[#00CDBA] to-[#1f7860]",
+    borderColor: "border-[#00CDBA]",
     textColor: "text-[#1f7860]",
-    bgHover: "hover:bg-[#36ba98]/5",
+    bgHover: "hover:bg-[#00CDBA]/5",
     activeBg: "bg-[#f0fdf4]",
-    activeBorder: "border-[#36ba98]/30",
+    activeBorder: "border-[#00CDBA]/30",
     image: "/tanisha.jpeg",
     roleTags: ["Social Media Head", "OneZeroLabs"],
-    linkedin: "https://www.linkedin.com/in/tanisha-karve/"
+    linkedin: "https://www.linkedin.com/in/tanisha-karve/",
+    website: "https://onezerolabs.in"
+  },
+  {
+    name: "Skanda Umesh",
+    initials: "SU",
+    role: "Founder, OneZeroLabs | Tech Support",
+    bio: "As the founder of OneZeroLabs, I provide the foundational tech support and technical direction for Vetaas, ensuring our digital platforms are robust, modern, and capable of scaling our impact in early childhood education.",
+    gradient: "from-[#FFC107] to-[#e6a800]",
+    borderColor: "border-[#FFC107]",
+    textColor: "text-[#e6a800]",
+    bgHover: "hover:bg-[#FFC107]/5",
+    activeBg: "bg-[#fffbf0]",
+    activeBorder: "border-[#FFC107]/30",
+    image: "/skanda.jpeg",
+    roleTags: ["Founder, OneZeroLabs", "Tech Support"],
+    linkedin: "https://www.linkedin.com/in/skanda-umesh-88b16432b/",
+    website: "https://onezerolabs.in"
   },
 ];
 
@@ -73,9 +90,9 @@ export default function AboutPageClient() {
       <section id="formula-section" className="py-24 bg-[#fafaf9] relative overflow-hidden rounded-[3.5rem] mx-4 md:mx-8 border border-gray-100 shadow-[inset_0_0_80px_rgba(0,0,0,0.01)]">
         
         {/* Glowing blur background blobs */}
-        <div className="absolute top-[10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-[#36ba98]/4 blur-[100px] pointer-events-none z-0" />
+        <div className="absolute top-[10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-[#00CDBA]/4 blur-[100px] pointer-events-none z-0" />
         <div className="absolute bottom-[10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-[#ff7f68]/4 blur-[100px] pointer-events-none z-0" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#1a4895]/3 blur-[120px] pointer-events-none z-0" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#7C3AED]/3 blur-[120px] pointer-events-none z-0" />
 
         {/* Refined Dot Grid Pattern */}
         <div 
@@ -87,8 +104,8 @@ export default function AboutPageClient() {
         />
 
         <div className="max-w-4xl mx-auto px-6 relative z-10 text-center mb-16 flex flex-col items-center">
-          <div className="inline-flex items-center gap-2 bg-[#1a4895]/10 text-[#1a4895] px-4.5 py-1.5 rounded-full mb-6 shadow-sm border border-[#1a4895]/5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1a4895] animate-pulse shrink-0" />
+          <div className="inline-flex items-center gap-2 bg-[#7C3AED]/10 text-[#7C3AED] px-4.5 py-1.5 rounded-full mb-6 shadow-sm border border-[#7C3AED]/5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] animate-pulse shrink-0" />
             <span className="text-[10px] font-black uppercase tracking-[0.25em]">The Framework</span>
           </div>
 
@@ -105,8 +122,8 @@ export default function AboutPageClient() {
             <p className="text-gray-500 font-semibold text-base md:text-lg leading-relaxed">
               Social Emotional Learning (SEL) is the most progressive framework we have to perceive education holistically.
             </p>
-            <div className="w-12 h-1 bg-[#36ba98]/40 rounded-full mx-auto my-6" />
-            <p className="text-[#36ba98] font-extrabold text-lg md:text-xl tracking-tight leading-relaxed max-w-lg mx-auto">
+            <div className="w-12 h-1 bg-[#00CDBA]/40 rounded-full mx-auto my-6" />
+            <p className="text-[#00CDBA] font-extrabold text-lg md:text-xl tracking-tight leading-relaxed max-w-lg mx-auto">
               And what best time to embrace this framework than early childhood education?
             </p>
           </div>
@@ -118,25 +135,25 @@ export default function AboutPageClient() {
           <motion.div 
             whileHover={{ y: -8, scale: 1.01 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="group relative p-8 md:p-10 bg-white/70 backdrop-blur-md rounded-[3rem] border border-[#36ba98]/10 shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-xl hover:shadow-[#36ba98]/5 hover:border-[#36ba98]/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+            className="group relative p-8 md:p-10 bg-white/70 backdrop-blur-md rounded-[3rem] border border-[#00CDBA]/10 shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-xl hover:shadow-[#00CDBA]/5 hover:border-[#00CDBA]/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
             {/* Subtle card accent pattern */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#36ba98]/5 to-transparent rounded-bl-full pointer-events-none" />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#00CDBA]/5 to-transparent rounded-bl-full pointer-events-none" />
 
             <div>
               <div className="flex justify-between items-start mb-8">
                 {/* Icon wrapper */}
-                <div className="w-16 h-16 rounded-[1.5rem] bg-[#eefcf7] flex items-center justify-center text-[#36ba98] shadow-inner relative group-hover:scale-105 transition-transform duration-300">
+                <div className="w-16 h-16 rounded-[1.5rem] bg-[#eefcf7] flex items-center justify-center text-[#00CDBA] shadow-inner relative group-hover:scale-105 transition-transform duration-300">
                   <Sparkles size={26} className="transition-transform duration-700 group-hover:rotate-45" />
                 </div>
                 
                 {/* Badge */}
-                <span className="bg-[#36ba98]/10 text-[#2a9d7e] text-[9px] font-black uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-full border border-[#36ba98]/5 shadow-sm">
+                <span className="bg-[#00CDBA]/10 text-[#2a9d7e] text-[9px] font-black uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-full border border-[#00CDBA]/5 shadow-sm">
                   Curriculum
                 </span>
               </div>
 
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 tracking-tight group-hover:text-[#36ba98] transition-colors duration-300">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 tracking-tight group-hover:text-[#00CDBA] transition-colors duration-300">
                 Reimagining
               </h3>
               
@@ -152,7 +169,7 @@ export default function AboutPageClient() {
                   "Holistic milestones and growth mapping"
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-[#36ba98]/10 flex items-center justify-center text-[#36ba98] shrink-0 mt-0.5">
+                    <div className="w-5 h-5 rounded-full bg-[#00CDBA]/10 flex items-center justify-center text-[#00CDBA] shrink-0 mt-0.5">
                       <Check size={12} strokeWidth={3} />
                     </div>
                     <span className="text-sm font-semibold text-gray-600">{item}</span>
@@ -258,10 +275,9 @@ export default function AboutPageClient() {
                 
                 <ul className="space-y-4">
                   {[
-                    "Daily mindfulness & emotion check-ins",
-                    "Playful conversation prompts & games",
-                    "Community support & sharing circles",
-                    "Expert parenting guides & newsletters"
+                    "Research-backed parenting support",
+                    "Interactive parent-child learning sessions",
+                    "SEL kits for meaningful engagement"
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <div className="w-5 h-5 rounded-full bg-[#ff7f68]/10 flex items-center justify-center text-[#ff7f68] shrink-0 mt-0.5">
@@ -290,19 +306,19 @@ export default function AboutPageClient() {
             >
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight leading-[1.1] mb-6">
                 Our Work With <br />
-                <span className="inline-block bg-[#4285F4] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-2">Teachers.</span>
+                <span className="inline-block bg-[#1E90FF] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-2">Teachers.</span>
               </h2>
               <div className="space-y-5 text-gray-500 font-medium leading-relaxed mb-8 text-base md:text-lg">
                 <p>
-                  The role of teachers is vital. We support teachers in providing excellent support and resources to manage complex learning journeys.
+                  We believe teachers need the right support and care to help children learn well. 
                 </p>
                 <p>
-                  Our programs help teachers integrate SEL, renew their energies, and create supportive environments.
+                  Our programs help teachers build new skills, feel supported, and enjoy their teaching with more confidence and happiness.
                 </p>
               </div>
               <Link 
                 href="/contact" 
-                className="inline-flex items-center gap-2 bg-[#4285F4] hover:bg-[#2d70db] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
+                className="inline-flex items-center gap-2 bg-[#1E90FF] hover:bg-[#2d70db] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
               >
                 Teacher Programs <ArrowRight size={16} />
               </Link>
@@ -310,9 +326,9 @@ export default function AboutPageClient() {
 
             {/* Redesigned Teacher Hub Card (No Image) */}
             <div className="lg:w-1/2 w-full max-w-[480px]">
-              <div className="bg-[#eff6ff] p-8 md:p-10 rounded-[2.5rem] border border-[#4285F4]/20 shadow-md -rotate-2 transition-transform duration-500 hover:rotate-0">
+              <div className="bg-[#eff6ff] p-8 md:p-10 rounded-[2.5rem] border border-[#1E90FF]/20 shadow-md -rotate-2 transition-transform duration-500 hover:rotate-0">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-[#dbeafe] flex items-center justify-center text-[#4285F4]">
+                  <div className="w-10 h-10 rounded-xl bg-[#dbeafe] flex items-center justify-center text-[#1E90FF]">
                     <BookOpen size={20} />
                   </div>
                   <h3 className="font-bold text-xl text-[#111827]">SEL Teacher Hub</h3>
@@ -320,13 +336,12 @@ export default function AboutPageClient() {
 
                 <ul className="space-y-4">
                   {[
-                    "Classroom integration modules & toolkits",
-                    "Teacher well-being & stress-relief programs",
-                    "Peer-to-peer lesson sharing networks",
-                    "Dynamic assessment & feedback templates"
+                    "Helping teachers understand SEL in practical ways",
+                    "Support the well-being of teachers",
+                    "Creating a community of teachers."
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-[#4285F4]/10 flex items-center justify-center text-[#4285F4] shrink-0 mt-0.5">
+                      <div className="w-5 h-5 rounded-full bg-[#1E90FF]/10 flex items-center justify-center text-[#1E90FF] shrink-0 mt-0.5">
                         <Check size={12} strokeWidth={3} />
                       </div>
                       <span className="text-sm font-semibold text-gray-600">{item}</span>
@@ -334,8 +349,8 @@ export default function AboutPageClient() {
                   ))}
                 </ul>
 
-                <div className="mt-8 pt-6 border-t border-[#4285F4]/10 text-center">
-                  <span className="text-xs font-bold text-[#4285F4] uppercase tracking-wider">Creating active learning ecosystems</span>
+                <div className="mt-8 pt-6 border-t border-[#1E90FF]/10 text-center">
+                  <span className="text-xs font-bold text-[#1E90FF] uppercase tracking-wider">Creating active learning ecosystems</span>
                 </div>
               </div>
             </div>
@@ -351,12 +366,12 @@ export default function AboutPageClient() {
             
             {/* Left Column: Typographic Intro */}
             <div className="lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-left">
-              <div className="inline-flex items-center justify-center bg-[#ffd166] text-[#111827] px-4 py-1.5 rounded-full mb-6 shadow-sm rotate-2">
+              <div className="inline-flex items-center justify-center bg-[#FFC107] text-[#111827] px-4 py-1.5 rounded-full mb-6 shadow-sm rotate-2">
                 <span className="text-xs font-semibold uppercase tracking-wider">Meet the Visionaries</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-bold text-[#111827] tracking-tight leading-[1.15] mb-6">
                 The Team <br />
-                Behind <span className="inline-block bg-[#36ba98] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-1">Vetaas.</span>
+                Behind <span className="inline-block bg-[#00CDBA] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-1">Vetaas.</span>
               </h2>
               <p className="text-gray-500 font-medium leading-relaxed mb-8 max-w-md">
                 We are doctors, teachers, developers, and parents united by a shared vision to build support systems around childhood learning and mental well-being.
@@ -454,14 +469,27 @@ export default function AboutPageClient() {
                             {member.bio}
                           </p>
 
-                          <a 
-                            href={member.linkedin} 
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`inline-flex items-center gap-2 font-bold text-xs uppercase tracking-wider ${member.textColor} hover:gap-3 transition-all pb-1 border-b-2 border-transparent hover:border-current`}
-                          >
-                            Let&apos;s Connect <LinkedinIcon size={14} />
-                          </a>
+                          <div className="flex flex-wrap gap-4 md:gap-6 justify-center md:justify-start">
+                            <a 
+                              href={member.linkedin} 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`inline-flex items-center gap-2 font-bold text-xs uppercase tracking-wider ${member.textColor} hover:gap-3 transition-all pb-1 border-b-2 border-transparent hover:border-current`}
+                            >
+                              Let&apos;s Connect <LinkedinIcon size={14} />
+                            </a>
+                            
+                            {member.website && (
+                              <a 
+                                href={member.website} 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`inline-flex items-center gap-2 font-bold text-xs uppercase tracking-wider ${member.textColor} hover:gap-3 transition-all pb-1 border-b-2 border-transparent hover:border-current`}
+                              >
+                                onezerolabs.in <ArrowRight size={14} />
+                              </a>
+                            )}
+                          </div>
                         </div>
 
                       </div>
