@@ -315,13 +315,29 @@ function EventCard({
   let day = "01";
   let monthStr = "Jan";
   let yearStr = "";
+  let durationDays = 1;
+  let hasRange = false;
   
   try {
     const dateObj = new Date(event.date);
     if (!isNaN(dateObj.getTime())) {
-      day = String(dateObj.getDate()).padStart(2, "0");
+      const startDayNum = dateObj.getDate();
+      day = String(startDayNum).padStart(2, "0");
       monthStr = dateObj.toLocaleString("default", { month: "short" }).toUpperCase();
       yearStr = String(dateObj.getFullYear());
+
+      if (event.endDate) {
+        const endDateObj = new Date(event.endDate);
+        if (!isNaN(endDateObj.getTime()) && endDateObj.toDateString() !== dateObj.toDateString()) {
+          const endDayNum = endDateObj.getDate();
+          
+          const diffTime = Math.abs(endDateObj.getTime() - dateObj.getTime());
+          durationDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+          day = `${startDayNum}-${endDayNum}`;
+          hasRange = true;
+        }
+      }
     }
   } catch (e) {}
 
@@ -382,15 +398,15 @@ function EventCard({
         {/* Card Body */}
         <div className="flex gap-4 flex-1">
           {/* Left: Date Badge */}
-          <div className="shrink-0 w-10 text-center bg-gradient-to-br from-[#00CDBA] to-[#2a9d7e] rounded-xl py-2 flex flex-col justify-center h-fit select-none shadow-sm shadow-[#00CDBA]/10 group-hover:scale-105 transition-all duration-300">
-            <span className="font-headline text-lg sm:text-xl font-bold text-white leading-none">{day}</span>
+          <div className={`shrink-0 ${hasRange ? 'w-12 sm:w-14' : 'w-10'} text-center bg-gradient-to-br from-[#00CDBA] to-[#2a9d7e] rounded-xl py-2 flex flex-col justify-center h-fit select-none shadow-sm shadow-[#00CDBA]/10 group-hover:scale-105 transition-all duration-300`}>
+            <span className={`font-headline font-bold text-white leading-none ${hasRange ? 'text-xs sm:text-sm' : 'text-lg sm:text-xl'}`}>{day}</span>
             <span className="text-[7px] font-black uppercase tracking-[0.05em] text-white/90 mt-1">{monthStr}</span>
             <span className="text-[6.5px] font-semibold text-white/75 mt-0.5">{yearStr}</span>
           </div>
 
           {/* Right: Event Details */}
           <div className="flex-1 min-w-0 flex flex-col">
-            <div className="mb-2">
+            <div className="mb-2 flex items-center gap-1.5 flex-wrap">
               <span className={`inline-block text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full ${
                 isCompleted
                   ? "bg-gray-100 text-gray-400"
@@ -415,6 +431,11 @@ function EventCard({
                 <Calendar size={11} className="text-gray-400 shrink-0" />
                 <span className="truncate">{formattedFull}</span>
               </span>
+              {durationDays > 1 && (
+                <span className="text-[10px] font-bold text-[#00CDBA] pl-[17px] mt-0.5">
+                  {durationDays} Days
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -483,15 +504,31 @@ function MemoryCard({
   let day = "01";
   let monthStr = "Jan";
   let yearStr = "";
+  let durationDays = 1;
+  let hasRange = false;
 
   try {
     const dateObj = new Date(event.date);
     if (!isNaN(dateObj.getTime())) {
-      day = String(dateObj.getDate()).padStart(2, "0");
+      const startDayNum = dateObj.getDate();
+      day = String(startDayNum).padStart(2, "0");
       monthStr = dateObj
         .toLocaleString("default", { month: "short" })
         .toUpperCase();
       yearStr = String(dateObj.getFullYear());
+
+      if (event.endDate) {
+        const endDateObj = new Date(event.endDate);
+        if (!isNaN(endDateObj.getTime()) && endDateObj.toDateString() !== dateObj.toDateString()) {
+          const endDayNum = endDateObj.getDate();
+          
+          const diffTime = Math.abs(endDateObj.getTime() - dateObj.getTime());
+          durationDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+          day = `${startDayNum}-${endDayNum}`;
+          hasRange = true;
+        }
+      }
     }
   } catch (_e) {}
 
@@ -544,7 +581,7 @@ function MemoryCard({
 
           {/* Date badge */}
           <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1 text-center shadow-sm">
-            <p className="font-headline text-base font-bold text-[#111827] leading-none">
+            <p className={`font-headline font-bold text-[#111827] leading-none ${hasRange ? 'text-xs px-0.5' : 'text-base'}`}>
               {day}
             </p>
             <p className="text-[7px] font-black uppercase tracking-[0.1em] text-[#00CDBA] mt-0.5">
@@ -559,7 +596,7 @@ function MemoryCard({
 
         {/* Card Body */}
         <div className="flex-1 flex flex-col">
-          <div className="mb-2.5">
+          <div className="mb-2.5 flex items-center gap-1.5 flex-wrap">
             <div className="inline-flex items-center gap-1.5 bg-gray-50 rounded-full px-2.5 py-1 border border-gray-100">
               <Check size={10} strokeWidth={3} className="text-[#00CDBA]" />
               <span className="text-[9px] font-black uppercase tracking-[0.15em] text-gray-600">
@@ -582,6 +619,11 @@ function MemoryCard({
               <Calendar size={11} className="text-gray-400 shrink-0" />
               <span className="truncate">{formattedFull}</span>
             </span>
+            {durationDays > 1 && (
+              <span className="text-[10px] font-bold text-[#00CDBA] pl-[17px] mt-0.5">
+                {durationDays} Days
+              </span>
+            )}
           </div>
         </div>
 

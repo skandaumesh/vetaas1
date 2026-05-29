@@ -135,7 +135,8 @@ export default function EventBanner() {
                       href={finalUrl}
                       target={isLuma ? undefined : "_blank"}
                       rel="noopener noreferrer"
-                      className="block bg-[#FFC107] text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap"
+                      className="block !bg-[#FFC107] !text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:!bg-yellow-300 transition-colors whitespace-nowrap"
+                      style={{ backgroundColor: "#FFC107", color: "#111827" }}
                       data-luma-action={isLuma ? "checkout" : undefined}
                       data-luma-event-id={lumaEventId}
                     >
