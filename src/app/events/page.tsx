@@ -252,9 +252,7 @@ function ShareButton({ event, variant = "light" }: { event: any; variant?: "ligh
     e.preventDefault();
     e.stopPropagation();
 
-    const shareUrl = event.registrationUrl 
-      ? event.registrationUrl 
-      : `${window.location.origin}/events#${event.id}`;
+    const shareUrl = `${window.location.origin}/events#${event.id}`;
 
     navigator.clipboard.writeText(shareUrl).then(() => {
       setCopied(true);
