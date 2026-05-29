@@ -32,10 +32,10 @@ export default function AdminEventsPage() {
   const [formData, setFormData] = useState({
     title: "",
     date: "",
+    endDate: "",
     location: "",
     highlightsUrl: "",
     registrationUrl: "",
-    status: "upcoming",
     manualImageUrl: ""
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -201,13 +201,30 @@ export default function AdminEventsPage() {
         imageUrl = formData.manualImageUrl;
       }
 
+      const getComputedStatus = (startDate: string, endDateStr?: string) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const checkDate = endDateStr || startDate;
+        if (!checkDate) return "upcoming";
+        try {
+          const eventDate = new Date(checkDate);
+          eventDate.setHours(0, 0, 0, 0);
+          return eventDate < today ? "completed" : "upcoming";
+        } catch {
+          return "upcoming";
+        }
+      };
+
+      const computedStatus = getComputedStatus(formData.date, formData.endDate);
+
       const eventData = {
         title: formData.title,
         date: formData.date,
+        endDate: formData.endDate || "",
         location: formData.location,
         highlightsUrl: formData.highlightsUrl,
         registrationUrl: formData.registrationUrl,
-        status: formData.status,
+        status: computedStatus,
         image: imageUrl,
         createdAt: new Date().toISOString()
       };
@@ -218,10 +235,10 @@ export default function AdminEventsPage() {
       setFormData({
         title: "",
         date: "",
+        endDate: "",
         location: "",
         highlightsUrl: "",
         registrationUrl: "",
-        status: "upcoming",
         manualImageUrl: ""
       });
       setImageFile(null);
@@ -262,17 +279,7 @@ export default function AdminEventsPage() {
     }
   };
 
-  const handleToggleStatus = async (id: string, currentStatus: string) => {
-    try {
-      const newStatus = currentStatus === "upcoming" ? "completed" : "upcoming";
-      await updateDoc(doc(db, "events", id), { status: newStatus });
-      fetchEvents();
-      showToast(`Event marked as ${newStatus}!`, "success");
-    } catch (error) {
-      console.error("Error updating status: ", error);
-      showToast("Failed to toggle event status.", "error");
-    }
-  };
+  // Automated status update handles completion status based on current date
 
   const handleUpdateHighlights = async (id: string, highlightsUrl: string) => {
     try {
@@ -551,19 +558,19 @@ export default function AdminEventsPage() {
                 <input type="text" id="title" name="title" value={formData.title} onChange={handleInputChange} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0CB0D8] outline-none" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
-                  <input type="date" id="date" name="date" value={formData.date} onChange={handleInputChange} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0CB0D8] outline-none" />
+                  <label htmlFor="date" className="block text-sm font-semibold text-gray-700 mb-1">Start Date *</label>
+                  <input type="date" id="date" name="date" value={formData.date} onChange={handleInputChange} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0CB0D8] outline-none text-sm" />
                 </div>
                 <div>
-                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-                  <select id="status" name="status" value={formData.status} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0CB0D8] outline-none">
-                    <option value="upcoming">Upcoming</option>
-                    <option value="completed">Completed</option>
-                  </select>
+                  <label htmlFor="endDate" className="block text-sm font-semibold text-gray-700 mb-1">End Date (Optional)</label>
+                  <input type="date" id="endDate" name="endDate" value={formData.endDate} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0CB0D8] outline-none text-sm" />
                 </div>
               </div>
+              <p className="text-[10px] text-gray-400 -mt-2">
+                Note: Status is calculated automatically (marked "Completed" after the event's date has passed).
+              </p>
 
               <div>
                 <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location *</label>
@@ -648,44 +655,62 @@ export default function AdminEventsPage() {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 truncate">{event.title}</h3>
                       <p className="text-xs text-gray-500 mt-0.5">
-                        {event.date} • {event.location}
+                        {event.date}{event.endDate ? ` - ${event.endDate}` : ""} • {event.location}
                       </p>
                       {event.registrationUrl && (
                         <span className="block text-xs text-blue-500 font-medium mt-1 truncate">
                           Reg: {event.registrationUrl}
                         </span>
                       )}
-                      <span className={`inline-block mt-2 px-2 py-0.5 text-[10px] font-medium rounded-full ${event.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                        {event.status.toUpperCase()}
-                      </span>
+                      {(() => {
+                        const isPast = (() => {
+                          if (!event.date) return true;
+                          try {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const checkDate = event.endDate || event.date;
+                            const eventDate = new Date(checkDate);
+                            eventDate.setHours(0, 0, 0, 0);
+                            return eventDate < today;
+                          } catch {
+                            return false;
+                          }
+                        })();
+                        const computedStatus = isPast ? "completed" : "upcoming";
 
-                      {event.status === "completed" && (
-                        <div className="mt-3 flex items-center gap-2 max-w-sm">
-                          <input
-                            type="url"
-                            placeholder="Instagram Reel / Highlights URL"
-                            defaultValue={event.highlightsUrl || ""}
-                            id={`highlights-input-${event.id}`}
-                            className="flex-1 text-xs px-2.5 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0CB0D8] outline-none"
-                          />
-                          <button
-                            onClick={() => {
-                              const val = (document.getElementById(`highlights-input-${event.id}`) as HTMLInputElement)?.value || "";
-                              handleUpdateHighlights(event.id, val);
-                            }}
-                            className="text-[10px] px-2.5 py-1.5 bg-[#0CB0D8] hover:bg-[#0aa0c5] text-white font-bold rounded-md transition shrink-0 cursor-pointer"
-                          >
-                            Save Reel
-                          </button>
-                        </div>
-                      )}
+                        return (
+                          <>
+                            <span className={`inline-block mt-2 px-2 py-0.5 text-[10px] font-medium rounded-full ${computedStatus === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                              {computedStatus.toUpperCase()}
+                            </span>
+
+                            {computedStatus === "completed" && (
+                              <div className="mt-3 flex items-center gap-2 max-w-sm">
+                                <input
+                                  type="url"
+                                  placeholder="Instagram Reel / Highlights URL"
+                                  defaultValue={event.highlightsUrl || ""}
+                                  id={`highlights-input-${event.id}`}
+                                  className="flex-1 text-xs px-2.5 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0CB0D8] outline-none"
+                                />
+                                <button
+                                  onClick={() => {
+                                    const val = (document.getElementById(`highlights-input-${event.id}`) as HTMLInputElement)?.value || "";
+                                    handleUpdateHighlights(event.id, val);
+                                  }}
+                                  className="text-[10px] px-2.5 py-1.5 bg-[#0CB0D8] hover:bg-[#0aa0c5] text-white font-bold rounded-md transition shrink-0 cursor-pointer"
+                                >
+                                  Save Reel
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
 
                     <div className="flex flex-col gap-2 shrink-0">
-                      <button onClick={() => handleToggleStatus(event.id, event.status)} className="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 transition cursor-pointer">
-                        Toggle Status
-                      </button>
-                      <button onClick={() => handleDeleteClick(event.id)} className="text-xs px-3 py-1 bg-red-50 hover:bg-red-100 rounded text-red-600 transition cursor-pointer">
+                      <button onClick={() => handleDeleteClick(event.id)} className="text-xs px-3 py-1.5 bg-rose-50 hover:bg-rose-100 rounded-lg text-rose-600 font-bold transition cursor-pointer">
                         Delete
                       </button>
                     </div>

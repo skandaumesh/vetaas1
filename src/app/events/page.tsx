@@ -18,7 +18,7 @@ import {
   Check,
 } from "lucide-react";
 import Image from "next/image";
-import { parseLumaUrl, initLumaCheckout } from "@/lib/luma";
+import { parseLumaUrl, initLumaCheckout, formatEventDateRange } from "@/lib/luma";
 
 export default function EventsPage() {
   const [events, setEvents] = useState<any[]>([]);
@@ -77,8 +77,22 @@ export default function EventsPage() {
     fetchEvents();
   }, []);
 
-  const upcomingEvents = events.filter((e) => e.status === "upcoming");
-  const pastEvents = events.filter((e) => e.status === "completed");
+  const isCompleted = (event: any) => {
+    if (!event.date) return true;
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkDate = event.endDate || event.date;
+      const eventDate = new Date(checkDate);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate < today;
+    } catch {
+      return false;
+    }
+  };
+
+  const upcomingEvents = events.filter((e) => !isCompleted(e));
+  const pastEvents = events.filter((e) => isCompleted(e));
 
   // Initialize Luma checkout widget and dynamic script binding
   useEffect(() => {
@@ -301,24 +315,31 @@ function EventCard({
   let day = "01";
   let monthStr = "Jan";
   let yearStr = "";
-  let formattedFull = event.date;
-
+  
   try {
     const dateObj = new Date(event.date);
     if (!isNaN(dateObj.getTime())) {
       day = String(dateObj.getDate()).padStart(2, "0");
       monthStr = dateObj.toLocaleString("default", { month: "short" }).toUpperCase();
       yearStr = String(dateObj.getFullYear());
-      formattedFull = dateObj.toLocaleString("default", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
     }
   } catch (e) {}
 
-  const isCompleted = event.status === "completed";
+  const formattedFull = formatEventDateRange(event.date, event.endDate, true);
+
+  const isCompleted = (() => {
+    if (!event.date) return true;
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkDate = event.endDate || event.date;
+      const eventDate = new Date(checkDate);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate < today;
+    } catch {
+      return false;
+    }
+  })();
 
   return (
     <motion.div
@@ -424,9 +445,7 @@ function EventCard({
                       href={finalUrl}
                       target={isLuma ? undefined : "_blank"}
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#00CDBA] border-b-2 border-[#00CDBA] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors ${
-                        isLuma ? "luma-checkout--button" : ""
-                      }`}
+                      className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#00CDBA] border-b-2 border-[#00CDBA] pb-0.5 hover:text-[#111827] hover:border-[#111827] transition-colors"
                       data-luma-action={isLuma ? "checkout" : undefined}
                       data-luma-event-id={lumaEventId}
                     >
@@ -464,7 +483,6 @@ function MemoryCard({
   let day = "01";
   let monthStr = "Jan";
   let yearStr = "";
-  let formattedFull = event.date;
 
   try {
     const dateObj = new Date(event.date);
@@ -474,14 +492,10 @@ function MemoryCard({
         .toLocaleString("default", { month: "short" })
         .toUpperCase();
       yearStr = String(dateObj.getFullYear());
-      formattedFull = dateObj.toLocaleString("default", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
     }
   } catch (_e) {}
+
+  const formattedFull = formatEventDateRange(event.date, event.endDate, false);
 
   return (
     <motion.div

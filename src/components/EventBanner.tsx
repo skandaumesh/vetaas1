@@ -6,12 +6,13 @@ import { db } from "@/lib/firebase";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar } from "lucide-react";
-import { parseLumaUrl, initLumaCheckout } from "@/lib/luma";
+import { parseLumaUrl, initLumaCheckout, formatShortDateRange } from "@/lib/luma";
 
 interface Event {
   id: string;
   title: string;
   date: string;
+  endDate?: string;
   status: string;
   registrationUrl?: string;
 }
@@ -31,14 +32,18 @@ export default function EventBanner() {
     const fetchEvents = async () => {
       try {
         const snapshot = await getDocs(collection(db, "events"));
-        const now = new Date();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
         const upcoming: Event[] = snapshot.docs
           .map((doc) => ({ id: doc.id, ...(doc.data() as Omit<Event, "id">) }))
           .filter((e) => {
-            if (e.status !== "upcoming") return false;
+            const checkDate = e.endDate || e.date;
+            if (!checkDate) return false;
             try {
-              return new Date(e.date) >= now;
+              const eventDate = new Date(checkDate);
+              eventDate.setHours(0, 0, 0, 0);
+              return eventDate >= today;
             } catch {
               return false;
             }
@@ -100,7 +105,7 @@ export default function EventBanner() {
             <p className="text-white text-xs sm:text-sm font-semibold text-center leading-tight">
               {event.date && (
                 <span className="opacity-75 mr-2">
-                  {formatShortDate(event.date)} ·
+                  {formatShortDateRange(event.date, event.endDate)} ·
                 </span>
               )}
               {event.title}
@@ -130,9 +135,7 @@ export default function EventBanner() {
                       href={finalUrl}
                       target={isLuma ? undefined : "_blank"}
                       rel="noopener noreferrer"
-                      className={`block bg-[#FFC107] text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap ${
-                        isLuma ? "luma-checkout--button" : ""
-                      }`}
+                      className="block bg-[#FFC107] text-[#111827] text-[10px] sm:text-xs font-black uppercase tracking-wide px-3.5 sm:px-4 py-1 sm:py-1.5 rounded-full hover:bg-yellow-300 transition-colors whitespace-nowrap"
                       data-luma-action={isLuma ? "checkout" : undefined}
                       data-luma-event-id={lumaEventId}
                     >
