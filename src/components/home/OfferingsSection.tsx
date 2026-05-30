@@ -30,11 +30,11 @@ export default function OfferingsSection() {
       btnColor: "bg-[#2da182]",
       title: "Teacher Engagement",
       subtitle: "CAPACITY BUILDING",
-      intro: "Carefully created sessions that cater to",
+      intro: "We support teachers learn about SEL, integrate SEL into their teaching, and creating a SEL-supportive environment.",
       points: [
-        "SEL 101 course for teachers' capacity building.",
-        "SEL for teachers' wellbeing.",
-        "Creating a SEL-supportive classroom environment."
+        "Helping teachers manage stress, emotions, and burnout.",
+        "Making social-emotional learning part of daily teaching practices.",
+        "Providing continuous guidance, reflection, and classroom support."
       ],
       link: "/services",
       marginTop: "mt-0", 

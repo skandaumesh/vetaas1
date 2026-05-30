@@ -152,6 +152,9 @@ function ContactFormContent() {
           <p className="text-gray-500 text-base sm:text-lg font-medium max-w-xl mx-auto md:mx-0 leading-relaxed">
             Whether you're a school, a parent, or a volunteer — we'd love to hear from you.
           </p>
+          <p className="text-gray-500 text-base sm:text-lg font-medium max-w-xl mx-auto md:mx-0 leading-relaxed mt-2">
+            It takes a village to raise a child, let's build the village together.
+          </p>
         </motion.div>
 
         {/* ── Two-column layout ── */}

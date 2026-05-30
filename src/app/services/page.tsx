@@ -91,7 +91,7 @@ export default function ServicesPage() {
                   <span className="font-serif italic text-[2.5rem]">Children</span>
                 </h3>
                 <p className="text-black/85 font-medium text-sm md:text-base leading-snug mb-6 max-w-[95%]">
-                  Designing playful learning spaces and inspiring curious young minds with fun-filled developmental activities.
+                  Creating an ecosystem to support children in developing social and emotional skills.
                 </p>
 
                 {/* Bullet Points */}
@@ -100,19 +100,19 @@ export default function ServicesPage() {
                     <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-black shrink-0 mt-0.5">
                       <Check size={12} strokeWidth={3} />
                     </div>
-                    <span className="text-sm font-semibold text-black/90 leading-snug">Creating rich learning experiences.</span>
+                    <span className="text-sm font-semibold text-black/90 leading-snug">Play-based, reflective, and experiential learning activities.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-black shrink-0 mt-0.5">
                       <Check size={12} strokeWidth={3} />
                     </div>
-                    <span className="text-sm font-semibold text-black/90 leading-snug">Playful, SEL-focused games and events.</span>
+                    <span className="text-sm font-semibold text-black/90 leading-snug">Building safe spaces where children can express and grow</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-black shrink-0 mt-0.5">
                       <Check size={12} strokeWidth={3} />
                     </div>
-                    <span className="text-sm font-semibold text-black/90 leading-snug">Take-home projects to extend learning.</span>
+                    <span className="text-sm font-semibold text-black/90 leading-snug">Integrate SEL in curriculum and school culture</span>
                   </li>
                 </ul>
 
@@ -156,7 +156,7 @@ export default function ServicesPage() {
                   <span className="font-serif italic text-[2.5rem]">Teachers</span>
                 </h3>
                 <p className="text-black/85 font-medium text-sm md:text-base leading-snug mb-6 max-w-[95%]">
-                  Elevating the role of educators in managing learning journeys and creating supportive, SEL-focused classroom environments.
+                  We support teachers learn about SEL, integrate SEL into their teaching, and creating a SEL-supportive environment.
                 </p>
 
                 {/* Bullet Points */}
@@ -165,19 +165,19 @@ export default function ServicesPage() {
                     <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-black shrink-0 mt-0.5">
                       <Check size={12} strokeWidth={3} />
                     </div>
-                    <span className="text-sm font-semibold text-black/90 leading-snug">SEL 101 course for teachers' capacity building.</span>
+                    <span className="text-sm font-semibold text-black/90 leading-snug">Helping teachers manage stress, emotions, and burnout.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-black shrink-0 mt-0.5">
                       <Check size={12} strokeWidth={3} />
                     </div>
-                    <span className="text-sm font-semibold text-black/90 leading-snug">SEL for teachers' well-being and renewal.</span>
+                    <span className="text-sm font-semibold text-black/90 leading-snug">Making social-emotional learning part of daily teaching practices.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center text-black shrink-0 mt-0.5">
                       <Check size={12} strokeWidth={3} />
                     </div>
-                    <span className="text-sm font-semibold text-black/90 leading-snug">Creating a supportive classroom environment.</span>
+                    <span className="text-sm font-semibold text-black/90 leading-snug">Providing continuous guidance, reflection, and classroom support.</span>
                   </li>
                 </ul>
 

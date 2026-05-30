@@ -575,10 +575,10 @@ export default function AdminEventsPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
           
           {/* Form Section */}
-          <div className="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-[#00CDBA]/15 shadow-[0_10px_30px_rgba(54,186,152,0.04)] h-fit lg:sticky lg:top-28">
+          <div className="lg:col-span-5 bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-[#00CDBA]/15 shadow-[0_10px_30px_rgba(54,186,152,0.04)] h-fit lg:sticky lg:top-28">
             <h2 className="text-2xl font-black text-gray-900 mb-6 font-headline flex items-center gap-2 text-[#00CDBA]">
               <PlusCircle className="w-6 h-6" /> Add New Event
             </h2>
@@ -651,7 +651,7 @@ export default function AdminEventsPage() {
 
               <div>
                 <label htmlFor="registrationUrl" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 font-headline">
-                  Registration Link or Luma URL
+                  Registration Link or Luma URL (Optional)
                 </label>
                 <input
                   type="text"
@@ -666,7 +666,7 @@ export default function AdminEventsPage() {
 
               <div className="pt-4 border-t border-gray-100">
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2.5 font-headline">
-                  Event Thumbnail Image
+                  Event Thumbnail Image (Optional)
                 </label>
                 
                 <div className="space-y-4 bg-gray-50 p-4 rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center text-center">
@@ -734,7 +734,7 @@ export default function AdminEventsPage() {
           </div>
 
           {/* List Section */}
-          <div>
+          <div className="lg:col-span-7">
             <h2 className="text-2xl font-black text-gray-900 mb-6 font-headline flex items-center gap-2 text-[#FF5C7A]">
               <Calendar className="w-6 h-6" /> Manage Events
             </h2>
