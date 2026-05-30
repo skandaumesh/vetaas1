@@ -110,7 +110,7 @@ export default function MissionVisionSection() {
 
               {/* Text */}
               <p className="text-gray-600 text-base md:text-lg font-medium leading-relaxed mb-6">
-                To build a network of high-performing and innovative schools to empower children and young adults from underserved communities.
+                We work with parents, teachers, and communities to create thoughtful social-emotional learning experiences that strengthen the ecosystem around children.
               </p>
             </div>
           </motion.div>
@@ -144,7 +144,7 @@ export default function MissionVisionSection() {
 
               {/* Text */}
               <p className="text-gray-600 text-base md:text-lg font-medium leading-relaxed mb-6">
-                To influence the educational ecosystem, creating a collaborative community where learning never stops and every child thrives.
+                To nurture a world where children, parents, and educators grow together with emotional awareness, meaningful relationships, creativity, and joy.
               </p>
             </div>
           </motion.div>
