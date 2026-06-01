@@ -82,7 +82,7 @@ export default function CTASection() {
           <div className="z-20">
             <Link 
               href="/contact" 
-              className="inline-flex items-center justify-center gap-2 px-5 py-2 sm:px-6 sm:py-2.5 bg-[#0B1523] text-white font-bold text-xs sm:text-sm rounded-full hover:bg-gray-800 hover:scale-105 transition-all shadow-sm hover:shadow-md whitespace-nowrap"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2 sm:px-6 sm:py-2.5 bg-[#7C3AED] text-white font-bold text-xs sm:text-sm rounded-full hover:bg-[#6D28D9] hover:scale-105 transition-all shadow-sm hover:shadow-md whitespace-nowrap"
             >
               Join the tribe
               <ArrowRight size={18} strokeWidth={2} />

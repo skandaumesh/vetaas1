@@ -51,7 +51,7 @@ const DIFFERENCES = [
     image: "/parents/image1.png"
   },
   {
-    title: "Age appropriate (2 to 8 years)",
+    title: "Age appropriate (3\u20116\u00A0years)",
     description: "Curriculum tailored specifically for critical early childhood years.",
     image: "/parents/image2.png"
   },
@@ -104,10 +104,11 @@ const OFFERINGS = [
   {
     title: "Workshops",
     badge: "Immersive & Practical",
-    description: "Immersive, hands-on experiences going beyond traditional advice. We provide a safe space to explore early childhood milestones, tailored for parents of children aged 2 to 8. These sessions combine evidence-based strategies with playful learning, ensuring actionable family routines.",
-    accentColor: "bg-amber-500",
-    badgeColor: "bg-amber-50 text-amber-600 border-amber-200/50",
-    hoverShadow: "hover:shadow-amber-100/50",
+    description: "Immersive, hands-on experiences going beyond traditional advice. We provide a safe space to explore early childhood milestones, tailored for parents of children aged 3 to 6. These sessions combine evidence-based strategies with playful learning, ensuring actionable family routines.",
+    color: "bg-[#45bcf6]", // Sky Blue
+    btnColor: "bg-[#35a8df] text-[#111827] hover:bg-[#2fa0d5]",
+    badgeColor: "bg-white/30 text-[#111827] border border-white/40",
+    hoverShadow: "hover:shadow-[#45bcf6]/30",
     listTitle: "Key themes:",
     items: [
       "Social Emotional Learning (SEL)",
@@ -119,9 +120,10 @@ const OFFERINGS = [
     title: "Events - MCME",
     badge: "My Child & Me",
     description: "Unique celebrations of the special bond between you and your child. We believe shared joy is the best catalyst for growth, offering interactive activities, collaborative creative projects, and high-energy games that spark laughter and lasting memories.",
-    accentColor: "bg-pink-500",
-    badgeColor: "bg-pink-50 text-pink-600 border-pink-200/50",
-    hoverShadow: "hover:shadow-pink-100/50",
+    color: "bg-[#ff7f68]", // Coral
+    btnColor: "bg-[#e56d58] text-[#111827] hover:bg-[#d65f4b]",
+    badgeColor: "bg-white/30 text-[#111827] border border-white/40",
+    hoverShadow: "hover:shadow-[#ff7f68]/30",
     listTitle: "The agenda includes:",
     items: [
       "Fun developmental games",
@@ -133,9 +135,10 @@ const OFFERINGS = [
     title: "Wellness circles",
     badge: "Parent Well-being",
     description: "A compassionate environment where parents prioritize their own well-being alongside their child's. These gatherings focus on holistic self-care, community support, and mindfulness, building the emotional resilience needed for daily life.",
-    accentColor: "bg-[#0CB0D8]",
-    badgeColor: "bg-sky-50 text-[#0CB0D8] border-sky-200/50",
-    hoverShadow: "hover:shadow-sky-100/50",
+    color: "bg-[#00CDBA]", // Emerald Green/Teal
+    btnColor: "bg-[#2da182] text-[#111827] hover:bg-[#258f73]",
+    badgeColor: "bg-white/30 text-[#111827] border border-white/40",
+    hoverShadow: "hover:shadow-[#00CDBA]/30",
     listTitle: "Key engagements:",
     items: [
       "Well-being & mindfulness practices",
@@ -258,37 +261,54 @@ export default function ParentsPageClient() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
-                className={`bg-white rounded-[2.5rem] border border-slate-200 p-8 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden group ${offering.hoverShadow}`}
+                className={`rounded-[2.5rem] border border-black/5 p-8 flex flex-col justify-between shadow-xl transition-all duration-500 relative overflow-hidden group ${offering.color} ${offering.hoverShadow}`}
               >
-                {/* Visual Top Accent Block */}
-                <div className={`absolute top-0 left-0 right-0 h-2.5 ${offering.accentColor}`} />
+                {/* Animated Inner Blobs */}
+                <motion.div 
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 90, 0],
+                    opacity: [0.1, 0.2, 0.1]
+                  }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  className="absolute -top-10 -right-10 w-40 h-40 bg-white rounded-full blur-3xl pointer-events-none"
+                />
+                <motion.div 
+                  animate={{ 
+                    x: [0, 30, 0],
+                    y: [0, -20, 0],
+                    opacity: [0.05, 0.1, 0.05]
+                  }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute bottom-10 -left-10 w-48 h-48 bg-black rounded-full blur-3xl pointer-events-none"
+                />
 
-                <div>
+                <div className="relative z-10">
                   <div className="flex justify-between items-center mb-6 mt-2">
                     <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${offering.badgeColor}`}>
                       {offering.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-4 group-hover:text-slate-800">
+                  <h3 className="text-2xl font-extrabold tracking-tight text-[#111827] mb-4">
                     {offering.title}
                   </h3>
 
-                  <p className="text-gray-500 font-semibold text-xs leading-relaxed mb-6">
+                  <p className="text-[#111827] font-bold text-xs leading-relaxed mb-6 opacity-90">
                     {offering.description}
                   </p>
 
-                  <div className="border-t border-dashed border-gray-200 pt-5 mb-8">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-3">
+                  <div className="border-t border-dashed border-black/10 pt-5 mb-8">
+                    <span className="text-[10px] font-black text-[#111827]/70 uppercase tracking-widest block mb-3">
                       {offering.listTitle}
                     </span>
                     <ul className="space-y-3">
                       {offering.items.map((item) => (
                         <li key={item} className="flex items-start gap-2.5">
-                          <div className="w-4 h-4 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#1a2d4c]" />
+                          <div className="w-4 h-4 rounded-full bg-white/40 border border-white/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#111827]" />
                           </div>
-                          <span className="text-xs font-bold text-gray-700 leading-snug">
+                          <span className="text-xs font-bold text-[#111827] leading-snug">
                             {item}
                           </span>
                         </li>
@@ -299,7 +319,7 @@ export default function ParentsPageClient() {
 
                 <Link
                   href="/events"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-slate-900 text-white font-bold text-xs py-3.5 px-6 rounded-2xl hover:bg-slate-800 hover:scale-[1.02] active:scale-95 transition-all shadow-sm"
+                  className={`w-full inline-flex items-center justify-center gap-2 ${offering.btnColor} font-bold text-xs py-3.5 px-6 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-sm relative z-10`}
                 >
                   Explore Program <ArrowRight size={14} />
                 </Link>
@@ -348,32 +368,7 @@ export default function ParentsPageClient() {
           </div>
         </section>
 
-        {/* ── BOTTOM STATEMENT QUOTE BANNER (Irregular Organic Shape Design) ── */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="w-full max-w-4xl mx-auto mt-24 mb-12 flex justify-center items-center px-4"
-        >
-          <div 
-            className="w-full relative p-12 md:p-20 bg-[#fef6fb] border border-[#ffa3c9]/30 shadow-sm flex flex-col items-center justify-center text-center overflow-hidden group hover:scale-[1.01] transition-transform duration-300"
-            style={{
-              borderRadius: "70% 30% 50% 50% / 50% 30% 70% 50%"
-            }}
-          >
-            {/* Soft decorative background accents */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#ffa3c9]/10 via-transparent to-[#0CB0D8]/10 pointer-events-none" />
-            
-            <div className="relative z-10 max-w-xl mx-auto flex flex-col items-center">
-              <span className="text-5xl text-[#ffa3c9] font-serif leading-none block mb-4">“</span>
-              <p className="text-[#1a2d4c] font-headline text-xl sm:text-2xl md:text-3xl font-extrabold italic leading-relaxed max-w-lg">
-                Trusting relationships with parents help children grow and learn.
-              </p>
-              <span className="text-5xl text-[#ffa3c9] font-serif leading-none block mt-4">”</span>
-            </div>
-          </div>
-        </motion.div>
+
 
 
       </div>

@@ -74,7 +74,7 @@ export default function Footer() {
             </ul>
             <div className="flex items-center gap-4">
               <a
-                href="https://www.instagram.com/vetaas_education/"
+                href="https://www.instagram.com/vetaaseducation/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center text-[#111827] hover:text-white hover:bg-[#ff7a43] transition-colors"

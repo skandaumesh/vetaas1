@@ -19,115 +19,7 @@ function ContactFormContent() {
       className="relative min-h-screen overflow-hidden bg-[#faf9f6]"
       style={{ fontFamily: "var(--font-poppins), sans-serif" }}
     >
-      {/* ── Background SVG Doodles (mirror of HeroSection) ── */}
 
-      {/* Paper Airplane + dashed loop — top left */}
-      <div className="absolute top-[8%] left-[3%] w-44 h-44 pointer-events-none z-0">
-        <svg viewBox="0 0 150 150" fill="none" className="w-full h-full">
-          <path
-            d="M 15,110 C 10,80 60,70 50,50 C 40,30 15,45 30,65 C 45,85 85,55 105,40"
-            stroke="#FFC107"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeDasharray="6 6"
-          />
-          <g transform="translate(100, 25) rotate(-15)">
-            <path
-              d="M 0,15 L 30,0 L 20,30 L 12,20 Z"
-              fill="none"
-              stroke="#7C3AED"
-              strokeWidth="2.2"
-              strokeLinejoin="round"
-            />
-            <path d="M 30,0 L 12,20" stroke="#7C3AED" strokeWidth="1.5" />
-          </g>
-        </svg>
-      </div>
-
-      {/* Navy dot grid — top right */}
-      <div className="absolute top-[10%] right-[6%] opacity-80 pointer-events-none z-0">
-        <svg width="56" height="42" viewBox="0 0 80 60" fill="#7C3AED">
-          {[10, 30, 50, 70].map((cx) =>
-            [10, 30, 50].map((cy) => (
-              <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="3.5" />
-            ))
-          )}
-        </svg>
-      </div>
-
-      {/* Coral dot grid — mid left */}
-      <div className="absolute top-[50%] left-[3%] opacity-75 pointer-events-none z-0">
-        <svg width="36" height="36" viewBox="0 0 60 60" fill="#FF5C7A">
-          {[10, 30, 50].map((cx) =>
-            [10, 30, 50].map((cy) => (
-              <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="3.5" />
-            ))
-          )}
-        </svg>
-      </div>
-
-      {/* Blue zigzag — bottom left */}
-      <div className="absolute bottom-[18%] left-[5%] w-20 h-10 pointer-events-none z-0">
-        <svg
-          viewBox="0 0 80 30"
-          fill="none"
-          stroke="#7C3AED"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-full h-full"
-        >
-          <path d="M 0,15 L 12,5 L 24,25 L 36,5 L 48,25 L 60,5 L 72,15" />
-        </svg>
-      </div>
-
-      {/* Half-circle yellow sun — right boundary */}
-      <div className="absolute top-[65%] right-0 translate-x-[50%] w-20 h-20 pointer-events-none z-0">
-        <svg viewBox="0 0 100 100" fill="#FFC107" className="w-full h-full">
-          <circle cx="50" cy="50" r="50" />
-        </svg>
-      </div>
-
-      {/* Soft flowing background curves */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 1440 900"
-          preserveAspectRatio="none"
-          fill="none"
-        >
-          <path
-            d="M-50,300 C300,500 700,100 1100,380 C1250,470 1380,220 1500,300"
-            stroke="#7C3AED"
-            strokeWidth="2"
-            strokeLinecap="round"
-            opacity="0.05"
-          />
-          <path
-            d="M-50,500 C200,300 550,600 900,400 C1150,250 1350,500 1500,440"
-            stroke="#00CDBA"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeDasharray="10 8"
-            opacity="0.05"
-          />
-        </svg>
-      </div>
-
-      {/* ── Navy bottom wave (exactly like HeroSection) ── */}
-      <div className="absolute bottom-0 left-0 w-full h-[90px] sm:h-[110px] md:h-[130px] pointer-events-none z-0">
-        <svg
-          viewBox="0 0 600 120"
-          preserveAspectRatio="none"
-          className="w-full h-full text-[#7C3AED]"
-        >
-          <path
-            d="M 0,90 C 80,110 160,115 220,105 C 300,90 400,60 480,70 C 520,75 560,95 600,90 L 600,120 L 0,120 Z"
-            fill="currentColor"
-          />
-        </svg>
-      </div>
 
       {/* ── Page Content ── */}
       <div className="relative z-10 max-w-[1300px] mx-auto px-6 md:px-12 pt-[calc(var(--header-height)+4rem)] pb-48">
@@ -144,7 +36,7 @@ function ContactFormContent() {
             Get in Touch
           </span>
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.05] text-[#111827] tracking-tight mb-5">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.2] text-[#111827] tracking-tight mb-5">
             Let's Build the{" "}
             <span className="text-[#00CDBA]">Village</span>
             <br className="hidden sm:block" /> Together.

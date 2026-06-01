@@ -17,6 +17,7 @@ const NAV_ITEMS = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
   const pathname = usePathname();
 
   return (
@@ -45,6 +46,29 @@ export default function Navbar() {
           <nav className="flex items-center gap-10">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
+              if (item.label === "Services") {
+                const isServicesActive = pathname === "/services" || pathname === "/parents";
+                return (
+                  <div key={item.href} className="relative group py-2">
+                    <button className={`flex items-center gap-1 text-base lg:text-[1.1rem] font-semibold transition-colors cursor-pointer ${
+                      isServicesActive
+                        ? "text-[#FF5C7A]"
+                        : "text-gray-800 hover:text-[#FF5C7A]"
+                    }`}>
+                      Services
+                      <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {/* Dropdown Menu */}
+                    <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 rounded-2xl bg-white border border-gray-100 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 py-2">
+                      <Link href="/parents" className="block text-center px-5 py-2.5 text-sm font-semibold text-gray-800 hover:text-[#FF5C7A] hover:bg-gray-50 transition-colors">
+                        SEL for Parents
+                      </Link>
+                    </div>
+                  </div>
+                );
+              }
               return (
                 <Link
                   key={item.href}
@@ -63,7 +87,7 @@ export default function Navbar() {
           
           {/* Desktop Social Links */}
           <div className="flex items-center gap-4 pl-4 border-l border-gray-300">
-            <a href="https://www.instagram.com/vetaas_education/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#FF5C7A] transition-colors">
+            <a href="https://www.instagram.com/vetaaseducation/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#FF5C7A] transition-colors">
               <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
             </a>
             <a href="https://www.linkedin.com/company/vetaas/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#FF5C7A] transition-colors">
@@ -91,6 +115,35 @@ export default function Navbar() {
         >
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
+            if (item.label === "Services") {
+              const isServicesActive = pathname === "/services" || pathname === "/parents";
+              return (
+                <div key={item.href} className="flex flex-col">
+                  <button
+                    onClick={() => setIsMobileServicesOpen(!isMobileServicesOpen)}
+                    className={`flex items-center justify-between w-full text-lg font-semibold py-3 px-4 rounded-xl text-left transition-colors ${
+                      isServicesActive
+                        ? "text-[#FF5C7A] bg-[#FF5C7A]/5"
+                        : "text-[#111827] hover:bg-gray-50"
+                    }`}
+                  >
+                    <span>Services</span>
+                    <svg className={`w-5 h-5 transition-transform ${isMobileServicesOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  <div className={`pl-6 flex flex-col gap-2 overflow-hidden transition-all duration-300 ${isMobileServicesOpen ? 'max-h-16 mt-1 mb-2' : 'max-h-0'}`}>
+                    <Link
+                      href="/parents"
+                      className="text-base font-semibold py-2 px-4 rounded-lg text-gray-700 hover:bg-gray-50"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      SEL for Parents
+                    </Link>
+                  </div>
+                </div>
+              );
+            }
             return (
               <Link
                 key={item.href}
@@ -109,7 +162,7 @@ export default function Navbar() {
 
           {/* Mobile Social Links */}
           <div className="flex items-center gap-4 px-4 pt-4 mt-2 border-t border-gray-100">
-            <a href="https://www.instagram.com/vetaas_education/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#FF5C7A] transition-colors p-2 -ml-2">
+            <a href="https://www.instagram.com/vetaaseducation/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#FF5C7A] transition-colors p-2 -ml-2">
               <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
             </a>
             <a href="https://www.linkedin.com/company/vetaas/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#7C3AED] transition-colors p-2">

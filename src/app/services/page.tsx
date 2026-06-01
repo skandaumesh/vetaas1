@@ -277,7 +277,7 @@ export default function ServicesPage() {
           </div>
           <Link 
             href="/contact" 
-            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[#0B1523] text-white font-bold text-sm rounded-full hover:bg-gray-800 hover:scale-105 transition-all shadow-md"
+            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[#7C3AED] text-white font-bold text-sm rounded-full hover:bg-[#6D28D9] hover:scale-105 transition-all shadow-md"
           >
             Get in touch
             <ArrowRight size={16} />
