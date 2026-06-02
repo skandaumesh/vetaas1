@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { X, User } from "lucide-react";
 
 interface Testimonial {
   quote: string;
@@ -14,6 +14,9 @@ interface Testimonial {
   pColor: string;
   roleColor: string;
   image: string;
+  isIcon?: boolean;
+  initials?: string;
+  avatarBg?: string;
 }
 
 const TESTIMONIALS: Testimonial[] = [
@@ -25,7 +28,10 @@ const TESTIMONIALS: Testimonial[] = [
     textColor: "text-[#111827]",
     pColor: "text-gray-700",
     roleColor: "text-gray-500",
-    image: "/testimonial6.png",
+    image: "",
+    isIcon: true,
+    initials: "AM",
+    avatarBg: "bg-[#00CDBA]",
   },
   {
     quote: "Kirti's expertise in Language and Curriculum Design helped us set up our Hindi curriculum from scratch. She guided our teachers and built their capacity. We still rely on her guidance! She brings a great amount of empathy and sensitivity to her work.",
@@ -45,7 +51,10 @@ const TESTIMONIALS: Testimonial[] = [
     textColor: "text-[#111827]",
     pColor: "text-gray-700",
     roleColor: "text-gray-500",
-    image: "/testimonial8.png",
+    image: "",
+    isIcon: true,
+    initials: "PP",
+    avatarBg: "bg-[#FF5C7A]",
   },
   {
     quote: "Kirti has always been Proactive with her tasks and assigned duties. As a consultant, her feedback has been balanced and constructive. Her inputs with lesson planning helped me in improving and modifying my teaching strategies for better outcomes.",
@@ -65,7 +74,10 @@ const TESTIMONIALS: Testimonial[] = [
     textColor: "text-[#111827]",
     pColor: "text-gray-700",
     roleColor: "text-gray-500",
-    image: "/testimonial10.png",
+    image: "",
+    isIcon: true,
+    initials: "SA",
+    avatarBg: "bg-[#FFC107]",
   },
 ];
 
@@ -165,14 +177,18 @@ export default function TestimonialsSection() {
                   
                   {/* Header: Avatar + Info */}
                   <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-black flex-shrink-0 bg-white shadow-sm">
-                      <Image 
-                        src={item.image} 
-                        alt={item.name} 
-                        fill 
-                        className="object-cover object-center scale-[1.15]" 
-                        draggable={false}
-                      />
+                    <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-black flex-shrink-0 bg-[#f3f4f6] flex items-center justify-center text-gray-400 shadow-sm">
+                      {item.isIcon ? (
+                        <User className="w-5 h-5 sm:w-6 sm:h-6" />
+                      ) : (
+                        <Image 
+                          src={item.image} 
+                          alt={item.name} 
+                          fill 
+                          className="object-cover object-center scale-[1.15]" 
+                          draggable={false}
+                        />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className={`text-sm md:text-base font-bold ${item.textColor} leading-tight tracking-tight mb-0.5 truncate`}>
@@ -251,14 +267,18 @@ export default function TestimonialsSection() {
               <div className="flex flex-col gap-6 font-body">
                 {/* Header: Avatar + Info */}
                 <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-black bg-white shadow-sm shrink-0">
-                    <Image 
-                      src={selectedTestimonial.image} 
-                      alt={selectedTestimonial.name} 
-                      fill
-                      className="object-cover object-center scale-[1.15]" 
-                      draggable={false}
-                    />
+                  <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-black bg-[#f3f4f6] flex items-center justify-center text-gray-400 shadow-sm shrink-0">
+                    {selectedTestimonial.isIcon ? (
+                      <User className="w-8 h-8 md:w-10 md:h-10" />
+                    ) : (
+                      <Image 
+                        src={selectedTestimonial.image} 
+                        alt={selectedTestimonial.name} 
+                        fill
+                        className="object-cover object-center scale-[1.15]" 
+                        draggable={false}
+                      />
+                    )}
                   </div>
                   <div>
                     <h3 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
