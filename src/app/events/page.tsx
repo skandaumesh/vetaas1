@@ -152,7 +152,6 @@ export default function EventsPage() {
               Fun-filled gatherings where learning meets play and joy meets growth.
             </p>
           </div>
-          </div>
         </motion.div>
       </div>
 
