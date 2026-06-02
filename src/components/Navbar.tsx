@@ -50,7 +50,7 @@ export default function Navbar() {
                 const isServicesActive = pathname === "/services" || pathname === "/parents";
                 return (
                   <div key={item.href} className="relative group py-2">
-                    <button className={`flex items-center gap-1 text-base lg:text-[1.1rem] font-semibold transition-colors cursor-pointer ${
+                    <Link href="/services" className={`flex items-center gap-1 text-base lg:text-[1.1rem] font-semibold transition-colors cursor-pointer ${
                       isServicesActive
                         ? "text-[#FF5C7A]"
                         : "text-gray-800 hover:text-[#FF5C7A]"
@@ -59,7 +59,7 @@ export default function Navbar() {
                       <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                       </svg>
-                    </button>
+                    </Link>
                     {/* Dropdown Menu */}
                     <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 rounded-2xl bg-white border border-gray-100 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 py-2">
                       <Link href="/parents" className="block text-center px-5 py-2.5 text-sm font-semibold text-gray-800 hover:text-[#FF5C7A] hover:bg-gray-50 transition-colors">
@@ -132,7 +132,14 @@ export default function Navbar() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
-                  <div className={`pl-6 flex flex-col gap-2 overflow-hidden transition-all duration-300 ${isMobileServicesOpen ? 'max-h-16 mt-1 mb-2' : 'max-h-0'}`}>
+                  <div className={`pl-6 flex flex-col gap-2 overflow-hidden transition-all duration-300 ${isMobileServicesOpen ? 'max-h-32 mt-1 mb-2' : 'max-h-0'}`}>
+                    <Link
+                      href="/services"
+                      className="text-base font-semibold py-2 px-4 rounded-lg text-gray-700 hover:bg-gray-50"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      All Services
+                    </Link>
                     <Link
                       href="/parents"
                       className="text-base font-semibold py-2 px-4 rounded-lg text-gray-700 hover:bg-gray-50"

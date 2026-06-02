@@ -33,9 +33,9 @@ const TEAM = [
     initials: "KK",
     role: "Co-Founder | Teacher Educator | Esperantist",
     bio: "Education has been my ticket to happiness. All the years that I served in the education sector makes me believe that investing in early childhood education is our best bet at creating happy childhoods. Vetaas was born out of this bold hunger to foster the best early childhood care practices and support parents in their parenting journeys.",
-    gradient: "from-[#ff7f68] to-[#e04f35]",
+    gradient: "from-[#ff7f68] to-[#ff7f68]",
     borderColor: "border-[#ff7f68]",
-    textColor: "text-[#e04f35]",
+    textColor: "text-[#ff7f68]",
     bgHover: "hover:bg-[#ff7f68]/5",
     activeBg: "bg-[#fff5f5]",
     activeBorder: "border-[#ff7f68]/30",
@@ -48,9 +48,9 @@ const TEAM = [
     initials: "T",
     role: "Social Media Head | OneZeroLabs",
     bio: "Representing OneZeroLabs, I lead the social media presence and digital campaigns for Vetaas. I specialize in creative storytelling, visual communication, and building interactive online communities to spread awareness about Social Emotional Learning (SEL) in early childhood.",
-    gradient: "from-[#00CDBA] to-[#1f7860]",
+    gradient: "from-[#00CDBA] to-[#00CDBA]",
     borderColor: "border-[#00CDBA]",
-    textColor: "text-[#1f7860]",
+    textColor: "text-[#00CDBA]",
     bgHover: "hover:bg-[#00CDBA]/5",
     activeBg: "bg-[#f0fdf4]",
     activeBorder: "border-[#00CDBA]/30",
@@ -64,9 +64,9 @@ const TEAM = [
     initials: "SU",
     role: "Founder, OneZeroLabs | Tech Support",
     bio: "As the founder of OneZeroLabs, I provide the foundational tech support and technical direction for Vetaas, ensuring our digital platforms are robust, modern, and capable of scaling our impact in early childhood education.",
-    gradient: "from-[#FFC107] to-[#e6a800]",
+    gradient: "from-[#FFC107] to-[#FFC107]",
     borderColor: "border-[#FFC107]",
-    textColor: "text-[#e6a800]",
+    textColor: "text-[#FFC107]",
     bgHover: "hover:bg-[#FFC107]/5",
     activeBg: "bg-[#fffbf0]",
     activeBorder: "border-[#FFC107]/30",
@@ -110,7 +110,7 @@ export default function AboutPageClient() {
             The Magic{" "}
             <span className="relative inline-block px-5 py-1.5 ml-1">
               {/* Slanted backdrop badge */}
-              <span className="absolute inset-0 bg-gradient-to-r from-[#ff7a43] to-[#ff9800] rounded-2xl -rotate-1 shadow-md shadow-orange-500/10" />
+              <span className="absolute inset-0 bg-gradient-to-r from-[#ff7f68] to-[#ff7f68] rounded-2xl -rotate-1 shadow-md shadow-orange-500/10" />
               <span className="relative text-white font-serif italic font-medium">Formula.</span>
             </span>
           </h2>
@@ -227,6 +227,97 @@ export default function AboutPageClient() {
         </div>
       </section>
 
+      {/* ── THE FOUNDATION OF OUR WORK ── */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-[#111827] tracking-tight leading-[1.15] mb-6">
+              The Foundation of <br className="hidden md:block" />
+              <span className="inline-block bg-[#FFC107] text-[#111827] px-4 py-0.5 rounded-xl rotate-1 shadow-sm font-semibold mt-2">Our Work.</span>
+            </h2>
+            <div className="w-12 h-1 bg-[#00CDBA] rounded-full mx-auto" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1200px] mx-auto mt-12 px-4 pb-16">
+            
+            {/* Tile 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="group relative bg-white rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-300 overflow-hidden"
+            >
+              <div className="absolute -top-6 -right-6 text-[#ff7f68] opacity-5 group-hover:opacity-10 transition-opacity duration-500 group-hover:rotate-12 group-hover:scale-110">
+                <Heart size={160} fill="currentColor" />
+              </div>
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="w-14 h-14 rounded-2xl bg-[#ff7f68]/10 flex items-center justify-center text-[#ff7f68] mb-8 group-hover:scale-110 transition-transform duration-300">
+                  <Heart size={28} />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-4 leading-tight">
+                  Relationships
+                </h3>
+                <p className="text-gray-600 font-medium leading-relaxed mt-auto">
+                  Relationships are at the heart of human development.
+                </p>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#ff7f68] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+            </motion.div>
+
+            {/* Tile 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="group relative bg-white rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-300 overflow-hidden"
+            >
+              <div className="absolute -top-6 -right-6 text-[#00CDBA] opacity-5 group-hover:opacity-10 transition-opacity duration-500 group-hover:rotate-12 group-hover:scale-110">
+                <Smile size={160} fill="currentColor" />
+              </div>
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="w-14 h-14 rounded-2xl bg-[#00CDBA]/10 flex items-center justify-center text-[#00CDBA] mb-8 group-hover:scale-110 transition-transform duration-300">
+                  <Smile size={28} />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-4 leading-tight">
+                  Well-being
+                </h3>
+                <p className="text-gray-600 font-medium leading-relaxed mt-auto">
+                  Well-being is foundational to learning and growth.
+                </p>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#00CDBA] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+            </motion.div>
+
+            {/* Tile 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="group relative bg-white rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-300 overflow-hidden"
+            >
+              <div className="absolute -top-6 -right-6 text-[#45bcf6] opacity-5 group-hover:opacity-10 transition-opacity duration-500 group-hover:rotate-12 group-hover:scale-110">
+                <Sprout size={160} fill="currentColor" />
+              </div>
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="w-14 h-14 rounded-2xl bg-[#45bcf6]/10 flex items-center justify-center text-[#45bcf6] mb-8 group-hover:scale-110 transition-transform duration-300">
+                  <Sprout size={28} />
+                </div>
+                <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-4 leading-tight">
+                  Community
+                </h3>
+                <p className="text-gray-600 font-medium leading-relaxed mt-auto">
+                  Children thrive when caring adults and communities grow alongside them.
+                </p>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#45bcf6] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* ── WORK: PARENTS & TEACHERS (Zero Images, Beautiful SVG Info Cards) ── */}
       <section className="py-24 md:py-32 px-6">
         <div className="max-w-[1100px] mx-auto space-y-36">
@@ -242,7 +333,7 @@ export default function AboutPageClient() {
             >
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight leading-[1.1] mb-6">
                 Our Work With <br />
-                <span className="inline-block bg-[#ff7a43] text-white px-4 py-0.5 rounded-xl rotate-1 shadow-sm font-semibold mt-2">Parents.</span>
+                <span className="inline-block bg-[#ff7f68] text-white px-4 py-0.5 rounded-xl rotate-1 shadow-sm font-semibold mt-2">Parents.</span>
               </h2>
               <div className="space-y-5 text-gray-500 font-medium leading-relaxed mb-8 text-base md:text-lg">
                 <p>
@@ -254,7 +345,7 @@ export default function AboutPageClient() {
               </div>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-[#ff7a43] hover:bg-[#e06530] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
+                className="inline-flex items-center gap-2 bg-[#ff7f68] hover:bg-[#ff7f68] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
               >
                 Get Resources <ArrowRight size={16} />
               </Link>
@@ -267,20 +358,23 @@ export default function AboutPageClient() {
                   <div className="w-10 h-10 rounded-xl bg-[#fff0f1] flex items-center justify-center text-[#ff7f68]">
                     <Heart size={20} fill="currentColor" />
                   </div>
-                  <h3 className="font-bold text-xl text-[#111827]">SEL Parent Kit</h3>
+                  <h3 className="font-bold text-xl text-[#111827]">SEL for Parents</h3>
                 </div>
 
                 <ul className="space-y-4">
                   {[
-                    "Research-backed parenting support",
-                    "Interactive parent-child learning sessions",
-                    "SEL kits for meaningful engagement"
+                    { title: "Parents are central to a child’s development.", desc: "The quality of everyday interactions between parents and children shapes how children learn, relate, and thrive." },
+                    { title: "The well-being of parents matters.", desc: "When parents feel supported, connected, and emotionally healthy, they are better able to nurture their children's growth and wellbeing." },
+                    { title: "Parenting is a journey of learning and growth.", desc: "Children flourish when parents have opportunities to reflect, learn, and respond intentionally to their evolving needs." }
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <div className="w-5 h-5 rounded-full bg-[#ff7f68]/10 flex items-center justify-center text-[#ff7f68] shrink-0 mt-0.5">
                         <Check size={12} strokeWidth={3} />
                       </div>
-                      <span className="text-sm font-semibold text-gray-600">{item}</span>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-gray-900">{item.title}</span>
+                        <span className="text-xs font-medium text-gray-500 leading-relaxed mt-0.5">{item.desc}</span>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -303,7 +397,7 @@ export default function AboutPageClient() {
             >
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight leading-[1.1] mb-6">
                 Our Work With <br />
-                <span className="inline-block bg-[#1E90FF] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-2">Teachers.</span>
+                <span className="inline-block bg-[#45bcf6] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-2">Teachers.</span>
               </h2>
               <div className="space-y-5 text-gray-500 font-medium leading-relaxed mb-8 text-base md:text-lg">
                 <p>
@@ -315,7 +409,7 @@ export default function AboutPageClient() {
               </div>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-[#1E90FF] hover:bg-[#2d70db] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
+                className="inline-flex items-center gap-2 bg-[#45bcf6] hover:bg-[#45bcf6] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
               >
                 Teacher Programs <ArrowRight size={16} />
               </Link>
@@ -323,31 +417,98 @@ export default function AboutPageClient() {
 
             {/* Redesigned Teacher Hub Card (No Image) */}
             <div className="lg:w-1/2 w-full max-w-[480px]">
-              <div className="bg-[#eff6ff] p-8 md:p-10 rounded-[2.5rem] border border-[#1E90FF]/20 shadow-md -rotate-2 transition-transform duration-500 hover:rotate-0">
+              <div className="bg-[#eff6ff] p-8 md:p-10 rounded-[2.5rem] border border-[#45bcf6]/20 shadow-md -rotate-2 transition-transform duration-500 hover:rotate-0">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-[#dbeafe] flex items-center justify-center text-[#1E90FF]">
+                  <div className="w-10 h-10 rounded-xl bg-[#dbeafe] flex items-center justify-center text-[#45bcf6]">
                     <BookOpen size={20} />
                   </div>
-                  <h3 className="font-bold text-xl text-[#111827]">SEL Teacher Hub</h3>
+                  <h3 className="font-bold text-xl text-[#111827]">SEL for Teachers</h3>
                 </div>
 
                 <ul className="space-y-4">
                   {[
-                    "Helping teachers understand SEL in practical ways",
-                    "Support the well-being of teachers",
-                    "Creating a community of teachers."
+                    { title: "Teachers shape more than learning—they shape lives.", desc: "Every interaction in the classroom influences how children see themselves, others, and the world around them." },
+                    { title: "Teacher wellbeing is essential to student well-being.", desc: "When teachers feel valued, supported, and emotionally equipped, they create environments where children can thrive." },
+                    { title: "Reflective teachers build responsive classrooms.", desc: "Children learn best when educators are empowered to understand, adapt, and grow alongside them." }
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-[#1E90FF]/10 flex items-center justify-center text-[#1E90FF] shrink-0 mt-0.5">
+                      <div className="w-5 h-5 rounded-full bg-[#45bcf6]/10 flex items-center justify-center text-[#45bcf6] shrink-0 mt-0.5">
                         <Check size={12} strokeWidth={3} />
                       </div>
-                      <span className="text-sm font-semibold text-gray-600">{item}</span>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-gray-900">{item.title}</span>
+                        <span className="text-xs font-medium text-gray-500 leading-relaxed mt-0.5">{item.desc}</span>
+                      </div>
                     </li>
                   ))}
                 </ul>
 
-                <div className="mt-8 pt-6 border-t border-[#1E90FF]/10 text-center">
-                  <span className="text-xs font-bold text-[#1E90FF] uppercase tracking-wider">Creating active learning ecosystems</span>
+                <div className="mt-8 pt-6 border-t border-[#45bcf6]/10 text-center">
+                  <span className="text-xs font-bold text-[#45bcf6] uppercase tracking-wider">Creating active learning ecosystems</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Children */}
+          <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7 }}
+              className="lg:w-1/2"
+            >
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight leading-[1.1] mb-6">
+                Our Work With <br />
+                <span className="inline-block bg-[#FFC107] text-[#111827] px-4 py-0.5 rounded-xl rotate-1 shadow-sm font-semibold mt-2">Children.</span>
+              </h2>
+              <div className="space-y-5 text-gray-500 font-medium leading-relaxed mb-8 text-base md:text-lg">
+                <p>
+                  Social and emotional learning starts early. Our events and activities are designed to nurture curiosity, empathy, and joy.
+                </p>
+                <div className="bg-[#fffbf0] p-6 rounded-2xl border-l-4 border-[#FFC107] border border-gray-100">
+                  <p className="text-[#111827] font-bold text-sm md:text-base">We create spaces where children feel valued and ready to explore.</p>
+                </div>
+              </div>
+              <Link
+                href="/events"
+                className="inline-flex items-center gap-2 bg-[#FFC107] hover:bg-[#FFC107] text-[#111827] font-bold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
+              >
+                View Events <ArrowRight size={16} />
+              </Link>
+            </motion.div>
+
+            {/* Redesigned Children Hub Card (No Image) */}
+            <div className="lg:w-1/2 w-full max-w-[480px]">
+              <div className="bg-[#fffbf0] p-8 md:p-10 rounded-[2.5rem] border border-[#FFC107]/20 shadow-md rotate-2 transition-transform duration-500 hover:rotate-0">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-[#ffecb3] flex items-center justify-center text-[#FFC107]">
+                    <Smile size={20} />
+                  </div>
+                  <h3 className="font-bold text-xl text-[#111827]">SEL for Children</h3>
+                </div>
+
+                <ul className="space-y-4">
+                  {[
+                    { title: "Children thrive through meaningful connections and experiences.", desc: "Strong relationships and engaging experiences create the foundation for learning, wellbeing, and lifelong growth." },
+                    { title: "Every child deserves to feel safe, seen, and valued.", desc: "A sense of belonging enables children to explore, express themselves, and develop confidence in who they are." },
+                    { title: "The well-being of society is reflected in the everyday experiences of children.", desc: "When communities invest in nurturing childhoods, they lay the foundation for a more compassionate, resilient, and equitable future." }
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-[#FFC107]/20 flex items-center justify-center text-[#FFC107] shrink-0 mt-0.5">
+                        <Check size={12} strokeWidth={3} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-gray-900">{item.title}</span>
+                        <span className="text-xs font-medium text-gray-500 leading-relaxed mt-0.5">{item.desc}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-8 pt-6 border-t border-[#FFC107]/20 text-center">
+                  <span className="text-xs font-bold text-[#FFC107] uppercase tracking-wider">Playful & joyful learning</span>
                 </div>
               </div>
             </div>

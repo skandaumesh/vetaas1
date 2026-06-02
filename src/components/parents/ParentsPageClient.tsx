@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { 
   ArrowRight, Heart, Smile, Sparkles, Coffee, 
-  BookOpen, Users, Sprout, MessageCircle, Gamepad2, Compass
+  BookOpen, Users, Sprout, MessageCircle, Gamepad2, Compass, Check, Calendar, Activity
 } from "lucide-react";
 import ParentsHero from "@/components/parents/ParentsHero";
 
@@ -13,34 +13,25 @@ import ParentsHero from "@/components/parents/ParentsHero";
 
 const BELIEFS = [
   {
-    text: "Parents are the foundation of every child's growth",
+    title: "Parents are central to a child's development.",
+    text: "The quality of everyday interactions between parents and children shapes how children learn, relate, and thrive.",
     icon: <Heart className="w-6 h-6 text-rose-500" />,
     borderColor: "border-rose-100/80",
     topLineColor: "bg-rose-500"
   },
   {
-    text: "Research & experience guide us to bring you best practices",
-    icon: <BookOpen className="w-6 h-6 text-amber-500" />,
+    title: "The well-being of parents matters.",
+    text: "When parents feel supported, connected, and emotionally healthy, they are better able to nurture their children's growth and wellbeing.",
+    icon: <Smile className="w-6 h-6 text-amber-500" />,
     borderColor: "border-amber-100/80",
     topLineColor: "bg-amber-500"
   },
   {
-    text: "We build a bridge between research and real life",
-    icon: <Compass className="w-6 h-6 text-teal-500" />,
-    borderColor: "border-teal-100/80",
-    topLineColor: "bg-teal-500"
-  },
-  {
-    text: "Holistic care for body, mind, heart and relationships",
+    title: "Parenting is a journey of learning and growth.",
+    text: "Children flourish when parents have opportunities to reflect, learn, and respond intentionally to their evolving needs.",
     icon: <Sprout className="w-6 h-6 text-emerald-500" />,
     borderColor: "border-emerald-100/80",
     topLineColor: "bg-emerald-500"
-  },
-  {
-    text: "Aware parents create happier, resilient children",
-    icon: <Users className="w-6 h-6 text-violet-500" />,
-    borderColor: "border-violet-100/80",
-    topLineColor: "bg-violet-500"
   }
 ];
 
@@ -104,12 +95,17 @@ const OFFERINGS = [
   {
     title: "Workshops",
     badge: "Immersive & Practical",
-    description: "Immersive, hands-on experiences going beyond traditional advice. We provide a safe space to explore early childhood milestones, tailored for parents of children aged 3 to 6. These sessions combine evidence-based strategies with playful learning, ensuring actionable family routines.",
-    color: "bg-[#45bcf6]", // Sky Blue
-    btnColor: "bg-[#35a8df] text-[#111827] hover:bg-[#2fa0d5]",
-    badgeColor: "bg-white/30 text-[#111827] border border-white/40",
-    hoverShadow: "hover:shadow-[#45bcf6]/30",
-    listTitle: "Key themes:",
+    description: "Immersive, hands-on experiences going beyond traditional advice. We provide a safe space to explore early childhood milestones, tailored for parents of children aged 3 to 6.",
+    icon: <BookOpen className="w-6 h-6 text-[#45bcf6]" />,
+    theme: {
+      bg: "bg-[#45bcf6]/[0.03]",
+      border: "border-[#45bcf6]/20",
+      iconBg: "bg-[#45bcf6]/10",
+      checkBg: "bg-[#45bcf6]/15",
+      checkColor: "text-[#45bcf6]",
+      separator: "border-[#45bcf6]/15",
+      bottomText: "text-[#45bcf6]"
+    },
     items: [
       "Social Emotional Learning (SEL)",
       "Pre-literacy and Pre-numeracy",
@@ -119,12 +115,17 @@ const OFFERINGS = [
   {
     title: "Events - MCME",
     badge: "My Child & Me",
-    description: "Unique celebrations of the special bond between you and your child. We believe shared joy is the best catalyst for growth, offering interactive activities, collaborative creative projects, and high-energy games that spark laughter and lasting memories.",
-    color: "bg-[#ff7f68]", // Coral
-    btnColor: "bg-[#e56d58] text-[#111827] hover:bg-[#d65f4b]",
-    badgeColor: "bg-white/30 text-[#111827] border border-white/40",
-    hoverShadow: "hover:shadow-[#ff7f68]/30",
-    listTitle: "The agenda includes:",
+    description: "Unique celebrations of the special bond between you and your child. We believe shared joy is the best catalyst for growth, offering interactive activities and collaborative projects.",
+    icon: <Calendar className="w-6 h-6 text-[#ff7f68]" />,
+    theme: {
+      bg: "bg-[#ff7f68]/[0.03]",
+      border: "border-[#ff7f68]/20",
+      iconBg: "bg-[#ff7f68]/10",
+      checkBg: "bg-[#ff7f68]/15",
+      checkColor: "text-[#ff7f68]",
+      separator: "border-[#ff7f68]/15",
+      bottomText: "text-[#ff7f68]"
+    },
     items: [
       "Fun developmental games",
       "Music, rhythm and dance",
@@ -134,12 +135,17 @@ const OFFERINGS = [
   {
     title: "Wellness circles",
     badge: "Parent Well-being",
-    description: "A compassionate environment where parents prioritize their own well-being alongside their child's. These gatherings focus on holistic self-care, community support, and mindfulness, building the emotional resilience needed for daily life.",
-    color: "bg-[#00CDBA]", // Emerald Green/Teal
-    btnColor: "bg-[#2da182] text-[#111827] hover:bg-[#258f73]",
-    badgeColor: "bg-white/30 text-[#111827] border border-white/40",
-    hoverShadow: "hover:shadow-[#00CDBA]/30",
-    listTitle: "Key engagements:",
+    description: "A compassionate environment where parents prioritize their own well-being alongside their child's. These gatherings focus on holistic self-care, community support, and mindfulness.",
+    icon: <Activity className="w-6 h-6 text-[#00CDBA]" />,
+    theme: {
+      bg: "bg-[#00CDBA]/[0.03]",
+      border: "border-[#00CDBA]/20",
+      iconBg: "bg-[#00CDBA]/10",
+      checkBg: "bg-[#00CDBA]/15",
+      checkColor: "text-[#00CDBA]",
+      separator: "border-[#00CDBA]/15",
+      bottomText: "text-[#00CDBA]"
+    },
     items: [
       "Well-being & mindfulness practices",
       "Supportive community building",
@@ -179,7 +185,7 @@ export default function ParentsPageClient() {
             <div className="w-12 h-1 bg-[#ffa3c9] rounded-full mt-4" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {BELIEFS.map((belief, idx) => (
               <motion.div
                 key={idx}
@@ -196,7 +202,8 @@ export default function ParentsPageClient() {
                   {belief.icon}
                 </div>
                 
-                <p className="text-xs sm:text-sm font-bold text-gray-800 leading-relaxed text-left">
+                <h4 className="text-sm sm:text-base font-bold text-gray-900 mb-2">{belief.title}</h4>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 leading-relaxed text-left">
                   {belief.text}
                 </p>
               </motion.div>
@@ -204,11 +211,11 @@ export default function ParentsPageClient() {
           </div>
         </section>
 
-        {/* ── THE VETAAS DIFFERENCE ── */}
+        {/* ── THE VETAAS WAY ── */}
         <section className="mb-32">
           <div className="text-center max-w-xl mx-auto mb-16 flex flex-col items-center">
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
-              The Vetaas Difference
+              The Vetaas Way
             </h3>
             <div className="w-12 h-1 bg-[#0CB0D8] rounded-full mt-4" />
           </div>
@@ -261,68 +268,48 @@ export default function ParentsPageClient() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
-                className={`rounded-[2.5rem] border border-black/5 p-8 flex flex-col justify-between shadow-xl transition-all duration-500 relative overflow-hidden group ${offering.color} ${offering.hoverShadow}`}
+                className={`rounded-[2.5rem] border p-8 md:p-10 flex flex-col justify-between transition-all duration-500 relative overflow-hidden group ${offering.theme.bg} ${offering.theme.border} hover:shadow-lg hover:-translate-y-1`}
               >
-                {/* Animated Inner Blobs */}
-                <motion.div 
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 90, 0],
-                    opacity: [0.1, 0.2, 0.1]
-                  }}
-                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                  className="absolute -top-10 -right-10 w-40 h-40 bg-white rounded-full blur-3xl pointer-events-none"
-                />
-                <motion.div 
-                  animate={{ 
-                    x: [0, 30, 0],
-                    y: [0, -20, 0],
-                    opacity: [0.05, 0.1, 0.05]
-                  }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute bottom-10 -left-10 w-48 h-48 bg-black rounded-full blur-3xl pointer-events-none"
-                />
-
-                <div className="relative z-10">
-                  <div className="flex justify-between items-center mb-6 mt-2">
-                    <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${offering.badgeColor}`}>
-                      {offering.badge}
-                    </span>
+                <div className="relative z-10 flex-grow">
+                  {/* Icon & Title Header */}
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${offering.theme.iconBg}`}>
+                      {offering.icon}
+                    </div>
+                    <h3 className="text-2xl md:text-[26px] font-extrabold tracking-tight text-[#111827]">
+                      {offering.title}
+                    </h3>
                   </div>
 
-                  <h3 className="text-2xl font-extrabold tracking-tight text-[#111827] mb-4">
-                    {offering.title}
-                  </h3>
-
-                  <p className="text-[#111827] font-bold text-xs leading-relaxed mb-6 opacity-90">
+                  {/* Description */}
+                  <p className="text-[#111827]/70 font-medium text-[15px] leading-relaxed mb-8">
                     {offering.description}
                   </p>
 
-                  <div className="border-t border-dashed border-black/10 pt-5 mb-8">
-                    <span className="text-[10px] font-black text-[#111827]/70 uppercase tracking-widest block mb-3">
-                      {offering.listTitle}
-                    </span>
-                    <ul className="space-y-3">
-                      {offering.items.map((item) => (
-                        <li key={item} className="flex items-start gap-2.5">
-                          <div className="w-4 h-4 rounded-full bg-white/40 border border-white/20 flex items-center justify-center shrink-0 mt-0.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#111827]" />
-                          </div>
-                          <span className="text-xs font-bold text-[#111827] leading-snug">
-                            {item}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {/* List Items */}
+                  <ul className="space-y-4 mb-10">
+                    {offering.items.map((item) => (
+                      <li key={item} className="flex items-start gap-3.5">
+                        <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center shrink-0 mt-[3px] ${offering.theme.checkBg}`}>
+                          <Check className={`w-3.5 h-3.5 ${offering.theme.checkColor}`} strokeWidth={3} />
+                        </div>
+                        <span className="text-[15px] font-semibold text-[#111827]/80 leading-snug">
+                          {item}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                <Link
-                  href="/events"
-                  className={`w-full inline-flex items-center justify-center gap-2 ${offering.btnColor} font-bold text-xs py-3.5 px-6 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-sm relative z-10`}
-                >
-                  Explore Program <ArrowRight size={14} />
-                </Link>
+                {/* Bottom Separator & Badge/Link */}
+                <div className={`relative z-10 pt-6 border-t ${offering.theme.separator} flex justify-center mt-auto`}>
+                  <Link
+                    href="/events"
+                    className={`inline-block text-[11px] font-black uppercase tracking-[0.15em] hover:scale-105 transition-transform ${offering.theme.bottomText}`}
+                  >
+                    {offering.badge}
+                  </Link>
+                </div>
               </motion.div>
             ))}
           </div>

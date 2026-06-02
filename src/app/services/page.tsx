@@ -2,7 +2,31 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, BookOpen, Smile, Compass } from "lucide-react";
+
+const BELIEFS_TEACHERS = [
+  {
+    title: "Teachers shape more than learning—they shape lives.",
+    text: "Every interaction in the classroom influences how children see themselves, others, and the world around them.",
+    icon: <BookOpen className="w-6 h-6 text-[#1E90FF]" />,
+    borderColor: "border-blue-100/80",
+    topLineColor: "bg-[#1E90FF]"
+  },
+  {
+    title: "Teacher wellbeing is essential to student well-being.",
+    text: "When teachers feel valued, supported, and emotionally equipped, they create environments where children can thrive.",
+    icon: <Smile className="w-6 h-6 text-[#00CDBA]" />,
+    borderColor: "border-teal-100/80",
+    topLineColor: "bg-[#00CDBA]"
+  },
+  {
+    title: "Reflective teachers build responsive classrooms.",
+    text: "Self-awareness and emotional regulation are key to fostering a positive, inclusive, and effective learning space.",
+    icon: <Compass className="w-6 h-6 text-[#7C3AED]" />,
+    borderColor: "border-purple-100/80",
+    topLineColor: "bg-[#7C3AED]"
+  }
+];
 
 export default function ServicesPage() {
   return (
@@ -260,6 +284,41 @@ export default function ServicesPage() {
           </Link>
 
         </div>
+
+        {/* ── WHAT WE BELIEVE SECTION (Typographical card list) ── */}
+        <section className="mb-32">
+          <div className="text-center max-w-xl mx-auto mb-16 flex flex-col items-center">
+            <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
+              SEL for Teachers: What We Believe
+            </h3>
+            <div className="w-12 h-1 bg-[#1E90FF] rounded-full mt-4" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {BELIEFS_TEACHERS.map((belief, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.08 }}
+                className={`relative flex flex-col items-start p-7 rounded-3xl border ${belief.borderColor} bg-white shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden`}
+              >
+                {/* Horizontal colored top line */}
+                <div className={`absolute top-0 left-0 right-0 h-1.5 ${belief.topLineColor}`} />
+
+                <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-6">
+                  {belief.icon}
+                </div>
+                
+                <h4 className="text-sm sm:text-base font-bold text-gray-900 mb-2">{belief.title}</h4>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 leading-relaxed text-left">
+                  {belief.text}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
 
         {/* Closing Partner Section */}
         <motion.div 
