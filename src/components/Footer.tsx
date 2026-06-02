@@ -47,7 +47,7 @@ export default function Footer() {
             <ul className="space-y-4">
               <li><Link href="/teachers" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Teachers</Link></li>
               <li><Link href="/parents" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Parents</Link></li>
-              <li><Link href="/children" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Children</Link></li>
+              <li><Link href="/services" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Children</Link></li>
             </ul>
           </div>
 
