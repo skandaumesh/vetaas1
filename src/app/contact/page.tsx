@@ -31,6 +31,27 @@ function ContactFormContent() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="mb-16 md:mb-20 text-center md:text-left"
         >
+          {/* Decorative quote */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mb-8 bg-[#7C3AED] text-white rounded-3xl p-8 relative overflow-hidden max-w-2xl mx-auto md:mx-0 text-left"
+          >
+            {/* inner doodle */}
+            <div className="absolute -top-4 -right-4 w-24 h-24 opacity-10">
+              <svg viewBox="0 0 100 100" fill="white" className="w-full h-full">
+                <circle cx="50" cy="50" r="50" />
+              </svg>
+            </div>
+            <p className="text-lg font-semibold leading-relaxed relative z-10">
+              "It takes a village to raise a child."
+            </p>
+            <p className="text-white/60 text-sm mt-3 font-medium relative z-10">
+              — African Proverb & our founding belief
+            </p>
+          </motion.div>
+
           {/* Pill badge */}
           <span className="inline-block py-1.5 px-5 rounded-full bg-white border border-[#7C3AED]/10 text-[#7C3AED] font-bold text-[10px] tracking-[0.2em] uppercase shadow-sm mb-5">
             Get in Touch
@@ -59,26 +80,7 @@ function ContactFormContent() {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col gap-6"
           >
-            {/* Decorative quote */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="mb-2 bg-[#7C3AED] text-white rounded-3xl p-8 relative overflow-hidden"
-            >
-              {/* inner doodle */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 opacity-10">
-                <svg viewBox="0 0 100 100" fill="white" className="w-full h-full">
-                  <circle cx="50" cy="50" r="50" />
-                </svg>
-              </div>
-              <p className="text-lg font-semibold leading-relaxed relative z-10">
-                "It takes a village to raise a child."
-              </p>
-              <p className="text-white/60 text-sm mt-3 font-medium relative z-10">
-                — African Proverb &amp; our founding belief
-              </p>
-            </motion.div>
+
 
             <InfoCard
               icon={<Phone size={22} />}
@@ -141,12 +143,37 @@ function ContactFormContent() {
                 </motion.div>
               ) : (
                 <form
-                  action="mailto:kirti.vetaas@gmail.com"
-                  method="POST"
-                  encType="text/plain"
-                  onSubmit={() => setSubmitted(true)}
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(e.currentTarget);
+                    formData.append("access_key", "2c7413a4-1b05-4c31-b815-d159bc0214d1");
+                    
+                    const object = Object.fromEntries(formData);
+                    const json = JSON.stringify(object);
+                    
+                    try {
+                      const res = await fetch("https://api.web3forms.com/submit", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Accept: "application/json"
+                        },
+                        body: json
+                      });
+                      const result = await res.json();
+                      if (result.success) {
+                        setSubmitted(true);
+                      }
+                    } catch (err) {
+                      console.error("Error submitting form", err);
+                    }
+                  }}
                   className="space-y-5"
                 >
+                  <input type="hidden" name="subject" value="New Contact Message from Vetaas Website" />
+                  <input type="hidden" name="from_name" value="Vetaas Website" />
+                  
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <Field id="name" label="Your Name" type="text" placeholder="Kiran" />
                     <Field id="email" label="Email Address" type="email" placeholder="kiran@example.com" />

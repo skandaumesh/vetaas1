@@ -36,7 +36,7 @@ export default function ServicesPage() {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block py-1.5 px-6 rounded-full bg-white border border-gray-200 text-gray-800 font-bold text-xs tracking-widest uppercase mb-4 shadow-sm">
-              OUR SERVICES
+              WHAT WE DO
             </span>
           </motion.div>
 
