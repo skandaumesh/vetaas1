@@ -72,6 +72,14 @@ body {
   color: transparent;
 }
 
+/* Ensure all tailwind bg-clip-text instances work correctly in Brave/Safari */
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
 /* ── Button System ── */
 .btn-primary {
   display: inline-flex;

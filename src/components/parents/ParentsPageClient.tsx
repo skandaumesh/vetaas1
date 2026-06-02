@@ -113,7 +113,7 @@ const OFFERINGS = [
     ]
   },
   {
-    title: "Events - MCME",
+    title: "Parent-Child engagement",
     badge: "My Child & Me",
     description: "Unique celebrations of the special bond between you and your child. We believe shared joy is the best catalyst for growth, offering interactive activities and collaborative projects.",
     icon: <Calendar className="w-6 h-6 text-[#ff7f68]" />,
@@ -185,7 +185,7 @@ export default function ParentsPageClient() {
             <div className="w-12 h-1 bg-[#ffa3c9] rounded-full mt-4" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {BELIEFS.map((belief, idx) => (
               <motion.div
                 key={idx}
@@ -220,7 +220,7 @@ export default function ParentsPageClient() {
             <div className="w-12 h-1 bg-[#0CB0D8] rounded-full mt-4" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {DIFFERENCES.map((diff, idx) => (
               <motion.div
                 key={idx}

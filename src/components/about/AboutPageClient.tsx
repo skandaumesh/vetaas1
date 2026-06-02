@@ -238,7 +238,7 @@ export default function AboutPageClient() {
             <div className="w-12 h-1 bg-[#00CDBA] rounded-full mx-auto" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1200px] mx-auto mt-12 px-4 pb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[1200px] mx-auto mt-12 px-4 pb-16">
             
             {/* Tile 1 */}
             <motion.div
