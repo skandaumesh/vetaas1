@@ -30,6 +30,12 @@ export const metadata: Metadata = {
   description: "Vetaas partners with parents, teachers, and schools to nurture Social Emotional Learning (SEL) in early childhood across Bangalore, India.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

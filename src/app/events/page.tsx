@@ -106,7 +106,7 @@ export default function EventsPage() {
     <div className="min-h-screen bg-[#faf9f7] pt-[calc(var(--header-height)+3rem)] pb-24 relative z-10 font-sans">
 
       {/* ── Page Header ── */}
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12 mb-20">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12 mb-20">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,7 +131,7 @@ export default function EventsPage() {
 
 
       {/* ── Main Content ── */}
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-16 lg:gap-20">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-16 lg:gap-20">
 
         {/* Left: Events */}
         <div>
