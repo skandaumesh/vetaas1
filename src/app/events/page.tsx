@@ -16,34 +16,8 @@ import {
   ChevronDown,
   Share2,
   Check,
-  Gamepad2,
-  Heart,
-  Users,
 } from "lucide-react";
 
-const BELIEFS_CHILDREN = [
-  {
-    title: "Children learn best through play and joy.",
-    text: "Play is the natural language of childhood. It is through joyful, self-directed exploration that children build confidence, creativity, and connection.",
-    icon: <Gamepad2 className="w-6 h-6 text-[#FFC107]" />,
-    borderColor: "border-amber-100/80",
-    topLineColor: "bg-[#FFC107]"
-  },
-  {
-    title: "Every child deserves a safe emotional space.",
-    text: "Emotional safety is the foundation of growth. When children feel seen, heard, and accepted, they are free to explore their feelings and the world around them.",
-    icon: <Heart className="w-6 h-6 text-[#FF5C7A]" />,
-    borderColor: "border-rose-100/80",
-    topLineColor: "bg-[#FF5C7A]"
-  },
-  {
-    title: "Social and emotional skills are built in community.",
-    text: "Growth happens together. Through interactions with peers and caring adults, children learn empathy, cooperation, and how to navigate relationships.",
-    icon: <Users className="w-6 h-6 text-[#38d38b]" />,
-    borderColor: "border-emerald-100/80",
-    topLineColor: "bg-[#38d38b]"
-  }
-];
 import Image from "next/image";
 import { parseLumaUrl, initLumaCheckout, formatEventDateRange } from "@/lib/luma";
 
@@ -155,40 +129,6 @@ export default function EventsPage() {
         </motion.div>
       </div>
 
-      {/* ── WHAT WE BELIEVE SECTION (Typographical card list) ── */}
-      <div className="max-w-[1200px] mx-auto px-6 md:px-12 mb-24">
-        <div className="text-center max-w-xl mx-auto mb-16 flex flex-col items-center">
-          <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
-            SEL for Children: What We Believe
-          </h3>
-          <div className="w-12 h-1 bg-[#FFC107] rounded-full mt-4" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {BELIEFS_CHILDREN.map((belief, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.08 }}
-              className={`relative flex flex-col items-start p-7 rounded-3xl border ${belief.borderColor} bg-white shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden`}
-            >
-              {/* Horizontal colored top line */}
-              <div className={`absolute top-0 left-0 right-0 h-1.5 ${belief.topLineColor}`} />
-
-              <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-6">
-                {belief.icon}
-              </div>
-              
-              <h4 className="text-sm sm:text-base font-bold text-gray-900 mb-2">{belief.title}</h4>
-              <p className="text-xs sm:text-sm font-medium text-gray-600 leading-relaxed text-left">
-                {belief.text}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
 
       {/* ── Main Content ── */}
       <div className="max-w-[1200px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-16 lg:gap-20">
