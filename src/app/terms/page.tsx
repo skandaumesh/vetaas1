@@ -10,7 +10,6 @@ export const metadata = {
 export default function TermsPage() {
   return (
     <div className="min-h-screen flex flex-col font-body">
-      <Header />
       <main className="flex-grow pt-[var(--header-height)]">
         <div className="bg-[#faf9f6] py-20 px-6">
           <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100">
@@ -54,7 +53,6 @@ export default function TermsPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
