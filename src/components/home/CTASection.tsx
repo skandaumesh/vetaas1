@@ -74,7 +74,7 @@ export default function CTASection() {
               JOIN THE COMMUNITY
             </span>
             
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#111827] leading-[1.1] mb-8 mt-3">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-headline tracking-tight text-[#111827] leading-[1.1] mb-8 mt-3">
               It takes a village to <br className="hidden md:block"/> raise a child.
             </h2>
           </div>

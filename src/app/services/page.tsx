@@ -44,7 +44,7 @@ export default function ServicesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#111827] tracking-tight mb-6"
+            className="text-4xl md:text-5xl lg:text-6xl font-extrabold font-headline text-[#111827] tracking-tight mb-6"
           >
             Our <span className="inline-block bg-[#7C3AED] text-white px-5 py-1 rounded-2xl rotate-1 shadow-sm font-semibold">Services.</span>
           </motion.h1>
@@ -272,9 +272,11 @@ export default function ServicesPage() {
           className="bg-gray-50 rounded-[3rem] p-8 md:p-12 border border-gray-200 max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left"
         >
           <div className="max-w-xl">
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Interested in our services?</h3>
+            <h3 className="text-3xl md:text-4xl font-headline text-gray-900 mb-4 tracking-tight">
+              Interested in our <span className="inline-block bg-[#ffa3c9] text-white px-5 py-1 rounded-[1.5rem] shadow-sm font-bold -rotate-2">services?</span>
+            </h3>
             <p className="text-gray-500 font-medium text-sm md:text-base leading-relaxed">
-              We customize workshops, events, and capacity-building programs for schools, community organizations, and parents.
+              We customize workshops, events, and capacity-building programs for schools, communities, and parents.
             </p>
           </div>
           <Link 

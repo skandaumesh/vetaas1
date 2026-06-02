@@ -106,7 +106,7 @@ export default function AboutPageClient() {
             <span className="text-[10px] font-black uppercase tracking-[0.25em]">The Framework</span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl lg:text-6xl text-[#111827] font-extrabold tracking-tight leading-[1.15] mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl text-[#111827] font-extrabold font-headline tracking-tight leading-[1.15] mb-6">
             The Magic{" "}
             <span className="relative inline-block px-5 py-1.5 ml-1">
               {/* Slanted backdrop badge */}
@@ -231,7 +231,7 @@ export default function AboutPageClient() {
       <section className="py-24 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-[#111827] tracking-tight leading-[1.15] mb-6">
+            <h2 className="text-3xl md:text-5xl font-bold font-headline text-[#111827] tracking-tight leading-[1.15] mb-6">
               The Foundation of <br className="hidden md:block" />
               <span className="inline-block bg-[#FFC107] text-[#111827] px-4 py-0.5 rounded-xl rotate-1 shadow-sm font-semibold mt-2">Our Work.</span>
             </h2>
@@ -331,7 +331,7 @@ export default function AboutPageClient() {
               transition={{ duration: 0.7 }}
               className="lg:w-1/2"
             >
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight leading-[1.1] mb-6">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-headline text-[#111827] tracking-tight leading-[1.1] mb-6">
                 Our Work With <br />
                 <span className="inline-block bg-[#ff7f68] text-white px-4 py-0.5 rounded-xl rotate-1 shadow-sm font-semibold mt-2">Parents.</span>
               </h2>
@@ -395,7 +395,7 @@ export default function AboutPageClient() {
               transition={{ duration: 0.7 }}
               className="lg:w-1/2"
             >
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight leading-[1.1] mb-6">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-headline text-[#111827] tracking-tight leading-[1.1] mb-6">
                 Our Work With <br />
                 <span className="inline-block bg-[#45bcf6] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-2">Teachers.</span>
               </h2>
@@ -459,7 +459,7 @@ export default function AboutPageClient() {
               transition={{ duration: 0.7 }}
               className="lg:w-1/2"
             >
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight leading-[1.1] mb-6">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-headline text-[#111827] tracking-tight leading-[1.1] mb-6">
                 Our Work With <br />
                 <span className="inline-block bg-[#FFC107] text-[#111827] px-4 py-0.5 rounded-xl rotate-1 shadow-sm font-semibold mt-2">Children.</span>
               </h2>
@@ -527,7 +527,7 @@ export default function AboutPageClient() {
               <div className="inline-flex items-center justify-center bg-[#FFC107] text-[#111827] px-4 py-1.5 rounded-full mb-6 shadow-sm rotate-2">
                 <span className="text-xs font-semibold uppercase tracking-wider">Meet the Visionaries</span>
               </div>
-              <h2 className="text-3xl md:text-5xl font-bold text-[#111827] tracking-tight leading-[1.15] mb-6">
+              <h2 className="text-3xl md:text-5xl font-bold font-headline text-[#111827] tracking-tight leading-[1.15] mb-6">
                 The Team <br />
                 Behind <span className="inline-block bg-[#00CDBA] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-1">Vetaas.</span>
               </h2>

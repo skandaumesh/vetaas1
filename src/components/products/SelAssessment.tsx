@@ -179,7 +179,7 @@ export default function SelAssessment() {
               <div className="inline-block p-4 bg-white border border-gray-100 rounded-full mb-6 shadow-sm">
                 <Sparkles className="w-8 h-8 text-[#FFC107]" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-semibold mb-6 tracking-tight text-gray-900">
+              <h1 className="text-4xl md:text-5xl font-semibold font-headline mb-6 tracking-tight text-gray-900">
                 Discover Your Child's Superpowers
               </h1>
               <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
@@ -282,7 +282,7 @@ export default function SelAssessment() {
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl mb-6 shadow-sm border border-gray-100">
                   <Star className="w-8 h-8 text-[#FFC107]" />
                 </div>
-                <h2 className="text-3xl md:text-4xl font-semibold mb-3 text-gray-900">Assessment Complete</h2>
+                <h2 className="text-3xl md:text-4xl font-semibold font-headline mb-3 text-gray-900">Assessment Complete</h2>
                 <p className="text-gray-500 font-medium">Here is a brief overview of your child's SEL profile.</p>
               </div>
 

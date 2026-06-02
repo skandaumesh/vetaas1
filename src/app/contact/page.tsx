@@ -36,7 +36,7 @@ function ContactFormContent() {
             Get in Touch
           </span>
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.2] text-[#111827] tracking-tight mb-5">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold font-headline leading-[1.2] text-[#111827] tracking-tight mb-5">
             Let's Build the{" "}
             <span className="text-[#00CDBA]">Village</span>
             <br className="hidden sm:block" /> Together.
@@ -114,7 +114,7 @@ function ContactFormContent() {
                 <span className="inline-block py-1 px-4 rounded-full bg-[#00CDBA]/10 text-[#2a9d7e] text-[10px] font-black uppercase tracking-[0.2em] mb-3">
                   Send a Message
                 </span>
-                <h2 className="text-3xl font-bold text-[#111827] leading-tight">
+                <h2 className="text-3xl font-bold font-headline text-[#111827] leading-tight">
                   We reply within 24 hours.
                 </h2>
               </div>
@@ -148,11 +148,11 @@ function ContactFormContent() {
                   className="space-y-5"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <Field id="name" label="Your Name" type="text" placeholder="Jane Doe" />
-                    <Field id="email" label="Email Address" type="email" placeholder="jane@example.com" />
+                    <Field id="name" label="Your Name" type="text" placeholder="Kiran" />
+                    <Field id="email" label="Email Address" type="email" placeholder="kiran@example.com" />
                   </div>
                   <Field id="phone" label="Phone (optional)" type="tel" placeholder="+91 98765 43210" />
-                  <Field id="role" label="I am a…" type="select" options={["Parent", "School / Principal", "Teacher", "Volunteer", "Other"]} />
+                  <Field id="role" label="I am a…" type="select" options={["Parent", "Principal", "Teacher", "Volunteer", "Other"]} />
                   <Field id="message" label="Your Message" type="textarea" placeholder="How can we help you?" defaultValue={defaultMessage} />
 
                   <button

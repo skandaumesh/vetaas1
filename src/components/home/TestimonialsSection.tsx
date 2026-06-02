@@ -142,8 +142,8 @@ export default function TestimonialsSection() {
           <div className="inline-flex items-center justify-center bg-[#FF5C7A] text-white px-5 py-2 rounded-full mb-4 shadow-sm rotate-1">
             <span className="text-sm font-semibold uppercase tracking-wider">Testimonials</span>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl text-[#111827] font-bold tracking-tight leading-[1.2]">
-            Voices from <span className="text-[#00CDBA]">Our Village</span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl text-[#111827] font-bold font-headline tracking-tight leading-[1.2]">
+            Voices from <span className="inline-block bg-[#00CDBA] text-white px-5 py-1 rounded-[1.5rem] shadow-sm rotate-2">Our Village</span>
           </h2>
         </motion.div>
       </div>

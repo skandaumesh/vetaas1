@@ -87,7 +87,7 @@ export default function HeroSection() {
             </span>
           </motion.div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-[2.5rem] font-bold leading-[1.3] text-[#FF5C7A] tracking-tight mb-8 max-w-2xl">
+          <h1 className="text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-[2.5rem] font-bold font-headline leading-[1.3] text-[#FF5C7A] tracking-tight mb-8 max-w-2xl">
             Enriching early childhood education by bringing Social Emotional Learning (SEL) research to classrooms.
           </h1>
 

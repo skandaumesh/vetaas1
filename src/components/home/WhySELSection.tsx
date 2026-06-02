@@ -127,7 +127,7 @@ export default function WhySELSection() {
             <span className="text-xs font-semibold uppercase tracking-wider">Why Social Emotional Learning?</span>
           </div>
           
-          <h2 className="text-3xl md:text-4xl lg:text-5xl text-[#111827] font-bold tracking-tight leading-[1.2] mb-5">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl text-[#111827] font-bold font-headline tracking-tight leading-[1.2] mb-5">
             Education isn't just academics.<br />
             <span className="inline-block bg-[#00CDBA] text-white px-3 py-0.5 rounded-xl -rotate-1 mt-2 shadow-sm font-semibold">It's about the whole child.</span>
           </h2>
