@@ -15,7 +15,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="col-span-1 md:col-span-4">
             <Link href="/" className="flex items-center gap-3 mb-6 w-max">
-              <Image src="/logo.webp" alt="Vetaas" width={50} height={50} className="object-contain" />
+              <Image src="/logo.webp" alt="Vetaas" width={50} height={50} style={{ height: "auto" }} className="w-[50px] object-contain" />
             </Link>
             <p className="text-gray-600 font-medium leading-relaxed max-w-xs mb-8">
               Nurturing Social Emotional Learning in early childhood. Building resilient, empathetic communities across India.

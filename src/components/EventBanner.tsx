@@ -55,7 +55,7 @@ export default function EventBanner() {
         // Use nearest Firestore event
         setEvent(upcoming.length > 0 ? upcoming[0] : null);
       } catch (err) {
-        console.error("EventBanner: failed to fetch events", err);
+        console.warn("EventBanner: failed to fetch events", err);
         setEvent(null);
       }
     };

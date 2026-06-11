@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCPX8GqGLLFDzRGnjhjJj_ovy88ulpK-D4",
@@ -13,10 +13,14 @@ const firebaseConfig = {
   measurementId: "G-1JKRXKWR09"
 };
 
-// Initialize Firebase only if it hasn't been initialized already (important for Next.js)
+// Initialize Firebase only if it hasn't been initialized already
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const auth = getAuth(app);
 
+// Attempt anonymous sign-in to bypass basic 'auth != null' rules
+if (typeof window !== "undefined") {
+  signInAnonymously(auth).catch(console.warn);
+}

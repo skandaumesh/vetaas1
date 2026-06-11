@@ -70,7 +70,7 @@ export default function EventsPage() {
         );
         setEvents(eventsData);
       } catch (error) {
-        console.error("Error fetching events: ", error);
+        console.warn("Error fetching events: ", error);
       } finally {
         setLoading(false);
       }

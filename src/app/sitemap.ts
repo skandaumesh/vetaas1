@@ -17,10 +17,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/terms',
   ];
 
-  return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: route === '' ? 1 : 0.8,
-  }));
+  return routes.map((route) => {
+    let priority = 0.8;
+    if (route === '') priority = 1.0;
+    else if (['/about', '/services', '/events', '/contact'].includes(route)) priority = 0.9;
+    else if (['/privacy', '/terms'].includes(route)) priority = 0.3; // Low priority to discourage sitelinks
+
+    return {
+      url: `${baseUrl}${route}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority,
+    };
+  });
 }

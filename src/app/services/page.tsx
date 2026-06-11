@@ -63,7 +63,7 @@ export default function ServicesPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-32">
           
           {/* Card 1: SEL for Children */}
-          <Link href="/events" className="flex group/card w-full">
+          <Link href="/children" className="flex group/card w-full">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -127,7 +127,7 @@ export default function ServicesPage() {
           </Link>
 
           {/* Card 2: SEL for Teachers */}
-          <Link href="/contact" className="flex group/card w-full">
+          <Link href="/teachers" className="flex group/card w-full">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}

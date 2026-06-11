@@ -110,12 +110,12 @@ export default function HeroSection() {
 
       {/* Right Column: Image Pane with Dynamic Wavy Divider */}
       <div className="w-full lg:w-[45%] h-[420px] sm:h-[520px] lg:h-auto relative z-10 overflow-hidden">
-        {/* Child Photo cropped from finalhero.png (Shifted to object-[62%_20%] on mobile to display face and drawing fully) */}
+        {/* Child Photo cropped from landingpage.png (Shifted to object-[62%_20%] on mobile to display face and drawing fully) */}
         <Image 
-          src="/finalhero.png" 
+          src="/landingpage.png" 
           alt="Nurturing Hope and Life" 
           fill 
-          className="object-cover object-[62%_20%] lg:object-[62%_0%]" 
+          className="object-cover object-[15%_20%] lg:object-[15%_0%]" 
           priority
         />
 
