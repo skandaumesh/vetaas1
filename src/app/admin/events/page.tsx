@@ -53,7 +53,8 @@ export default function AdminEventsPage() {
     title: "",
     date: "",
     endDate: "",
-    timeSlot: "",
+    startTime: "",
+    endTime: "",
     location: "",
     highlightsUrl: "",
     registrationUrl: "",
@@ -242,11 +243,24 @@ export default function AdminEventsPage() {
 
       const computedStatus = getComputedStatus(formData.date, formData.endDate);
 
+      const formatTime = (timeStr: string) => {
+        if (!timeStr) return "";
+        const [hourString, minute] = timeStr.split(":");
+        const hour = parseInt(hourString, 10);
+        const ampm = hour >= 12 ? "PM" : "AM";
+        const hour12 = hour % 12 || 12;
+        return `${hour12}:${minute} ${ampm}`;
+      };
+
+      const computedTimeSlot = (formData.startTime && formData.endTime) 
+        ? `${formatTime(formData.startTime)} - ${formatTime(formData.endTime)}`
+        : "";
+
       const eventData: any = {
         title: formData.title,
         date: formData.date,
         endDate: formData.endDate || "",
-        timeSlot: formData.timeSlot || "",
+        timeSlot: computedTimeSlot,
         location: formData.location,
         highlightsUrl: formData.highlightsUrl,
         registrationUrl: formData.registrationUrl,
@@ -274,7 +288,8 @@ export default function AdminEventsPage() {
         title: "",
         date: "",
         endDate: "",
-        timeSlot: "",
+        startTime: "",
+        endTime: "",
         location: "",
         highlightsUrl: "",
         registrationUrl: "",
@@ -306,11 +321,34 @@ export default function AdminEventsPage() {
 
   const handleEditClick = (event: any) => {
     setEditingEventId(event.id);
+    
+    // Attempt to parse back start and end time from "10:00 AM - 1:00 PM"
+    let parsedStart = "";
+    let parsedEnd = "";
+    if (event.timeSlot) {
+      const parts = event.timeSlot.split(" - ");
+      if (parts.length === 2) {
+        const parseTo24 = (timeStr: string) => {
+          const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!match) return "";
+          let h = parseInt(match[1], 10);
+          const m = match[2];
+          const isPM = match[3].toUpperCase() === "PM";
+          if (isPM && h < 12) h += 12;
+          if (!isPM && h === 12) h = 0;
+          return `${h.toString().padStart(2, "0")}:${m}`;
+        };
+        parsedStart = parseTo24(parts[0]);
+        parsedEnd = parseTo24(parts[1]);
+      }
+    }
+
     setFormData({
       title: event.title || "",
       date: event.date || "",
       endDate: event.endDate || "",
-      timeSlot: event.timeSlot || "",
+      startTime: parsedStart,
+      endTime: parsedEnd,
       location: event.location || "",
       highlightsUrl: event.highlightsUrl || "",
       registrationUrl: event.registrationUrl || "",
@@ -628,7 +666,7 @@ export default function AdminEventsPage() {
                   onClick={() => {
                     setEditingEventId(null);
                     setFormData({
-                      title: "", date: "", endDate: "", timeSlot: "", location: "", highlightsUrl: "", registrationUrl: "", manualImageUrl: ""
+                      title: "", date: "", endDate: "", startTime: "", endTime: "", location: "", highlightsUrl: "", registrationUrl: "", manualImageUrl: ""
                     });
                     setImagePreview(null);
                     setImageFile(null);
@@ -690,19 +728,33 @@ export default function AdminEventsPage() {
                 Note: Status calculates automatically (marks completed when event dates pass).
               </p>
 
-              <div>
-                <label htmlFor="timeSlot" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 font-headline">
-                  Time Slot (Optional)
-                </label>
-                <input
-                  type="text"
-                  id="timeSlot"
-                  name="timeSlot"
-                  value={formData.timeSlot}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
-                  placeholder="e.g. 10:00 AM - 1:00 PM"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="startTime" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 font-headline">
+                    Start Time (Optional)
+                  </label>
+                  <input
+                    type="time"
+                    id="startTime"
+                    name="startTime"
+                    value={formData.startTime}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="endTime" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 font-headline">
+                    End Time (Optional)
+                  </label>
+                  <input
+                    type="time"
+                    id="endTime"
+                    name="endTime"
+                    value={formData.endTime}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                  />
+                </div>
               </div>
 
               <div>
