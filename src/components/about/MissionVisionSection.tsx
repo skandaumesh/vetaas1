@@ -110,7 +110,7 @@ export default function MissionVisionSection() {
 
               {/* Text */}
               <p className="text-gray-600 text-base md:text-lg font-medium leading-relaxed mb-6">
-                We work with parents, teachers, and communities to create thoughtful social-emotional learning experiences that strengthen the ecosystem around children.
+                To transform the early years by embedding social and emotional learning into the everyday experiences of children, parents, and educators.
               </p>
             </div>
           </motion.div>
