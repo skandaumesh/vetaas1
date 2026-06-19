@@ -98,6 +98,7 @@ export default function Footer() {
         <div className="pt-8 border-t border-black/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500 font-medium">
           <p>&copy; {new Date().getFullYear()} Vetaas Education Foundation. All rights reserved.</p>
           <div className="flex items-center gap-6">
+            <Link href="/store-locator" className="hover:text-[#1E90FF] transition-colors">Store Locator</Link>
             <Link href="/privacy" className="hover:text-[#1E90FF] transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-[#1E90FF] transition-colors">Terms of Service</Link>
           </div>
