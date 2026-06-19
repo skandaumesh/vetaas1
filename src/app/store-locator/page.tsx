@@ -42,7 +42,7 @@ export default function StoreLocatorPage() {
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 
-                src="https://maps.google.com/maps?q=21,+Dhanlalshmi,+The+Nest+Studio,+2nd+floor,+Kanakapura+Main+Rd,+J.+P.+Nagar,+Phase+1,+Bengaluru,+Karnataka+560082&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                src="https://maps.google.com/maps?q=Nest+creations,+Kanakapura+Main+Rd,+Bengaluru&t=&z=15&ie=UTF8&iwloc=&output=embed" 
                 allowFullScreen={true}
                 loading="lazy" 
                 referrerPolicy="no-referrer-when-downgrade"

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, ArrowUpRight } from "lucide-react";
+import { Mail, Phone, ArrowUpRight, MapPin } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -70,6 +70,14 @@ export default function Footer() {
                 <a href="mailto:kirti.vetaas@gmail.com" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold break-all">
                   kirti.vetaas@gmail.com
                 </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-[#7C3AED]">
+                  <MapPin size={16} />
+                </div>
+                <Link href="/store-locator" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold break-all">
+                  Store Locator
+                </Link>
               </li>
             </ul>
             <div className="flex items-center gap-4">
