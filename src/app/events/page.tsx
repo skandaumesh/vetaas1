@@ -16,6 +16,7 @@ import {
   ChevronDown,
   Share2,
   Check,
+  Clock,
 } from "lucide-react";
 
 import Image from "next/image";
@@ -433,6 +434,12 @@ function EventCard({
                 <Calendar size={11} className="text-gray-400 shrink-0" />
                 <span className="truncate">{formattedFull}</span>
               </span>
+              {event.timeSlot && (
+                <span className="flex items-center gap-1.5">
+                  <Clock size={11} className="text-gray-400 shrink-0" />
+                  <span className="truncate">{event.timeSlot}</span>
+                </span>
+              )}
               {durationDays > 1 && (
                 <span className="text-[10px] font-bold text-[#00CDBA] pl-[17px] mt-0.5">
                   {durationDays} Days
@@ -621,6 +628,12 @@ function MemoryCard({
               <Calendar size={11} className="text-gray-400 shrink-0" />
               <span className="truncate">{formattedFull}</span>
             </span>
+            {event.timeSlot && (
+              <span className="flex items-center gap-1.5">
+                <Clock size={11} className="text-gray-400 shrink-0" />
+                <span className="truncate">{event.timeSlot}</span>
+              </span>
+            )}
             {durationDays > 1 && (
               <span className="text-[10px] font-bold text-[#00CDBA] pl-[17px] mt-0.5">
                 {durationDays} Days

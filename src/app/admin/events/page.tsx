@@ -53,6 +53,7 @@ export default function AdminEventsPage() {
     title: "",
     date: "",
     endDate: "",
+    timeSlot: "",
     location: "",
     highlightsUrl: "",
     registrationUrl: "",
@@ -60,6 +61,7 @@ export default function AdminEventsPage() {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
   // Custom alert/toast states
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -240,30 +242,45 @@ export default function AdminEventsPage() {
 
       const computedStatus = getComputedStatus(formData.date, formData.endDate);
 
-      const eventData = {
+      const eventData: any = {
         title: formData.title,
         date: formData.date,
         endDate: formData.endDate || "",
+        timeSlot: formData.timeSlot || "",
         location: formData.location,
         highlightsUrl: formData.highlightsUrl,
         registrationUrl: formData.registrationUrl,
         status: computedStatus,
-        image: imageUrl,
-        createdAt: new Date().toISOString()
       };
 
-      await addDoc(collection(db, "events"), eventData);
+      if (imageUrl) {
+        eventData.image = imageUrl;
+      }
+
+      if (editingEventId) {
+        // Update existing event
+        await updateDoc(doc(db, "events", editingEventId), eventData);
+        showToast("Event updated successfully!", "success");
+      } else {
+        // Create new event
+        eventData.createdAt = new Date().toISOString();
+        if (!imageUrl) eventData.image = ""; // Default empty string for new events without image
+        await addDoc(collection(db, "events"), eventData);
+        showToast("Event added successfully!", "success");
+      }
       
       // Reset form
       setFormData({
         title: "",
         date: "",
         endDate: "",
+        timeSlot: "",
         location: "",
         highlightsUrl: "",
         registrationUrl: "",
         manualImageUrl: ""
       });
+      setEditingEventId(null);
       setImageFile(null);
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview);
@@ -285,6 +302,27 @@ export default function AdminEventsPage() {
 
   const handleDeleteClick = (id: string) => {
     setDeleteConfirmId(id);
+  };
+
+  const handleEditClick = (event: any) => {
+    setEditingEventId(event.id);
+    setFormData({
+      title: event.title || "",
+      date: event.date || "",
+      endDate: event.endDate || "",
+      timeSlot: event.timeSlot || "",
+      location: event.location || "",
+      highlightsUrl: event.highlightsUrl || "",
+      registrationUrl: event.registrationUrl || "",
+      manualImageUrl: event.image || ""
+    });
+    if (event.image) {
+      setImagePreview(event.image);
+    } else {
+      setImagePreview(null);
+    }
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleConfirmDelete = async () => {
@@ -579,9 +617,28 @@ export default function AdminEventsPage() {
           
           {/* Form Section */}
           <div className="lg:col-span-5 bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-[#00CDBA]/15 shadow-[0_10px_30px_rgba(54,186,152,0.04)] h-fit lg:sticky lg:top-28">
-            <h2 className="text-2xl font-black text-gray-900 mb-6 font-headline flex items-center gap-2 text-[#00CDBA]">
-              <PlusCircle className="w-6 h-6" /> Add New Event
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-black text-gray-900 font-headline flex items-center gap-2 text-[#00CDBA]">
+                {editingEventId ? <Edit2 className="w-6 h-6" /> : <PlusCircle className="w-6 h-6" />} 
+                {editingEventId ? "Edit Event" : "Add New Event"}
+              </h2>
+              {editingEventId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingEventId(null);
+                    setFormData({
+                      title: "", date: "", endDate: "", timeSlot: "", location: "", highlightsUrl: "", registrationUrl: "", manualImageUrl: ""
+                    });
+                    setImagePreview(null);
+                    setImageFile(null);
+                  }}
+                  className="text-xs font-bold text-gray-500 hover:text-rose-500 transition-colors uppercase tracking-wider bg-gray-100 px-3 py-1.5 rounded-full"
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
             
             <form onSubmit={handleSubmit} className="space-y-5 font-body">
               <div>
@@ -632,6 +689,21 @@ export default function AdminEventsPage() {
               <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider -mt-2">
                 Note: Status calculates automatically (marks completed when event dates pass).
               </p>
+
+              <div>
+                <label htmlFor="timeSlot" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 font-headline">
+                  Time Slot (Optional)
+                </label>
+                <input
+                  type="text"
+                  id="timeSlot"
+                  name="timeSlot"
+                  value={formData.timeSlot}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                  placeholder="e.g. 10:00 AM - 1:00 PM"
+                />
+              </div>
 
               <div>
                 <label htmlFor="location" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 font-headline">
@@ -727,7 +799,7 @@ export default function AdminEventsPage() {
                     Saving Event...
                   </>
                 ) : (
-                  "Save Event"
+                  editingEventId ? "Update Event" : "Save Event"
                 )}
               </button>
             </form>
@@ -884,12 +956,22 @@ export default function AdminEventsPage() {
 
                       {/* Actions row */}
                       <div className="flex justify-end gap-2 border-t border-slate-100/80 pt-3 pr-2 pl-2">
-                        <button
-                          onClick={() => handleDeleteClick(event.id)}
-                          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition cursor-pointer"
-                        >
-                          <Trash2 size={11} /> Delete Event
-                        </button>
+                          <div className="flex items-center gap-2 mt-4 ml-auto">
+                            <button
+                              onClick={() => handleEditClick(event)}
+                              className="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-500 rounded-xl transition duration-200 shadow-sm flex items-center justify-center cursor-pointer"
+                              title="Edit Event"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(event.id)}
+                              className="p-2.5 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-xl transition duration-200 shadow-sm flex items-center justify-center cursor-pointer"
+                              title="Delete Event"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                       </div>
                     </div>
                   );
