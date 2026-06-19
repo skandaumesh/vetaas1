@@ -12,20 +12,6 @@ import ChildrenHero from "@/components/children/ChildrenHero";
 
 const BELIEFS = [
   {
-    title: "Every child deserves to thrive.",
-    text: "Children learn best when they feel safe, connected, and valued.",
-    icon: <Heart className="w-6 h-6 text-rose-500" />,
-    borderColor: "border-rose-100/80",
-    topLineColor: "bg-rose-500"
-  },
-  {
-    title: "Play is the foundation of learning.",
-    text: "Meaningful play helps children develop cognitive, social, emotional, language, and problem-solving skills.",
-    icon: <Gamepad2 className="w-6 h-6 text-amber-500" />,
-    borderColor: "border-amber-100/80",
-    topLineColor: "bg-amber-500"
-  },
-  {
     title: "Social and emotional skills improve academics.",
     text: "Self-awareness, emotional regulation, empathy, and relationship skills create a mindset for lifelong learning.",
     icon: <BookOpen className="w-6 h-6 text-emerald-500" />,
@@ -48,67 +34,45 @@ const BELIEFS = [
   }
 ];
 
-const DIFFERENCES = [
+const OFFERINGS = [
   {
-    title: "Experiential Learning",
-    description: "Learning through play, exploration, and real-life experiences that make concepts meaningful and memorable.",
-    icon: <Gamepad2 className="w-7 h-7" />,
-    color: "text-amber-500",
-    bg: "bg-amber-50"
+    title: "Joyful Learning Experiences",
+    description: "Children learn best when they are actively engaged. Our sessions combine play, exploration, creativity, and meaningful interactions to build foundational skills for lifelong learning.",
+    points: [
+      "Literacy, language, and communication development",
+      "Early numeracy and STEM exploration",
+      "Creative arts, movement, and hands-on discovery"
+    ],
+    icon: <Sparkles className="w-7 h-7 text-amber-500" />,
+    bg: "bg-amber-50",
+    borderColor: "border-amber-200/60",
+    shadow: "shadow-amber-500/5"
   },
   {
-    title: "Meaningful Activities",
-    description: "Thoughtfully designed experiences that foster curiosity, creativity, social skills, and a love for learning.",
-    icon: <Sparkles className="w-7 h-7" />,
-    color: "text-sky-500",
-    bg: "bg-sky-50"
+    title: "Social and Emotional Growth",
+    description: "We create opportunities for children to understand themselves, build relationships, and develop confidence in expressing their thoughts and feelings.",
+    points: [
+      "Self-awareness and emotional expression",
+      "Empathy, cooperation, and friendship skills",
+      "Confidence, resilience, and decision-making"
+    ],
+    icon: <Heart className="w-7 h-7 text-rose-500" />,
+    bg: "bg-rose-50",
+    borderColor: "border-rose-200/60",
+    shadow: "shadow-rose-500/5"
   },
   {
-    title: "Mindfulness and Well-being",
-    description: "Helping children build self-awareness, emotional resilience, focus, and positive relationships from an early age.",
-    icon: <Smile className="w-7 h-7" />,
-    color: "text-emerald-500",
-    bg: "bg-emerald-50"
-  },
-  {
-    title: "Research Backed",
-    description: "Rooted in evidence-based practices from child development, social-emotional learning, and early childhood education.",
-    icon: <BookOpen className="w-7 h-7" />,
-    color: "text-purple-500",
-    bg: "bg-purple-50"
-  }
-];
-
-const EXPLORE_TOPICS = [
-  {
-    title: "Emotional Awareness",
-    icon: <Heart className="w-6 h-6 text-rose-500" />,
-    bg: "hover:bg-rose-50/20 border-gray-150 hover:border-rose-300"
-  },
-  {
-    title: "Growth Mindset",
-    icon: <Sprout className="w-6 h-6 text-emerald-500" />,
-    bg: "hover:bg-emerald-50/20 border-gray-150 hover:border-emerald-300"
-  },
-  {
-    title: "Self-awareness",
-    icon: <Smile className="w-6 h-6 text-amber-500" />,
-    bg: "hover:bg-amber-50/20 border-gray-150 hover:border-amber-300"
-  },
-  {
-    title: "Relationship Building",
-    icon: <Users className="w-6 h-6 text-sky-500" />,
-    bg: "hover:bg-sky-50/20 border-gray-150 hover:border-sky-300"
-  },
-  {
-    title: "Problem Solving",
-    icon: <Puzzle className="w-6 h-6 text-purple-500" />,
-    bg: "hover:bg-purple-50/20 border-gray-150 hover:border-purple-300"
-  },
-  {
-    title: "Decision Making",
-    icon: <Compass className="w-6 h-6 text-indigo-500" />,
-    bg: "hover:bg-indigo-50/20 border-gray-150 hover:border-indigo-300"
+    title: "Parent-Child Connection",
+    description: "Learning extends beyond our space. We support meaningful parent-child engagement through activities and experiences that strengthen relationships and nurture development at home.",
+    points: [
+      "Guided parent-child activities and workshops",
+      "Conversation starters and take-home resources",
+      "Opportunities for shared play and learning"
+    ],
+    icon: <Users className="w-7 h-7 text-sky-500" />,
+    bg: "bg-sky-50",
+    borderColor: "border-sky-200/60",
+    shadow: "shadow-sky-500/5"
   }
 ];
 
@@ -163,73 +127,50 @@ export default function ChildrenPageClient() {
           </div>
         </section>
 
-        {/* ── THE VETAAS WAY ── */}
+        {/* ── OUR OFFERINGS ── */}
         <section className="mb-32">
           <div className="text-center max-w-xl mx-auto mb-16 flex flex-col items-center">
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
-              The Vetaas Way
+              Our Offerings
             </h3>
             <div className="w-12 h-1 bg-[#0CB0D8] rounded-full mt-4" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {DIFFERENCES.map((diff, idx) => (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+            {OFFERINGS.map((offering, idx) => (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.08 }}
-                className="bg-white rounded-[2rem] border border-slate-150 p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-start text-left group overflow-hidden relative"
-              >
-                {/* Subtle gradient hover effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                
-                <div className={`relative z-10 w-16 h-16 rounded-2xl ${diff.bg} ${diff.color} flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                  {diff.icon}
-                </div>
-                
-                <h4 className="relative z-10 text-xl font-extrabold text-gray-900 mb-3 leading-snug">
-                  {diff.title}
-                </h4>
-                <p className="relative z-10 text-sm font-medium text-gray-500 leading-relaxed">
-                  {diff.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── TOPICS WE EXPLORE ── */}
-        <section className="mb-32">
-          <div className="text-center max-w-xl mx-auto mb-16 flex flex-col items-center">
-            <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
-              Topics We Explore
-            </h3>
-            <div className="w-12 h-1 bg-[#38d38b] rounded-full mt-4" />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {EXPLORE_TOPICS.map((topic, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.08 }}
-                className={`flex items-center gap-5 p-6 rounded-2xl border bg-white shadow-sm hover:shadow-md transition-all duration-300 group ${topic.bg}`}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className={`flex flex-col bg-white rounded-3xl p-8 border ${offering.borderColor} shadow-sm hover:shadow-xl ${offering.shadow} transition-all duration-300 group`}
               >
-                <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 shadow-inner flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                  {topic.icon}
+                <div className={`w-14 h-14 rounded-2xl ${offering.bg} flex items-center justify-center mb-6 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300`}>
+                  {offering.icon}
                 </div>
-                <h4 className="text-sm sm:text-base font-bold text-gray-900">
-                  {topic.title}
+                
+                <h4 className="text-xl font-bold text-gray-900 mb-3 font-headline leading-tight">
+                  {offering.title}
                 </h4>
+                
+                <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                  {offering.description}
+                </p>
+
+                <ul className="space-y-3 mt-auto">
+                  {offering.points.map((point, pIdx) => (
+                    <li key={pIdx} className="flex items-start gap-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-300 mt-1.5 shrink-0" />
+                      <span className="text-sm font-medium text-gray-700 leading-snug">{point}</span>
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
             ))}
           </div>
 
-          <div className="flex justify-center mt-10">
+          <div className="flex justify-center">
             <Link 
               href="/events" 
               className="group inline-flex items-center justify-center gap-2 px-10 py-4.5 bg-[#38d38b] text-[#111827] font-extrabold text-sm rounded-full hover:bg-[#2ebc7a] hover:scale-105 transition-all shadow-md active:scale-95"
