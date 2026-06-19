@@ -37,42 +37,63 @@ const BELIEFS = [
 const OFFERINGS = [
   {
     title: "Joyful Learning Experiences",
+    badge: "Joyful Learning",
     description: "Children learn best when they are actively engaged. Our sessions combine play, exploration, creativity, and meaningful interactions to build foundational skills for lifelong learning.",
     points: [
       "Literacy, language, and communication development",
       "Early numeracy and STEM exploration",
       "Creative arts, movement, and hands-on discovery"
     ],
-    icon: <Sparkles className="w-7 h-7 text-amber-500" />,
-    bg: "bg-amber-50",
-    borderColor: "border-amber-200/60",
-    shadow: "shadow-amber-500/5"
+    icon: <Sparkles className="w-6 h-6 text-[#F59E0B]" />,
+    theme: {
+      bg: "bg-[#F59E0B]/[0.03]",
+      border: "border-[#F59E0B]/20",
+      iconBg: "bg-[#F59E0B]/10",
+      checkBg: "bg-[#F59E0B]/15",
+      checkColor: "text-[#F59E0B]",
+      separator: "border-[#F59E0B]/15",
+      bottomText: "text-[#F59E0B]"
+    }
   },
   {
     title: "Social and Emotional Growth",
+    badge: "Social & Emotional Growth",
     description: "We create opportunities for children to understand themselves, build relationships, and develop confidence in expressing their thoughts and feelings.",
     points: [
       "Self-awareness and emotional expression",
       "Empathy, cooperation, and friendship skills",
       "Confidence, resilience, and decision-making"
     ],
-    icon: <Heart className="w-7 h-7 text-rose-500" />,
-    bg: "bg-rose-50",
-    borderColor: "border-rose-200/60",
-    shadow: "shadow-rose-500/5"
+    icon: <Heart className="w-6 h-6 text-[#F43F5E]" />,
+    theme: {
+      bg: "bg-[#F43F5E]/[0.03]",
+      border: "border-[#F43F5E]/20",
+      iconBg: "bg-[#F43F5E]/10",
+      checkBg: "bg-[#F43F5E]/15",
+      checkColor: "text-[#F43F5E]",
+      separator: "border-[#F43F5E]/15",
+      bottomText: "text-[#F43F5E]"
+    }
   },
   {
     title: "Parent-Child Connection",
+    badge: "Parent-Child Connection",
     description: "Learning extends beyond our space. We support meaningful parent-child engagement through activities and experiences that strengthen relationships and nurture development at home.",
     points: [
       "Guided parent-child activities and workshops",
       "Conversation starters and take-home resources",
       "Opportunities for shared play and learning"
     ],
-    icon: <Users className="w-7 h-7 text-sky-500" />,
-    bg: "bg-sky-50",
-    borderColor: "border-sky-200/60",
-    shadow: "shadow-sky-500/5"
+    icon: <Users className="w-6 h-6 text-[#0EA5E9]" />,
+    theme: {
+      bg: "bg-[#0EA5E9]/[0.03]",
+      border: "border-[#0EA5E9]/20",
+      iconBg: "bg-[#0EA5E9]/10",
+      checkBg: "bg-[#0EA5E9]/15",
+      checkColor: "text-[#0EA5E9]",
+      separator: "border-[#0EA5E9]/15",
+      bottomText: "text-[#0EA5E9]"
+    }
   }
 ];
 
@@ -139,33 +160,48 @@ export default function ChildrenPageClient() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
             {OFFERINGS.map((offering, idx) => (
               <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
+                key={offering.title}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className={`flex flex-col bg-white rounded-3xl p-8 border ${offering.borderColor} shadow-sm hover:shadow-xl ${offering.shadow} transition-all duration-300 group`}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
+                className={`rounded-[2.5rem] border p-8 md:p-10 flex flex-col justify-between transition-all duration-500 relative overflow-hidden group ${offering.theme.bg} ${offering.theme.border} hover:shadow-lg hover:-translate-y-1`}
               >
-                <div className={`w-14 h-14 rounded-2xl ${offering.bg} flex items-center justify-center mb-6 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300`}>
-                  {offering.icon}
-                </div>
-                
-                <h4 className="text-xl font-bold text-gray-900 mb-3 font-headline leading-tight">
-                  {offering.title}
-                </h4>
-                
-                <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-                  {offering.description}
-                </p>
+                <div className="relative z-10 flex-grow">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${offering.theme.iconBg}`}>
+                      {offering.icon}
+                    </div>
+                    <h3 className="text-2xl md:text-[26px] font-extrabold tracking-tight text-[#111827]">
+                      {offering.title}
+                    </h3>
+                  </div>
 
-                <ul className="space-y-3 mt-auto">
-                  {offering.points.map((point, pIdx) => (
-                    <li key={pIdx} className="flex items-start gap-2.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-gray-300 mt-1.5 shrink-0" />
-                      <span className="text-sm font-medium text-gray-700 leading-snug">{point}</span>
-                    </li>
-                  ))}
-                </ul>
+                  <p className="text-[#111827]/70 font-medium text-[15px] leading-relaxed mb-8">
+                    {offering.description}
+                  </p>
+
+                  <ul className="space-y-4 mb-10">
+                    {offering.points.map((point, pIdx) => (
+                      <li key={pIdx} className="flex items-start gap-3.5">
+                        <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center shrink-0 mt-[3px] ${offering.theme.checkBg}`}>
+                          <Check className={`w-3.5 h-3.5 ${offering.theme.checkColor}`} strokeWidth={3} />
+                        </div>
+                        <span className="text-[15px] font-semibold text-[#111827]/80 leading-snug">
+                          {point}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className={`relative z-10 pt-6 border-t ${offering.theme.separator} flex justify-center mt-auto`}>
+                  <div
+                    className={`inline-block text-[11px] font-black uppercase tracking-[0.15em] ${offering.theme.bottomText}`}
+                  >
+                    {offering.badge}
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
