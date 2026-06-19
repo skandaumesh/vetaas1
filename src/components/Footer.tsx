@@ -75,8 +75,8 @@ export default function Footer() {
                 <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-[#7C3AED]">
                   <MapPin size={16} />
                 </div>
-                <Link href="/store-locator" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold break-all">
-                  Store Locator
+                <Link href="/find-us" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold break-all">
+                  Find Us
                 </Link>
               </li>
             </ul>
@@ -106,7 +106,7 @@ export default function Footer() {
         <div className="pt-8 border-t border-black/10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500 font-medium">
           <p>&copy; {new Date().getFullYear()} Vetaas Education Foundation. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="/store-locator" className="hover:text-[#1E90FF] transition-colors">Store Locator</Link>
+            <Link href="/find-us" className="hover:text-[#1E90FF] transition-colors">Find Us</Link>
             <Link href="/privacy" className="hover:text-[#1E90FF] transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-[#1E90FF] transition-colors">Terms of Service</Link>
           </div>

@@ -2,7 +2,7 @@ import React from "react";
 import { MapPin } from "lucide-react";
 
 export const metadata = {
-  title: "Store Locator | Vetaas",
+  title: "Find Us | Vetaas",
   description: "Find Vetaas Education Foundation's physical location.",
 };
 

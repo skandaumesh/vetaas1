@@ -94,7 +94,7 @@ export default function Navbar() {
           
           {/* Desktop Social Links */}
           <div className="flex items-center gap-4 pl-4 border-l border-gray-300">
-            <Link href="/store-locator" title="Store Locator" className="text-gray-600 hover:text-[#FF5C7A] transition-colors">
+            <Link href="/find-us" title="Find Us" className="text-gray-600 hover:text-[#FF5C7A] transition-colors">
               <MapPin size={20} />
             </Link>
             <a href="https://www.instagram.com/vetaaseducation/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#FF5C7A] transition-colors">
@@ -193,7 +193,7 @@ export default function Navbar() {
 
           {/* Mobile Social Links */}
           <div className="flex items-center gap-4 px-4 pt-4 mt-2 border-t border-gray-100">
-            <Link href="/store-locator" title="Store Locator" className="text-gray-500 hover:text-[#FF5C7A] transition-colors p-2 -ml-2">
+            <Link href="/find-us" title="Find Us" className="text-gray-500 hover:text-[#FF5C7A] transition-colors p-2 -ml-2">
               <MapPin size={24} />
             </Link>
             <a href="https://www.instagram.com/vetaaseducation/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#FF5C7A] transition-colors p-2">
