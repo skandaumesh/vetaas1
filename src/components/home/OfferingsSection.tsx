@@ -36,7 +36,7 @@ export default function OfferingsSection() {
         "Making social-emotional learning part of daily teaching practices.",
         "Providing continuous guidance, reflection, and classroom support."
       ],
-      link: "/services",
+      link: "/teachers",
       marginTop: "mt-0", 
     },
     {
@@ -52,7 +52,7 @@ export default function OfferingsSection() {
         "SEL-focused activities for children.",
         "Take-home projects to extend learning."
       ],
-      link: "/events",
+      link: "/children",
       marginTop: "mt-16", 
     },
   ];
