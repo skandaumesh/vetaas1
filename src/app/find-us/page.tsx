@@ -2,8 +2,15 @@ import React from "react";
 import { MapPin } from "lucide-react";
 
 export const metadata = {
-  title: "Find Us | Vetaas",
-  description: "Find Vetaas Education Foundation's physical location.",
+  title: "Find Us",
+  description: "Find Vetaas Education Foundation's physical location in Bangalore, India. Visit us or get directions.",
+  alternates: { canonical: "/find-us" },
+  openGraph: {
+    title: "Find Us | Vetaas Education Foundation",
+    description: "Find Vetaas Education Foundation's physical location in Bangalore, India.",
+    url: "/find-us",
+    type: "website",
+  },
 };
 
 export default function StoreLocatorPage() {

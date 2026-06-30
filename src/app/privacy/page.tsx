@@ -3,8 +3,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Privacy Policy | Vetaas",
+  title: "Privacy Policy",
   description: "Privacy Policy for Vetaas Education Foundation.",
+  alternates: { canonical: "/privacy" },
+  robots: { index: false, follow: true },
 };
 
 export default function PrivacyPolicyPage() {

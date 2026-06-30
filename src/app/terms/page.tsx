@@ -3,8 +3,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Terms of Service | Vetaas",
+  title: "Terms of Service",
   description: "Terms of Service and Conditions for Vetaas Education Foundation.",
+  alternates: { canonical: "/terms" },
+  robots: { index: false, follow: true },
 };
 
 export default function TermsPage() {

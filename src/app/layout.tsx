@@ -35,7 +35,10 @@ export const metadata: Metadata = {
   authors: [{ name: "Vetaas Education Foundation" }],
   creator: "Vetaas Education Foundation",
   publisher: "Vetaas Education Foundation",
-  metadataBase: new URL("http://localhost:3005"), // Replace with your production domain
+  metadataBase: new URL("https://www.vetaas.in"),
+  alternates: {
+    canonical: "/",
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -86,6 +89,64 @@ export const viewport = {
   maximumScale: 1,
 };
 
+const SITE_URL = "https://www.vetaas.in";
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Organization", "EducationalOrganization", "NGO"],
+      "@id": `${SITE_URL}/#organization`,
+      name: "Vetaas Education Foundation",
+      alternateName: "Vetaas — The Tree of Hope",
+      url: SITE_URL,
+      logo: `${SITE_URL}/logo.webp`,
+      description:
+        "Vetaas partners with parents, teachers, and schools to nurture Social Emotional Learning (SEL) in early childhood across Bangalore, India.",
+      areaServed: {
+        "@type": "City",
+        name: "Bangalore",
+      },
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Bangalore",
+        addressRegion: "Karnataka",
+        addressCountry: "IN",
+      },
+      sameAs: [
+        "https://www.instagram.com/vetaaseducation/",
+        "https://www.linkedin.com/company/vetaas/",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: "Vetaas Education Foundation",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      inLanguage: "en-IN",
+    },
+    // Explicit main-navigation signal — the closest you can get to "hardcoding"
+    // sitelinks. Google may use this to choose which links to surface.
+    {
+      "@type": "ItemList",
+      "@id": `${SITE_URL}/#nav`,
+      name: "Primary navigation",
+      itemListElement: [
+        { "@type": "SiteNavigationElement", position: 1, name: "Home", url: SITE_URL },
+        { "@type": "SiteNavigationElement", position: 2, name: "About", url: `${SITE_URL}/about` },
+        { "@type": "SiteNavigationElement", position: 3, name: "Services", url: `${SITE_URL}/services` },
+        { "@type": "SiteNavigationElement", position: 4, name: "SEL for Children", url: `${SITE_URL}/children` },
+        { "@type": "SiteNavigationElement", position: 5, name: "SEL for Teachers", url: `${SITE_URL}/teachers` },
+        { "@type": "SiteNavigationElement", position: 6, name: "SEL for Parents", url: `${SITE_URL}/parents` },
+        { "@type": "SiteNavigationElement", position: 7, name: "Events", url: `${SITE_URL}/events` },
+        { "@type": "SiteNavigationElement", position: 8, name: "Find Us", url: `${SITE_URL}/find-us` },
+        { "@type": "SiteNavigationElement", position: 9, name: "Contact", url: `${SITE_URL}/contact` },
+      ],
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -94,7 +155,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${plusJakarta.variable} ${playfair.variable} ${poppins.variable} min-h-screen flex flex-col antialiased`}>
-        <Script 
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        <Script
           src="https://ozlabsprototype1.vercel.app/api/v1/track/script?key=d0a677c9-0c0e-4005-9876-3e091add411d" 
           strategy="afterInteractive" 
         />
