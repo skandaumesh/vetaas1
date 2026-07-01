@@ -18,7 +18,7 @@ export default function Footer() {
               <Image src="/logo.webp" alt="Vetaas" width={50} height={50} style={{ height: "auto" }} className="w-[50px] object-contain" />
             </Link>
             <p className="text-gray-600 font-medium leading-relaxed max-w-xs mb-8">
-              Integrating social-emotional education into early childhood education so that children become resilient and compassionate.
+              Integrating social-emotional learning into early childhood education so that children become resilient and compassionate.
             </p>
           </div>
 
