@@ -37,11 +37,11 @@ export default function StoreLocatorPage() {
             </h2>
 
             <div className="text-center text-gray-600 text-lg leading-relaxed mb-10 max-w-md">
-              <p>21, Dhanlalshmi,</p>
-              <p>The Nest Studio, 2nd floor,</p>
-              <p>Kanakapura Main Rd,</p>
-              <p>J. P. Nagar, Phase 1</p>
-              <p>Bengaluru, Karnataka 560082</p>
+              <p className="font-bold">Nest by Vetaas</p>
+              <p>Education center metro pillar 48,</p>
+              <p>Dhanalakshmi Building, D21, Kanakapura Main Rd,</p>
+              <p>opposite Total Energies petrol station, Shakambari Nagar,</p>
+              <p>1st Phase, J. P. Nagar, Bengaluru, Karnataka 560078</p>
             </div>
 
             <div className="w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden border border-gray-200 shadow-inner">
@@ -49,7 +49,7 @@ export default function StoreLocatorPage() {
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 
-                src="https://maps.google.com/maps?q=Nest+creations,+Kanakapura+Main+Rd,+Bengaluru&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                src="https://maps.google.com/maps?q=Nest+by+Vetaas,+D21,+Kanakapura+Main+Rd,+Bengaluru&t=&z=15&ie=UTF8&iwloc=&output=embed" 
                 allowFullScreen={true}
                 loading="lazy" 
                 referrerPolicy="no-referrer-when-downgrade"
@@ -58,7 +58,7 @@ export default function StoreLocatorPage() {
 
             <div className="mt-10 text-center">
               <a 
-                href="https://maps.app.goo.gl/eDUjxb3UagczEzxz6?g_st=ic" 
+                href="https://maps.app.goo.gl/eMUJokfKE8opyhhz5" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-8 py-3.5 bg-[#111827] text-white font-bold rounded-full hover:bg-[#2a3852] transition-colors shadow-md"
