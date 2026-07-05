@@ -38,7 +38,7 @@ export default function StoreLocatorPage() {
 
             <div className="text-center text-gray-600 text-lg leading-relaxed mb-10 max-w-md">
               <p className="font-bold">Nest by Vetaas</p>
-              <p>Education center metro pillar 48,</p>
+              <p>Metro pillar 48,</p>
               <p>Dhanalakshmi Building, D21, Kanakapura Main Rd,</p>
               <p>opposite Total Energies petrol station, Shakambari Nagar,</p>
               <p>1st Phase, J. P. Nagar, Bengaluru, Karnataka 560078</p>
