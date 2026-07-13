@@ -66,10 +66,6 @@ export const metadata: Metadata = {
     description: "Nurturing Social Emotional Learning (SEL) in early childhood.",
     images: ["/logo.webp"],
   },
-  icons: {
-    icon: "/logo.webp",
-    apple: "/logo.webp",
-  },
   robots: {
     index: true,
     follow: true,
