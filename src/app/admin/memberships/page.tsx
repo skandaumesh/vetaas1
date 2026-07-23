@@ -13,14 +13,8 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
-import { isAdminUser } from "@/lib/admin";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  User,
-} from "firebase/auth";
+import { db } from "@/lib/firebase";
+import { useAdminAuth } from "@/components/admin/AdminGate";
 import {
   buildEmailHtml,
   buildEmailText,
@@ -38,7 +32,6 @@ import {
   Clock,
   IndianRupee,
   Loader2,
-  Lock,
   Mail,
   Maximize2,
   Phone,
@@ -136,13 +129,7 @@ function confirmationMailto(order: Order): string {
 }
 
 export default function AdminMembershipsPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
-  const [loggingIn, setLoggingIn] = useState(false);
-
+  const { user } = useAdminAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<OrderStatus | "all">("pending");
@@ -152,21 +139,6 @@ export default function AdminMembershipsPage() {
   const [confirmEmailKey, setConfirmEmailKey] = useState<string | null>(null);
   // Payment screenshot lightbox
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      // Only allowlisted admin emails get in — being logged in is not enough
-      if (currentUser && !currentUser.isAnonymous && !isAdminUser(currentUser)) {
-        setLoginError("This account is not authorized for admin access.");
-        signOut(auth);
-        setUser(null);
-      } else {
-        setUser(isAdminUser(currentUser) ? currentUser : null);
-      }
-      setAuthLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -212,19 +184,6 @@ export default function AdminMembershipsPage() {
       }
     })();
   }, [user]);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoggingIn(true);
-    setLoginError("");
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch {
-      setLoginError("Invalid email or password.");
-    } finally {
-      setLoggingIn(false);
-    }
-  };
 
   const setStatus = async (order: Order, status: OrderStatus) => {
     await updateDoc(doc(db, "membershipOrders", order.id), { status });
@@ -372,60 +331,6 @@ export default function AdminMembershipsPage() {
     .reduce((sum, o) => sum + (o.totalMonthly ?? 0), 0);
   const pendingCount = orders.filter((o) => o.status === "pending").length;
   const expiringSoon = activeOrders.filter((o) => daysLeft(o.expiresAt)! <= 5).length;
-
-  if (authLoading) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="animate-spin text-[#7C3AED]" size={32} />
-      </main>
-    );
-  }
-
-  if (!user) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
-        <form
-          onSubmit={handleLogin}
-          className="bg-white rounded-3xl shadow-sm border border-gray-200 p-8 w-full max-w-sm space-y-4"
-        >
-          <div className="text-center mb-2">
-            <div className="w-12 h-12 rounded-full bg-[#7C3AED]/10 flex items-center justify-center mx-auto mb-3">
-              <Lock className="text-[#7C3AED]" size={20} />
-            </div>
-            <h1 className="text-xl font-extrabold text-[#111827]">Membership Admin</h1>
-            <p className="text-sm text-gray-500 font-medium">Sign in to manage orders</p>
-          </div>
-          <input
-            required
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-          />
-          <input
-            required
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-          />
-          {loginError && (
-            <p className="text-xs text-red-500 font-semibold text-center">{loginError}</p>
-          )}
-          <button
-            type="submit"
-            disabled={loggingIn}
-            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#7C3AED] text-white font-bold text-sm rounded-full hover:bg-[#6D28D9] transition-all disabled:opacity-60 cursor-pointer"
-          >
-            {loggingIn && <Loader2 size={16} className="animate-spin" />}
-            Sign in
-          </button>
-        </form>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-gray-50 py-8 md:py-10 px-4 md:px-10">

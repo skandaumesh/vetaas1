@@ -2,33 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage, auth } from "@/lib/firebase";
-import { isAdminUser } from "@/lib/admin";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from "firebase/auth";
-import { 
-  CheckCircle2, 
-  XCircle, 
-  AlertTriangle, 
-  LogOut, 
-  Lock, 
-  Mail, 
-  Loader2, 
-  Sparkles, 
-  AlertCircle, 
+import { db } from "@/lib/firebase";
+import { useAdminAuth } from "@/components/admin/AdminGate";
+import {
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Loader2,
+  AlertCircle,
   X,
   PlusCircle,
   Calendar,
   MapPin,
   Link2,
   Image as ImageIcon,
-  ExternalLink,
   Trash2,
-  Edit2,
-  Play
+  Edit2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 
 interface Toast {
   id: number;
@@ -37,13 +28,7 @@ interface Toast {
 }
 
 export default function AdminEventsPage() {
-  // Authentication states
-  const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
-  const [loggingIn, setLoggingIn] = useState(false);
+  const { user } = useAdminAuth();
 
   // Events & logic states
   const [events, setEvents] = useState<any[]>([]);
@@ -77,23 +62,7 @@ export default function AdminEventsPage() {
   // Event form modal
   const [formOpen, setFormOpen] = useState(false);
 
-  // Monitor Authentication state
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      // Only allowlisted admin emails get in — being logged in is not enough
-      if (currentUser && !currentUser.isAnonymous && !isAdminUser(currentUser)) {
-        setLoginError("This account is not authorized for admin access.");
-        signOut(auth);
-        setUser(null);
-      } else {
-        setUser(isAdminUser(currentUser) ? currentUser : null);
-      }
-      setAuthLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // Fetch events only if authenticated
+  // Fetch events once the admin is signed in
   useEffect(() => {
     if (user) {
       fetchEvents();
@@ -106,42 +75,6 @@ export default function AdminEventsPage() {
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 4500);
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
-      showToast("Please enter both email and password.", "error");
-      return;
-    }
-    setLoggingIn(true);
-    setLoginError("");
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      showToast("Welcome back, Administrator!", "success");
-    } catch (err: any) {
-      console.error("Login error: ", err);
-      let friendlyMessage = "Invalid credentials. Please try again.";
-      if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
-        friendlyMessage = "Incorrect email or password.";
-      } else if (err.code === "auth/too-many-requests") {
-        friendlyMessage = "Too many failed attempts. Try again later.";
-      }
-      setLoginError(friendlyMessage);
-      showToast(friendlyMessage, "error");
-    } finally {
-      setLoggingIn(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      showToast("Signed out successfully.", "info");
-    } catch (err) {
-      console.error("Logout error: ", err);
-      showToast("Failed to sign out.", "error");
-    }
   };
 
   const fetchEvents = async () => {
@@ -420,153 +353,6 @@ export default function AdminEventsPage() {
     }
   };
 
-  // Loading State
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-[#faf9f7] flex flex-col items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 text-[#00CDBA] animate-spin" />
-          <p className="text-gray-500 font-semibold animate-pulse">Verifying credentials...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Unauthenticated Login Panel
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-[#faf9f7] flex flex-col items-center justify-center py-12 px-6 relative overflow-hidden">
-        {/* Background Decorative Blobs */}
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-[#00CDBA]/10 rounded-full blur-3xl -z-10 pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#FF5C7A]/10 rounded-full blur-3xl -z-10 pointer-events-none" />
-        
-        <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-[#00CDBA]/15 p-8 md:p-10 relative overflow-hidden">
-          <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#00CDBA] to-[#FF5C7A]" />
-          
-          <div className="flex flex-col items-center mb-8">
-            <div className="relative w-20 h-20 mb-4 bg-slate-50 p-2.5 rounded-2xl border border-slate-100 flex items-center justify-center">
-              <Image
-                src="/logo.webp"
-                alt="Vetaas Logo"
-                width={64}
-                height={64}
-                className="object-contain"
-                priority
-              />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 font-headline">Admin Portal</h2>
-            <p className="text-gray-500 text-sm mt-1 text-center font-body">
-              Please sign in to manage events & highlights
-            </p>
-          </div>
-
-          {loginError && (
-            <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-              <p className="text-xs text-rose-600 font-medium leading-relaxed">{loginError}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 font-headline">
-                Email Address
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
-                  <Mail className="w-5 h-5" />
-                </span>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition"
-                  placeholder="admin@vetaas.org"
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 font-headline">
-                  Password
-                </label>
-              </div>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
-                  <Lock className="w-5 h-5" />
-                </span>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition animate-pulse-none"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loggingIn}
-              className="w-full py-3.5 bg-[#00CDBA] hover:bg-[#00b0a0] text-white rounded-xl font-bold transition shadow-lg shadow-[#00CDBA]/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 hover:-translate-y-0.5 duration-200"
-            >
-              {loggingIn ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Signing In...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  Sign In
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-        
-        {/* Toast Container Layer */}
-        <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
-          <AnimatePresence>
-            {toasts.map((toast) => (
-              <motion.div
-                key={toast.id}
-                initial={{ opacity: 0, y: -20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                className="pointer-events-auto"
-              >
-                <div className={`flex items-center gap-3 px-4 py-3.5 rounded-xl shadow-lg border backdrop-blur-md ${
-                  toast.type === "success"
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
-                    : toast.type === "error"
-                    ? "bg-rose-500/10 border-rose-500/20 text-rose-600"
-                    : "bg-blue-500/10 border-blue-500/20 text-blue-600"
-                }`}>
-                  {toast.type === "success" && <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-500" />}
-                  {toast.type === "error" && <XCircle className="w-5 h-5 shrink-0 text-rose-500" />}
-                  {toast.type === "info" && <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />}
-                  
-                  <p className="text-sm font-semibold flex-1 leading-snug">{toast.message}</p>
-                  
-                  <button
-                    onClick={() => setToasts(prev => prev.filter(t => t.id !== toast.id))}
-                    className="text-gray-400 hover:text-gray-600 transition shrink-0"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </div>
-    );
-  }
-
   // Authenticated Admin Panel
   return (
     <div className="min-h-screen bg-gray-50 py-8 md:py-10 px-4 md:px-10 relative">
@@ -663,7 +449,7 @@ export default function AdminEventsPage() {
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-extrabold text-[#111827]">Events Dashboard</h1>
           <p className="text-sm text-gray-500 font-medium mt-1">
-            Signed in as <span className="font-semibold text-gray-700">{user.email}</span>
+            Signed in as <span className="font-semibold text-gray-700">{user?.email}</span>
           </p>
         </div>
 

@@ -1,4 +1,4 @@
-import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminGate from "@/components/admin/AdminGate";
 
 export const metadata = {
   robots: { index: false, follow: false },
@@ -9,8 +9,7 @@ export default function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="md:pl-60">{children}</div>
+      <AdminGate>{children}</AdminGate>
     </div>
   );
 }
