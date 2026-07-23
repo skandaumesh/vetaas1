@@ -14,9 +14,11 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
+import { isAdminUser } from "@/lib/admin";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signOut,
   User,
 } from "firebase/auth";
 import {
@@ -153,8 +155,14 @@ export default function AdminMembershipsPage() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      // Anonymous visitors are not admins
-      setUser(currentUser && !currentUser.isAnonymous ? currentUser : null);
+      // Only allowlisted admin emails get in — being logged in is not enough
+      if (currentUser && !currentUser.isAnonymous && !isAdminUser(currentUser)) {
+        setLoginError("This account is not authorized for admin access.");
+        signOut(auth);
+        setUser(null);
+      } else {
+        setUser(isAdminUser(currentUser) ? currentUser : null);
+      }
       setAuthLoading(false);
     });
     return () => unsubscribe();

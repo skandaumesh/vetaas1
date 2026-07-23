@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage, auth } from "@/lib/firebase";
+import { isAdminUser } from "@/lib/admin";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from "firebase/auth";
 import { 
   CheckCircle2, 
@@ -79,7 +80,14 @@ export default function AdminEventsPage() {
   // Monitor Authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      // Only allowlisted admin emails get in — being logged in is not enough
+      if (currentUser && !currentUser.isAnonymous && !isAdminUser(currentUser)) {
+        setLoginError("This account is not authorized for admin access.");
+        signOut(auth);
+        setUser(null);
+      } else {
+        setUser(isAdminUser(currentUser) ? currentUser : null);
+      }
       setAuthLoading(false);
     });
     return () => unsubscribe();

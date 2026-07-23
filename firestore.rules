@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin = a signed-in account whose email is on the allowlist.
+    // Keep this list in sync with src/lib/admin.ts and storage.rules.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in ['kirti.vetaas@gmail.com'];
+    }
+
+    // Events: anyone can view; only an admin can manage them
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Membership orders: a visitor may only file a new, well-formed pending
+    // order; only an admin can read or manage them
+    match /membershipOrders/{orderId} {
+      allow create: if request.auth != null
+        && request.resource.data.status == 'pending'
+        && request.resource.data.parentName is string
+        && request.resource.data.parentName.size() > 0
+        && request.resource.data.parentName.size() < 200
+        && request.resource.data.childName is string
+        && request.resource.data.childName.size() < 200
+        && request.resource.data.email is string
+        && request.resource.data.email.matches('.+@.+[.].+')
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() < 20
+        && request.resource.data.totalMonthly is number
+        && request.resource.data.items is list;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Email queue: only an admin can enqueue; the sending Cloud Function uses
+    // the Admin SDK and bypasses these rules
+    match /mail/{mailId} {
+      allow create: if isAdmin();
+      allow read, update, delete: if false;
+    }
+
+    // Everything else is locked
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,27 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Admin = a signed-in account whose email is on the allowlist.
+    // Keep this list in sync with src/lib/admin.ts and firestore.rules.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in ['kirti.vetaas@gmail.com'];
+    }
+
+    // Payment screenshots: a signed-in visitor may upload an image under 5 MB;
+    // only an admin can read them back
+    match /membership-screenshots/{file} {
+      allow create: if request.auth != null
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow read: if isAdmin();
+    }
+
+    // Event images and other assets: public read, admin-only write
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
