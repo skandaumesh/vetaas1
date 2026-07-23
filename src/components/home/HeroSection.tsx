@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Zap, Star, Heart, Sparkles } from "lucide-react";
+import { Zap, Star, Heart, Sparkles, ArrowRight } from "lucide-react";
  
 export default function HeroSection() {
   return (
@@ -103,6 +103,26 @@ export default function HeroSection() {
             </Link>
             <Link href="/parents" className="w-full sm:w-auto bg-white text-[#111827] font-semibold text-sm px-8 py-4 rounded-full border border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center justify-center gap-2">
               SEL for Parents <Heart size={16} className="text-[#FF5C7A]" fill="currentColor" />
+            </Link>
+          </div>
+
+          {/* Membership plans CTA */}
+          <div className="mt-5 z-20">
+            <Link
+              href="/services#membership"
+              className="group inline-flex items-center gap-3 bg-white pl-2 pr-5 py-2 rounded-full border border-[#7C3AED]/20 shadow-sm hover:shadow-md hover:border-[#7C3AED]/40 hover:-translate-y-0.5 transition-all"
+            >
+              <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#7C3AED] text-white shadow-sm">
+                <Star size={16} fill="currentColor" />
+              </span>
+              <span className="text-sm font-semibold text-[#111827]">
+                Explore our{" "}
+                <span className="text-[#7C3AED]">membership plans</span>
+              </span>
+              <ArrowRight
+                size={16}
+                className="text-[#7C3AED] group-hover:translate-x-1 transition-transform"
+              />
             </Link>
           </div>
         </motion.div>

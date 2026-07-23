@@ -73,6 +73,9 @@ export default function AdminEventsPage() {
   // Custom highlights editing state
   const [editingHighlightsId, setEditingHighlightsId] = useState<string | null>(null);
 
+  // Event form modal
+  const [formOpen, setFormOpen] = useState(false);
+
   // Monitor Authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -306,7 +309,7 @@ export default function AdminEventsPage() {
       if (fileInput) fileInput.value = '';
 
       fetchEvents();
-      showToast("Event added successfully!", "success");
+      setFormOpen(false);
     } catch (error: any) {
       console.error("Error adding event: ", error);
       showToast(`Failed to add event: ${error.message || "Unknown error"}`, "error");
@@ -359,8 +362,26 @@ export default function AdminEventsPage() {
     } else {
       setImagePreview(null);
     }
-    // Scroll to form
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setFormOpen(true);
+  };
+
+  const closeForm = () => {
+    setFormOpen(false);
+    setEditingEventId(null);
+    setFormData({
+      title: "", date: "", endDate: "", startTime: "", endTime: "",
+      location: "", highlightsUrl: "", registrationUrl: "", manualImageUrl: ""
+    });
+    setImageFile(null);
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+      setImagePreview(null);
+    }
+  };
+
+  const openNewForm = () => {
+    closeForm();
+    setFormOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -394,7 +415,7 @@ export default function AdminEventsPage() {
   // Loading State
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#faf9f7] flex flex-col items-center justify-center pt-[var(--header-height)]">
+      <div className="min-h-screen bg-[#faf9f7] flex flex-col items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 text-[#00CDBA] animate-spin" />
           <p className="text-gray-500 font-semibold animate-pulse">Verifying credentials...</p>
@@ -406,7 +427,7 @@ export default function AdminEventsPage() {
   // Unauthenticated Login Panel
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#faf9f7] flex flex-col items-center justify-center py-12 px-6 pt-[calc(var(--header-height)+2rem)] relative overflow-hidden">
+      <div className="min-h-screen bg-[#faf9f7] flex flex-col items-center justify-center py-12 px-6 relative overflow-hidden">
         {/* Background Decorative Blobs */}
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-[#00CDBA]/10 rounded-full blur-3xl -z-10 pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#FF5C7A]/10 rounded-full blur-3xl -z-10 pointer-events-none" />
@@ -452,7 +473,7 @@ export default function AdminEventsPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition"
+                  className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition"
                   placeholder="admin@vetaas.org"
                 />
               </div>
@@ -473,7 +494,7 @@ export default function AdminEventsPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition animate-pulse-none"
+                  className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition animate-pulse-none"
                   placeholder="••••••••"
                 />
               </div>
@@ -540,10 +561,7 @@ export default function AdminEventsPage() {
 
   // Authenticated Admin Panel
   return (
-    <div className="min-h-screen bg-[#faf9f7] pt-[calc(var(--header-height)+3rem)] pb-20 px-4 sm:px-6 relative overflow-hidden">
-      {/* Decorative Blobs */}
-      <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#00CDBA]/5 blur-[120px] pointer-events-none -z-10" />
-      <div className="absolute bottom-[10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-[#FF5C7A]/5 blur-[130px] pointer-events-none -z-10" />
+    <div className="min-h-screen bg-gray-50 py-8 md:py-10 px-4 md:px-10 relative">
 
       {/* Toast Notification Layer */}
       <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
@@ -632,50 +650,46 @@ export default function AdminEventsPage() {
       </AnimatePresence>
 
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Admin Dashboard Subheader */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#00CDBA]/10 pb-6 mb-10 gap-4">
-          <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight font-headline">Events Dashboard</h1>
-            <p className="text-gray-500 mt-1.5 font-body text-xs flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#00CDBA] inline-block animate-pulse" />
-              Authenticated as <span className="font-semibold text-gray-700">{user.email}</span>
-            </p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-[#FF5C7A]/25 text-[#FF5C7A] hover:bg-[#FF5C7A] hover:text-white rounded-2xl text-sm font-semibold transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer hover:-translate-y-0.5"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[#111827]">Events Dashboard</h1>
+          <p className="text-sm text-gray-500 font-medium mt-1">
+            Signed in as <span className="font-semibold text-gray-700">{user.email}</span>
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-          
-          {/* Form Section */}
-          <div className="lg:col-span-5 bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-[#00CDBA]/15 shadow-[0_10px_30px_rgba(54,186,152,0.04)] h-fit lg:sticky lg:top-28">
+        {/* Event Form Modal */}
+        <AnimatePresence>
+          {formOpen && (
+          <div className="fixed inset-0 z-[9980] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeForm}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97, y: 10 }}
+              transition={{ type: "spring", duration: 0.35 }}
+              className="relative bg-white rounded-2xl shadow-xl w-full max-w-xl max-h-[88vh] overflow-y-auto p-6 sm:p-8 z-10"
+            >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black text-gray-900 font-headline flex items-center gap-2 text-[#00CDBA]">
-                {editingEventId ? <Edit2 className="w-6 h-6" /> : <PlusCircle className="w-6 h-6" />} 
+              <h2 className="text-lg font-extrabold text-[#111827] flex items-center gap-2">
+                {editingEventId ? <Edit2 className="w-5 h-5 text-[#7C3AED]" /> : <PlusCircle className="w-5 h-5 text-[#7C3AED]" />}
                 {editingEventId ? "Edit Event" : "Add New Event"}
               </h2>
-              {editingEventId && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingEventId(null);
-                    setFormData({
-                      title: "", date: "", endDate: "", startTime: "", endTime: "", location: "", highlightsUrl: "", registrationUrl: "", manualImageUrl: ""
-                    });
-                    setImagePreview(null);
-                    setImageFile(null);
-                  }}
-                  className="text-xs font-bold text-gray-500 hover:text-rose-500 transition-colors uppercase tracking-wider bg-gray-100 px-3 py-1.5 rounded-full"
-                >
-                  Cancel Edit
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={closeForm}
+                className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Close form"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-5 font-body">
@@ -690,7 +704,7 @@ export default function AdminEventsPage() {
                   value={formData.title}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   placeholder="e.g. Creative Play Workshop"
                 />
               </div>
@@ -707,7 +721,7 @@ export default function AdminEventsPage() {
                     value={formData.date}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   />
                 </div>
                 <div>
@@ -720,7 +734,7 @@ export default function AdminEventsPage() {
                     name="endDate"
                     value={formData.endDate}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   />
                 </div>
               </div>
@@ -739,7 +753,7 @@ export default function AdminEventsPage() {
                     name="startTime"
                     value={formData.startTime}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   />
                 </div>
                 <div>
@@ -752,7 +766,7 @@ export default function AdminEventsPage() {
                     name="endTime"
                     value={formData.endTime}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   />
                 </div>
               </div>
@@ -768,7 +782,7 @@ export default function AdminEventsPage() {
                   value={formData.location}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   placeholder="e.g. Virtual, Bengaluru Central"
                 />
               </div>
@@ -783,7 +797,7 @@ export default function AdminEventsPage() {
                   name="registrationUrl"
                   value={formData.registrationUrl}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] focus:border-[#00CDBA] outline-none text-sm transition-all duration-200 bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   placeholder="e.g. https://forms.gle/... or Luma link"
                 />
               </div>
@@ -843,7 +857,7 @@ export default function AdminEventsPage() {
               <button
                 type="submit"
                 disabled={uploading}
-                className="w-full py-3.5 bg-[#00CDBA] hover:bg-[#00b0a0] text-white rounded-xl font-bold transition shadow-lg shadow-[#00CDBA]/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 hover:-translate-y-0.5 duration-200 text-sm mt-3"
+                className="w-full py-3.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 duration-200 text-sm mt-3"
               >
                 {uploading ? (
                   <>
@@ -855,25 +869,37 @@ export default function AdminEventsPage() {
                 )}
               </button>
             </form>
+            </motion.div>
           </div>
+          )}
+        </AnimatePresence>
 
-          {/* List Section */}
-          <div className="lg:col-span-7">
-            <h2 className="text-2xl font-black text-gray-900 mb-6 font-headline flex items-center gap-2 text-[#FF5C7A]">
-              <Calendar className="w-6 h-6" /> Manage Events
+        {/* List Section */}
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-extrabold text-[#111827] flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-[#7C3AED]" /> Manage Events
             </h2>
+            <button
+              onClick={openNewForm}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-full text-sm font-bold transition-colors cursor-pointer"
+            >
+              <PlusCircle className="w-4 h-4" />
+              Add Event
+            </button>
+          </div>
             
             {loading ? (
               <div className="flex items-center gap-2 text-gray-500 font-body py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-[#00CDBA]" />
+                <Loader2 className="w-6 h-6 animate-spin text-[#7C3AED]" />
                 <span className="font-semibold">Loading events list...</span>
               </div>
             ) : events.length === 0 ? (
-              <p className="text-gray-500 font-body py-8 text-center bg-white/60 rounded-3xl border border-dashed border-slate-200">
-                No events found. Add your first event on the left!
+              <p className="text-gray-500 font-body py-8 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+                No events yet. Click &quot;Add Event&quot; to create your first one.
               </p>
             ) : (
-              <div className="space-y-4 font-body">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 font-body items-start">
                 {events.map((event) => {
                   const isPast = (() => {
                     if (!event.date) return true;
@@ -893,14 +919,9 @@ export default function AdminEventsPage() {
                   return (
                     <div
                       key={event.id}
-                      className="bg-white/80 backdrop-blur-md rounded-3xl border border-slate-100 p-5 shadow-[0_4px_15px_rgba(0,0,0,0.015)] hover:shadow-md hover:border-[#00CDBA]/25 transition-all duration-300 relative overflow-hidden flex flex-col gap-4 group"
+                      className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all duration-300 relative overflow-hidden flex flex-col gap-4 group"
                     >
-                      {/* Left indicator tag */}
-                      <div className={`absolute top-0 left-0 w-1.5 h-full ${
-                        computedStatus === 'completed' ? 'bg-[#FF5C7A]' : 'bg-[#00CDBA]'
-                      }`} />
-
-                      <div className="flex gap-4 items-start pl-2">
+                      <div className="flex gap-4 items-start">
                         {event.image ? (
                           <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-100">
                             <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
@@ -913,13 +934,13 @@ export default function AdminEventsPage() {
                         
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                            <h3 className="font-bold text-gray-900 text-base truncate flex-1 min-w-[120px] font-headline">
+                            <h3 className="font-bold text-gray-900 text-base truncate flex-1 min-w-[120px]">
                               {event.title}
                             </h3>
-                            <span className={`px-2 py-0.5 text-[8px] font-black uppercase tracking-widest rounded-full leading-none shrink-0 ${
+                            <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-full leading-none shrink-0 ${
                               computedStatus === 'completed'
-                                ? 'bg-[#FF5C7A]/10 text-[#FF5C7A]'
-                                : 'bg-[#00CDBA]/10 text-[#2a9d7e]'
+                                ? 'bg-gray-100 text-gray-500'
+                                : 'bg-green-100 text-green-700'
                             }`}>
                               {computedStatus}
                             </span>
@@ -948,23 +969,23 @@ export default function AdminEventsPage() {
 
                       {/* Highlights / Reel Management block */}
                       {computedStatus === "completed" && (
-                        <div className="mt-1 pl-2 border-t border-slate-100/80 pt-3">
+                        <div className="mt-1 border-t border-gray-100 pt-3">
                           {event.highlightsUrl && editingHighlightsId !== event.id ? (
-                            <div className="flex items-center justify-between gap-3 bg-[#FF5C7A]/5 border border-[#FF5C7A]/10 rounded-2xl p-3">
+                            <div className="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3">
                               <div className="flex-1 min-w-0">
-                                <span className="text-[9px] font-black uppercase tracking-wider text-[#FF5C7A] block mb-0.5">Highlights Reel / Link</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-0.5">Highlights Reel / Link</span>
                                 <a
                                   href={event.highlightsUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-xs text-blue-600 hover:text-blue-700 hover:underline font-bold truncate block"
+                                  className="text-xs text-[#7C3AED] hover:underline font-semibold truncate block"
                                 >
                                   {event.highlightsUrl}
                                 </a>
                               </div>
                               <button
                                 onClick={() => setEditingHighlightsId(event.id)}
-                                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 bg-white border border-[#FF5C7A]/20 hover:bg-[#FF5C7A]/10 text-[#FF5C7A] rounded-xl transition cursor-pointer shrink-0"
+                                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-white border border-gray-200 hover:bg-gray-100 text-gray-600 rounded-lg transition cursor-pointer shrink-0"
                               >
                                 <Edit2 size={10} /> Edit
                               </button>
@@ -978,7 +999,7 @@ export default function AdminEventsPage() {
                                   placeholder="Instagram Reel or YouTube Link"
                                   defaultValue={event.highlightsUrl || ""}
                                   id={`highlights-input-${event.id}`}
-                                  className="flex-1 text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#00CDBA] outline-none bg-white"
+                                  className="flex-1 text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] outline-none bg-white"
                                 />
                                 <div className="flex gap-1 shrink-0">
                                   <button
@@ -1030,8 +1051,6 @@ export default function AdminEventsPage() {
                 })}
               </div>
             )}
-          </div>
-
         </div>
       </div>
     </div>

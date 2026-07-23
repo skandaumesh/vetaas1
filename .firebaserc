@@ -1,0 +1,11 @@
+{
+  "projects": {
+    "default": "vetaas-7aeae"
+  },
+  "targets": {},
+  "etags": {
+    "vetaas-7aeae": {
+      "extensionInstances": {}
+    }
+  }
+}

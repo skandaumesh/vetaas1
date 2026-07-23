@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCPX8GqGLLFDzRGnjhjJj_ovy88ulpK-D4",
@@ -20,7 +20,11 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const auth = getAuth(app);
 
-// Attempt anonymous sign-in to bypass basic 'auth != null' rules
+// Keep visitors signed in anonymously (required to submit membership orders),
+// but never replace an existing session — signing in anonymously while the
+// admin is logged in would silently kick them back to anonymous.
 if (typeof window !== "undefined") {
-  signInAnonymously(auth).catch(console.warn);
+  onAuthStateChanged(auth, (user) => {
+    if (!user) signInAnonymously(auth).catch(console.warn);
+  });
 }

@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import EventBanner from "./EventBanner";
 import Navbar from "./Navbar";
 
 export default function Header() {
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith("/admin");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,6 +38,8 @@ export default function Header() {
       window.removeEventListener("resize", updateHeight);
     };
   }, []);
+
+  if (isAdmin) return null;
 
   return (
     <div ref={ref} className="fixed top-0 inset-x-0 z-50">

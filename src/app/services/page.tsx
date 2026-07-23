@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
+import MembershipSection from "@/components/services/MembershipSection";
 
 export default function ServicesPage() {
   return (
@@ -261,7 +262,8 @@ export default function ServicesPage() {
 
         </div>
 
-
+        {/* Membership Plans */}
+        <MembershipSection />
 
         {/* Closing Partner Section */}
         <motion.div 

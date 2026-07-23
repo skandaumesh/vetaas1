@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Mail, Phone, ArrowUpRight, MapPin } from "lucide-react";
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
     <footer className="bg-[#e5e5e5] text-[#111827] relative overflow-hidden" style={{ fontFamily: 'var(--font-poppins), sans-serif' }}>
 
@@ -47,7 +51,7 @@ export default function Footer() {
             <ul className="space-y-4">
               <li><Link href="/teachers" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Teachers</Link></li>
               <li><Link href="/parents" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Parents</Link></li>
-              <li><Link href="/services" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Children</Link></li>
+              <li><Link href="/children" className="text-gray-700 hover:text-[#1E90FF] transition-colors font-semibold">Children</Link></li>
             </ul>
           </div>
 
