@@ -49,39 +49,37 @@ const PLANS: Plan[] = [
     id: "curious",
     name: "Curious",
     tagline: "Discover and explore the Vetaas experience.",
-    price: 3150,
+    price: 2999,
 
-    siblingDiscount: 0,
+    siblingDiscount: 0.05,
     accent: "#fdf3d8",
     headerText: "#b45309",
     features: [
-      { label: "7 flexible studio experiences / month", included: true },
+      { label: "7 flexible workshops / month", included: true },
       { label: "Recommended usage: 1–2 visits per week", included: true },
-      { label: "Flexible access across all programs", included: true },
+      { label: "Flexible access across all workshops", included: true },
       { label: "Studio access: Library", included: true },
       { label: "Co-working space access", included: false },
-      { label: "Priority registration", included: false },
-      { label: "5% discount on family events", included: true },
-      { label: "Sibling membership discount", included: false },
+      { label: "5% discount on other Nest events", included: true },
+      { label: "5% discount on sibling membership", included: true },
     ],
   },
   {
     id: "grow",
     name: "Grow",
     tagline: "Build consistent rhythm and deeper engagement.",
-    price: 6300,
+    price: 5999,
 
     siblingDiscount: 0.1,
     accent: "#d9edf8",
     headerText: "#1d4ed8",
     features: [
-      { label: "14 flexible studio experiences / month", included: true },
+      { label: "14 flexible workshops / month", included: true },
       { label: "Recommended usage: 3 visits per week", included: true },
-      { label: "Flexible access across all programs", included: true },
+      { label: "Flexible access across all workshops", included: true },
       { label: "Studio access: Library + art supplies", included: true },
       { label: "Co-working space access", included: true },
-      { label: "Priority registration", included: true },
-      { label: "10% discount on family events", included: true },
+      { label: "10% discount on other Nest events", included: true },
       { label: "10% discount on sibling membership", included: true },
     ],
   },
@@ -89,19 +87,18 @@ const PLANS: Plan[] = [
     id: "flourish",
     name: "Flourish",
     tagline: "For families who want to be deeply immersed in the Vetaas community.",
-    price: 10000,
+    price: 9999,
 
     siblingDiscount: 0.2,
     accent: "#ece5fa",
     headerText: "#7c3aed",
     features: [
-      { label: "Unlimited access to children, parent and/or adult sessions", included: true },
+      { label: "All Children, Parent and/or Family workshops", included: true },
       { label: "Attend as often as your schedule allows", included: true },
-      { label: "Unlimited access across all programs", included: true },
+      { label: "Unlimited access across all workshops", included: true },
       { label: "Studio access: Library + art supplies + borrow up to 4 books a month", included: true },
       { label: "Co-working space access", included: true },
-      { label: "Priority registration", included: true },
-      { label: "15% discount on family events", included: true },
+      { label: "15% discount on other Nest events", included: true },
       { label: "20% discount on sibling membership", included: true },
     ],
   },
@@ -292,7 +289,7 @@ export default function MembershipSection() {
           transition={{ duration: 0.6 }}
         >
           <span className="inline-block py-1.5 px-6 rounded-full bg-white border border-gray-200 text-gray-800 font-bold text-xs tracking-widest uppercase mb-4 shadow-sm">
-            OUR MEMBERSHIP GUIDE
+NEST MEMBERSHIP GUIDE
           </span>
         </motion.div>
         <motion.h2
@@ -311,7 +308,7 @@ export default function MembershipSection() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="text-gray-500 font-medium text-base md:text-lg leading-relaxed"
         >
-          Choose the plan that fits your journey with Vetaas.
+          Choose the plan that fits your journey with The Nest.
         </motion.p>
       </div>
 
