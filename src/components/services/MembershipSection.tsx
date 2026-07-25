@@ -53,7 +53,7 @@ const PLANS: Plan[] = [
 
     siblingDiscount: 0.05,
     accent: "#fbf3e4",
-    headerText: "#b45309",
+    headerText: "#d97706",
     features: [
       { label: "7 flexible workshops / month", included: true },
       { label: "Recommended usage: 1–2 visits per week", included: true },
