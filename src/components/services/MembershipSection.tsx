@@ -363,7 +363,8 @@ NEST MEMBERSHIP GUIDE
 
             <button
               onClick={() => addToCart(plan.id)}
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#111827] text-white font-bold text-sm rounded-full hover:bg-black hover:scale-[1.02] transition-all shadow-md cursor-pointer"
+              style={{ backgroundColor: plan.headerText }}
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 text-white font-bold text-sm rounded-full hover:brightness-110 hover:scale-[1.02] transition-all shadow-md cursor-pointer"
             >
               <ShoppingCart size={16} />
               Choose {plan.name}
