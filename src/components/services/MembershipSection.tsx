@@ -52,7 +52,7 @@ const PLANS: Plan[] = [
     price: 2999,
 
     siblingDiscount: 0.05,
-    accent: "#fdf3d8",
+    accent: "#fbf3e4",
     headerText: "#b45309",
     features: [
       { label: "7 flexible workshops / month", included: true },
@@ -71,8 +71,8 @@ const PLANS: Plan[] = [
     price: 5999,
 
     siblingDiscount: 0.1,
-    accent: "#d9edf8",
-    headerText: "#1d4ed8",
+    accent: "#fdecef",
+    headerText: "#e23d6d",
     features: [
       { label: "14 flexible workshops / month", included: true },
       { label: "Recommended usage: 3 visits per week", included: true },
@@ -90,8 +90,8 @@ const PLANS: Plan[] = [
     price: 9999,
 
     siblingDiscount: 0.2,
-    accent: "#ece5fa",
-    headerText: "#7c3aed",
+    accent: "#eaf2fb",
+    headerText: "#2563eb",
     features: [
       { label: "All Children, Parent and/or Family workshops", included: true },
       { label: "Attend as often as your schedule allows", included: true },
