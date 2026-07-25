@@ -334,7 +334,10 @@ NEST MEMBERSHIP GUIDE
               {plan.tagline}
             </p>
             <div className="mb-8">
-              <span className="text-4xl font-extrabold text-[#111827] tracking-tight">
+              <span
+                style={{ color: plan.headerText }}
+                className="text-4xl font-extrabold tracking-tight"
+              >
                 {formatINR(plan.price)}
               </span>
               <span className="text-gray-600 font-semibold text-sm"> / month</span>
