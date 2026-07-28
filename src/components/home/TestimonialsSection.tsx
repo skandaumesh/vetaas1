@@ -95,12 +95,12 @@ export default function TestimonialsSection() {
     >
       {/* Background Decor — Layered Premium */}
       <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-[#FF5C7A]/4 blur-[100px] md:animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute top-[-5%] left-[-8%] w-[400px] h-[400px] rounded-full bg-[#1E90FF]/4 blur-[110px] md:animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[-5%] left-[-8%] w-[400px] h-[400px] rounded-full bg-[#268bff]/4 blur-[110px] md:animate-pulse-slow pointer-events-none z-0" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[350px] h-[350px] rounded-full bg-[#00CDBA]/4 blur-[100px] md:animate-pulse-slow pointer-events-none z-0" />
  
       {/* Morphing organic blobs */}
       <div className="absolute top-[15%] right-[8%] w-[220px] h-[220px] bg-gradient-to-br from-[#FF5C7A]/6 to-[#FFC107]/5 md:animate-morph pointer-events-none z-0 blur-[50px]" />
-      <div className="absolute bottom-[10%] left-[5%] w-[260px] h-[260px] bg-gradient-to-tr from-[#1E90FF]/6 to-[#00CDBA]/5 md:animate-morph pointer-events-none z-0 blur-[55px]" style={{ animationDelay: '-6s' }} />
+      <div className="absolute bottom-[10%] left-[5%] w-[260px] h-[260px] bg-gradient-to-tr from-[#268bff]/6 to-[#00CDBA]/5 md:animate-morph pointer-events-none z-0 blur-[55px]" style={{ animationDelay: '-6s' }} />
  
       {/* Drifting geometric rings */}
       <div className="absolute top-[8%] left-[12%] w-[100px] h-[100px] rounded-full border-2 border-[#FF5C7A]/8 md:animate-drift pointer-events-none z-0" />
@@ -139,7 +139,7 @@ export default function TestimonialsSection() {
           />
           {/* Decorative SVG circles */}
           <circle cx="150" cy="100" r="45" stroke="#FF5C7A" strokeWidth="1" opacity="0.04" />
-          <circle cx="1300" cy="450" r="55" stroke="#1E90FF" strokeWidth="1" opacity="0.04" />
+          <circle cx="1300" cy="450" r="55" stroke="#268bff" strokeWidth="1" opacity="0.04" />
           <circle cx="800" cy="50" r="25" stroke="#00CDBA" strokeWidth="1.5" opacity="0.05" />
         </svg>
       </div>
@@ -210,7 +210,7 @@ export default function TestimonialsSection() {
                       {isLong && (
                         <button
                           onClick={() => setSelectedTestimonial(item)}
-                          className="mt-2 text-[11px] font-black text-[#00CDBA] hover:text-[#2d9e81] transition-colors flex items-center gap-1 cursor-pointer self-start"
+                          className="mt-2 text-[11px] font-black text-[#00CDBA] hover:text-[#00cdba] transition-colors flex items-center gap-1 cursor-pointer self-start"
                         >
                           Read More <span>→</span>
                         </button>
@@ -302,7 +302,7 @@ export default function TestimonialsSection() {
                 {/* OK Button */}
                 <button
                   onClick={() => setSelectedTestimonial(null)}
-                  className="mt-6 py-3 px-6 bg-[#00CDBA] hover:bg-[#2d9e81] text-white font-bold rounded-xl transition shadow-lg shadow-teal-500/10 cursor-pointer self-end"
+                  className="mt-6 py-3 px-6 bg-[#00CDBA] hover:bg-[#00cdba] text-white font-bold rounded-xl transition shadow-lg shadow-teal-500/10 cursor-pointer self-end"
                 >
                   Close
                 </button>

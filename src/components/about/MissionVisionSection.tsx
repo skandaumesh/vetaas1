@@ -9,21 +9,21 @@ export default function MissionVisionSection() {
     <section className="pt-12 pb-10 lg:pt-16 lg:pb-12 bg-[#faf9f6] relative overflow-hidden font-sans">
       {/* Background Decor — Layered Premium */}
       <div className="absolute top-[-10%] left-[-10%] w-[450px] h-[450px] rounded-full bg-[#00CDBA]/6 blur-[100px] md:animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#ff7a43]/6 blur-[120px] md:animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute top-[30%] right-[-5%] w-[380px] h-[380px] rounded-full bg-[#1E90FF]/4 blur-[110px] md:animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#ffc107]/6 blur-[120px] md:animate-pulse-slow pointer-events-none z-0" />
+      <div className="absolute top-[30%] right-[-5%] w-[380px] h-[380px] rounded-full bg-[#268bff]/4 blur-[110px] md:animate-pulse-slow pointer-events-none z-0" />
 
       {/* Morphing organic blobs */}
-      <div className="absolute top-[5%] right-[10%] w-[260px] h-[260px] bg-gradient-to-br from-[#00CDBA]/7 to-[#1E90FF]/5 md:animate-morph pointer-events-none z-0 blur-[55px]" />
-      <div className="absolute bottom-[10%] left-[5%] w-[300px] h-[300px] bg-gradient-to-tr from-[#ff7a43]/6 to-[#FFC107]/5 md:animate-morph pointer-events-none z-0 blur-[65px]" style={{ animationDelay: '-4s' }} />
-      <div className="absolute top-[45%] left-[45%] w-[200px] h-[200px] bg-gradient-to-br from-[#ffa3c9]/5 to-[#ff7a43]/4 md:animate-morph pointer-events-none z-0 blur-[45px]" style={{ animationDelay: '-8s' }} />
+      <div className="absolute top-[5%] right-[10%] w-[260px] h-[260px] bg-gradient-to-br from-[#00CDBA]/7 to-[#268bff]/5 md:animate-morph pointer-events-none z-0 blur-[55px]" />
+      <div className="absolute bottom-[10%] left-[5%] w-[300px] h-[300px] bg-gradient-to-tr from-[#ffc107]/6 to-[#FFC107]/5 md:animate-morph pointer-events-none z-0 blur-[65px]" style={{ animationDelay: '-4s' }} />
+      <div className="absolute top-[45%] left-[45%] w-[200px] h-[200px] bg-gradient-to-br from-[#ff5c7a]/5 to-[#ffc107]/4 md:animate-morph pointer-events-none z-0 blur-[45px]" style={{ animationDelay: '-8s' }} />
 
       {/* Drifting geometric rings */}
       <div className="absolute top-[10%] left-[15%] w-[110px] h-[110px] rounded-full border-2 border-[#00CDBA]/8 md:animate-drift pointer-events-none z-0" />
-      <div className="absolute bottom-[12%] right-[12%] w-[85px] h-[85px] rounded-full border-2 border-[#ff7a43]/10 md:animate-drift-reverse pointer-events-none z-0" />
-      <div className="absolute top-[55%] left-[3%] w-[65px] h-[65px] rounded-full border border-[#1E90FF]/8 md:animate-drift pointer-events-none z-0" style={{ animationDelay: '-10s' }} />
+      <div className="absolute bottom-[12%] right-[12%] w-[85px] h-[85px] rounded-full border-2 border-[#ffc107]/10 md:animate-drift-reverse pointer-events-none z-0" />
+      <div className="absolute top-[55%] left-[3%] w-[65px] h-[65px] rounded-full border border-[#268bff]/8 md:animate-drift pointer-events-none z-0" style={{ animationDelay: '-10s' }} />
       {/* Orbiting dots */}
       <div className="absolute top-[20%] right-[25%] w-[10px] h-[10px] rounded-full bg-[#00CDBA]/12 md:animate-orbit pointer-events-none z-0" />
-      <div className="absolute bottom-[25%] left-[30%] w-[8px] h-[8px] rounded-full bg-[#ff7a43]/15 md:animate-orbit pointer-events-none z-0" style={{ animationDelay: '-15s' }} />
+      <div className="absolute bottom-[25%] left-[30%] w-[8px] h-[8px] rounded-full bg-[#ffc107]/15 md:animate-orbit pointer-events-none z-0" style={{ animationDelay: '-15s' }} />
 
       {/* Layered SVG journey lines */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -39,7 +39,7 @@ export default function MissionVisionSection() {
           {/* Secondary orange curve */}
           <path
             d="M-50,280 C350,100 650,350 1050,150 C1250,70 1400,300 1550,250"
-            stroke="#ff7a43"
+            stroke="#ffc107"
             strokeWidth="2"
             strokeLinecap="round"
             opacity="0.05"
@@ -47,7 +47,7 @@ export default function MissionVisionSection() {
           {/* Dashed blue accent */}
           <path
             d="M-50,500 C250,400 500,600 800,450 C1100,320 1350,520 1500,470"
-            stroke="#1E90FF"
+            stroke="#268bff"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeDasharray="12 8"
@@ -55,8 +55,8 @@ export default function MissionVisionSection() {
           />
           {/* Decorative circles */}
           <circle cx="220" cy="180" r="55" stroke="#00CDBA" strokeWidth="1" opacity="0.04" />
-          <circle cx="1150" cy="600" r="70" stroke="#ff7a43" strokeWidth="1" opacity="0.04" />
-          <circle cx="650" cy="90" r="30" stroke="#1E90FF" strokeWidth="1.5" opacity="0.05" />
+          <circle cx="1150" cy="600" r="70" stroke="#ffc107" strokeWidth="1" opacity="0.04" />
+          <circle cx="650" cy="90" r="30" stroke="#268bff" strokeWidth="1.5" opacity="0.05" />
         </svg>
       </div>
 
@@ -74,7 +74,7 @@ export default function MissionVisionSection() {
             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Our Purpose</span>
           </div>
           <h2 className="font-headline text-5xl md:text-6xl lg:text-7xl text-[#111827] tracking-tight leading-[1.05]">
-            Driven by <span className="inline-block bg-[#ffa3c9] text-white px-6 py-1 rounded-[1.5rem] rotate-2 mt-2 shadow-sm font-bold">Purpose</span>
+            Driven by <span className="inline-block bg-[#ff5c7a] text-white px-6 py-1 rounded-[1.5rem] rotate-2 mt-2 shadow-sm font-bold">Purpose</span>
           </h2>
         </motion.div>
 
@@ -122,7 +122,7 @@ export default function MissionVisionSection() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, delay: 0.2 }}
             whileHover={{ y: -8, scale: 1.02 }}
-            className="relative bg-white rounded-[2.5rem] border border-gray-200 shadow-[0_15px_45px_rgba(0,0,0,0.05)] p-8 flex flex-col justify-between rotate-1 hover:shadow-[0_25px_60px_rgba(0,0,0,0.09)] transition-all duration-500 hover:rotate-0 hover:border-[#1E90FF]/40"
+            className="relative bg-white rounded-[2.5rem] border border-gray-200 shadow-[0_15px_45px_rgba(0,0,0,0.05)] p-8 flex flex-col justify-between rotate-1 hover:shadow-[0_25px_60px_rgba(0,0,0,0.09)] transition-all duration-500 hover:rotate-0 hover:border-[#268bff]/40"
           >
             <div>
               <div className="relative aspect-[16/10] rounded-[2rem] overflow-hidden bg-gray-50 mb-6 border border-gray-100">
@@ -137,7 +137,7 @@ export default function MissionVisionSection() {
 
               {/* Title Badge */}
               <div className="mb-4">
-                <span className="inline-block bg-[#1E90FF] text-white text-base font-bold px-4 py-1.5 rounded-xl rotate-2 shadow-sm">
+                <span className="inline-block bg-[#268bff] text-white text-base font-bold px-4 py-1.5 rounded-xl rotate-2 shadow-sm">
                   Our Vision
                 </span>
               </div>

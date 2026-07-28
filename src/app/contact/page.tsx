@@ -111,7 +111,7 @@ function ContactFormContent() {
             <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100">
               {/* Form header */}
               <div className="mb-8">
-                <span className="inline-block py-1 px-4 rounded-full bg-[#00CDBA]/10 text-[#2a9d7e] text-[10px] font-black uppercase tracking-[0.2em] mb-3">
+                <span className="inline-block py-1 px-4 rounded-full bg-[#00CDBA]/10 text-[#00cdba] text-[10px] font-black uppercase tracking-[0.2em] mb-3">
                   Send a Message
                 </span>
                 <h2 className="text-3xl font-bold font-headline text-[#111827] leading-tight">

@@ -9,9 +9,9 @@ export default function OfferingsSection() {
   const offerings = [
     {
       image: "/flow1.png",
-      color: "bg-[#45bcf6]", // Sky Blue
+      color: "bg-[#268bff]", // Sky Blue
       iconBg: "bg-[#8bd6f9]",
-      btnColor: "bg-[#35a8df]", 
+      btnColor: "bg-[#268bff]", 
       title: "Parent Engagement",
       subtitle: "WORKSHOPS & SPACES",
       intro: "Action oriented workshops that cater to",
@@ -27,7 +27,7 @@ export default function OfferingsSection() {
       image: "/flow2.png",
       color: "bg-[#00CDBA]", // Emerald Green
       iconBg: "bg-[#7fd9bc]",
-      btnColor: "bg-[#2da182]",
+      btnColor: "bg-[#00cdba]",
       title: "Teacher Engagement",
       subtitle: "CAPACITY BUILDING",
       intro: "We support teachers learn about SEL, integrate SEL into their teaching, and creating a SEL-supportive environment.",
@@ -41,9 +41,9 @@ export default function OfferingsSection() {
     },
     {
       image: "/flow3.png",
-      color: "bg-[#ff7f68]", // Coral
-      iconBg: "bg-[#ffa696]",
-      btnColor: "bg-[#e56d58]",
+      color: "bg-[#ff5c7a]", // Coral
+      iconBg: "bg-[#ff5c7a]",
+      btnColor: "bg-[#ff5c7a]",
       title: "Child Engagement",
       subtitle: "FUN FILLED EVENTS",
       intro: "Fun filled events that cater to",
@@ -83,7 +83,7 @@ export default function OfferingsSection() {
             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Our Mission</span>
           </div>
           <h2 className="font-headline text-5xl md:text-7xl lg:text-8xl text-[#111827] tracking-tight leading-[1.05]">
-            Our <span className="inline-block bg-[#ffa3c9] text-white px-8 py-2 rounded-[2rem] rotate-2 mt-4 shadow-sm font-bold">Work</span>
+            Our <span className="inline-block bg-[#ff5c7a] text-white px-8 py-2 rounded-[2rem] rotate-2 mt-4 shadow-sm font-bold">Work</span>
           </h2>
         </motion.div>
 

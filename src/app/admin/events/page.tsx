@@ -432,7 +432,7 @@ export default function AdminEventsPage() {
                   </button>
                   <button
                     onClick={handleConfirmDelete}
-                    className="flex-1 py-3 px-4 bg-[#FF5C7A] hover:bg-[#e04b68] text-white font-semibold rounded-xl shadow-lg shadow-rose-600/20 transition duration-200 cursor-pointer text-sm"
+                    className="flex-1 py-3 px-4 bg-[#FF5C7A] hover:bg-[#ff5c7a] text-white font-semibold rounded-xl shadow-lg shadow-rose-600/20 transition duration-200 cursor-pointer text-sm"
                   >
                     Delete
                   </button>
@@ -637,7 +637,7 @@ export default function AdminEventsPage() {
                               const fileInput = document.getElementById('image') as HTMLInputElement;
                               if (fileInput) fileInput.value = '';
                             }}
-                            className="p-2.5 bg-[#FF5C7A] hover:bg-[#e04b68] text-white rounded-full transition shadow-lg flex items-center justify-center cursor-pointer"
+                            className="p-2.5 bg-[#FF5C7A] hover:bg-[#ff5c7a] text-white rounded-full transition shadow-lg flex items-center justify-center cursor-pointer"
                           >
                             <X className="w-5 h-5" />
                           </button>

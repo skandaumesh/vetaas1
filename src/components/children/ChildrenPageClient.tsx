@@ -14,23 +14,23 @@ const BELIEFS = [
   {
     title: "Social and emotional skills improve academics.",
     text: "Self-awareness, emotional regulation, empathy, and relationship skills create a mindset for lifelong learning.",
-    icon: <BookOpen className="w-6 h-6 text-emerald-500" />,
-    borderColor: "border-emerald-100/80",
-    topLineColor: "bg-emerald-500"
+    icon: <BookOpen className="w-6 h-6 text-[#00cdba]" />,
+    borderColor: "border-[#00cdba]/30",
+    topLineColor: "bg-[#00cdba]"
   },
   {
     title: "Relationships shape development.",
     text: "Children grow through nurturing interactions with caring adults and positive experiences with peers.",
-    icon: <Users className="w-6 h-6 text-sky-500" />,
-    borderColor: "border-sky-100/80",
-    topLineColor: "bg-sky-500"
+    icon: <Users className="w-6 h-6 text-[#268bff]" />,
+    borderColor: "border-[#268bff]/30",
+    topLineColor: "bg-[#268bff]"
   },
   {
     title: "Learning should be joyful and holistic.",
     text: "Children flourish when learning experiences nurture their minds, emotions, creativity, curiosity, and sense of belonging.",
-    icon: <Sparkles className="w-6 h-6 text-purple-500" />,
-    borderColor: "border-purple-100/80",
-    topLineColor: "bg-purple-500"
+    icon: <Sparkles className="w-6 h-6 text-[#7c3aed]" />,
+    borderColor: "border-[#7c3aed]/30",
+    topLineColor: "bg-[#7c3aed]"
   }
 ];
 
@@ -44,15 +44,15 @@ const OFFERINGS = [
       "Early numeracy and STEM exploration",
       "Creative arts, movement, and hands-on discovery"
     ],
-    icon: <Sparkles className="w-6 h-6 text-[#F59E0B]" />,
+    icon: <Sparkles className="w-6 h-6 text-[#ffc107]" />,
     theme: {
-      bg: "bg-[#F59E0B]/[0.03]",
-      border: "border-[#F59E0B]/20",
-      iconBg: "bg-[#F59E0B]/10",
-      checkBg: "bg-[#F59E0B]/15",
-      checkColor: "text-[#F59E0B]",
-      separator: "border-[#F59E0B]/15",
-      bottomText: "text-[#F59E0B]"
+      bg: "bg-[#ffc107]/[0.03]",
+      border: "border-[#ffc107]/20",
+      iconBg: "bg-[#ffc107]/10",
+      checkBg: "bg-[#ffc107]/15",
+      checkColor: "text-[#ffc107]",
+      separator: "border-[#ffc107]/15",
+      bottomText: "text-[#ffc107]"
     }
   },
   {
@@ -64,15 +64,15 @@ const OFFERINGS = [
       "Empathy, cooperation, and friendship skills",
       "Confidence, resilience, and decision-making"
     ],
-    icon: <Heart className="w-6 h-6 text-[#F43F5E]" />,
+    icon: <Heart className="w-6 h-6 text-[#ff5c7a]" />,
     theme: {
-      bg: "bg-[#F43F5E]/[0.03]",
-      border: "border-[#F43F5E]/20",
-      iconBg: "bg-[#F43F5E]/10",
-      checkBg: "bg-[#F43F5E]/15",
-      checkColor: "text-[#F43F5E]",
-      separator: "border-[#F43F5E]/15",
-      bottomText: "text-[#F43F5E]"
+      bg: "bg-[#ff5c7a]/[0.03]",
+      border: "border-[#ff5c7a]/20",
+      iconBg: "bg-[#ff5c7a]/10",
+      checkBg: "bg-[#ff5c7a]/15",
+      checkColor: "text-[#ff5c7a]",
+      separator: "border-[#ff5c7a]/15",
+      bottomText: "text-[#ff5c7a]"
     }
   },
   {
@@ -84,15 +84,15 @@ const OFFERINGS = [
       "Conversation starters and take-home resources",
       "Opportunities for shared play and learning"
     ],
-    icon: <Users className="w-6 h-6 text-[#0EA5E9]" />,
+    icon: <Users className="w-6 h-6 text-[#268bff]" />,
     theme: {
-      bg: "bg-[#0EA5E9]/[0.03]",
-      border: "border-[#0EA5E9]/20",
-      iconBg: "bg-[#0EA5E9]/10",
-      checkBg: "bg-[#0EA5E9]/15",
-      checkColor: "text-[#0EA5E9]",
-      separator: "border-[#0EA5E9]/15",
-      bottomText: "text-[#0EA5E9]"
+      bg: "bg-[#268bff]/[0.03]",
+      border: "border-[#268bff]/20",
+      iconBg: "bg-[#268bff]/10",
+      checkBg: "bg-[#268bff]/15",
+      checkColor: "text-[#268bff]",
+      separator: "border-[#268bff]/15",
+      bottomText: "text-[#268bff]"
     }
   }
 ];
@@ -120,7 +120,7 @@ export default function ChildrenPageClient() {
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
               What We Believe
             </h3>
-            <div className="w-12 h-1 bg-[#38d38b] rounded-full mt-4" />
+            <div className="w-12 h-1 bg-[#00cdba] rounded-full mt-4" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -154,7 +154,7 @@ export default function ChildrenPageClient() {
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
               Our Offerings
             </h3>
-            <div className="w-12 h-1 bg-[#0CB0D8] rounded-full mt-4" />
+            <div className="w-12 h-1 bg-[#00cdba] rounded-full mt-4" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
@@ -209,7 +209,7 @@ export default function ChildrenPageClient() {
           <div className="flex justify-center">
             <Link 
               href="/events" 
-              className="group inline-flex items-center justify-center gap-2 px-10 py-4.5 bg-[#38d38b] text-[#111827] font-extrabold text-sm rounded-full hover:bg-[#2ebc7a] hover:scale-105 transition-all shadow-md active:scale-95"
+              className="group inline-flex items-center justify-center gap-2 px-10 py-4.5 bg-[#00cdba] text-[#111827] font-extrabold text-sm rounded-full hover:bg-[#00cdba] hover:scale-105 transition-all shadow-md active:scale-95"
             >
               <span>View upcoming children events</span>
               <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />

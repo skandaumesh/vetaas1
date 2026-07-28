@@ -70,7 +70,7 @@ export default function ServicesPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               whileHover={{ y: -10 }}
-              className="bg-[#38d38b] rounded-[2.5rem] p-8 relative overflow-hidden min-h-[520px] flex flex-col justify-between shadow-sm cursor-pointer w-full"
+              className="bg-[#00cdba] rounded-[2.5rem] p-8 relative overflow-hidden min-h-[520px] flex flex-col justify-between shadow-sm cursor-pointer w-full"
             >
               {/* Abstract Yellow Blob */}
               <svg className="absolute -bottom-10 -left-10 w-64 h-64 text-[#fce270] transition-transform duration-500 group-hover/card:scale-110" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -138,7 +138,7 @@ export default function ServicesPage() {
               className="bg-[#c8bdf5] rounded-[2.5rem] p-8 relative overflow-hidden min-h-[520px] flex flex-col justify-between shadow-sm cursor-pointer w-full"
             >
               {/* Abstract Light Green Line */}
-              <svg className="absolute -top-10 -right-10 w-64 h-64 text-[#d4fca4] transition-transform duration-500 group-hover/card:rotate-12" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <svg className="absolute -top-10 -right-10 w-64 h-64 text-[#dbeafe] transition-transform duration-500 group-hover/card:rotate-12" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                 <path fill="none" stroke="currentColor" strokeWidth="16" strokeLinecap="round" d="M30,150 C50,50 150,50 170,150 C180,200 250,150 250,50" transform="rotate(-30 100 100) scale(0.8)"/>
               </svg>
 
@@ -200,7 +200,7 @@ export default function ServicesPage() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
               whileHover={{ y: -10 }}
-              className="bg-[#d4fca4] rounded-[2.5rem] p-8 relative overflow-hidden min-h-[520px] flex flex-col justify-between shadow-sm cursor-pointer w-full"
+              className="bg-[#dbeafe] rounded-[2.5rem] p-8 relative overflow-hidden min-h-[520px] flex flex-col justify-between shadow-sm cursor-pointer w-full"
             >
               {/* Abstract Purple Asterisk */}
               <div className="absolute -bottom-16 -left-12 text-[#c8bdf5] transition-transform duration-500 group-hover/card:rotate-45">
@@ -275,7 +275,7 @@ export default function ServicesPage() {
         >
           <div className="max-w-xl">
             <h3 className="text-3xl md:text-4xl font-headline text-gray-900 mb-4 tracking-tight">
-              Interested in our <span className="inline-block bg-[#ffa3c9] text-white px-5 py-1 rounded-[1.5rem] shadow-sm font-bold -rotate-2">services?</span>
+              Interested in our <span className="inline-block bg-[#ff5c7a] text-white px-5 py-1 rounded-[1.5rem] shadow-sm font-bold -rotate-2">services?</span>
             </h3>
             <p className="text-gray-500 font-medium text-sm md:text-base leading-relaxed">
               We customize workshops, events, and capacity-building programs for schools, communities, and parents.

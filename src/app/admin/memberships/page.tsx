@@ -365,7 +365,7 @@ export default function AdminMembershipsPage() {
               label: "Pending verification",
               value: String(pendingCount),
               sub: pendingCount > 0 ? "needs your review" : "all caught up",
-              icon: <Clock size={18} className="text-[#f59e0b]" />,
+              icon: <Clock size={18} className="text-[#ffc107]" />,
               iconBg: "bg-amber-100",
             },
             {
@@ -567,7 +567,7 @@ export default function AdminMembershipsPage() {
                       ) : (
                         <button
                           onClick={() => setConfirmEmailKey(`approve:${order.id}`)}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#38d38b] text-white rounded-full text-xs font-bold hover:brightness-95 transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#00cdba] text-white rounded-full text-xs font-bold hover:brightness-95 transition-all cursor-pointer"
                         >
                           <CheckCircle2 size={14} />
                           Approve &amp; Email
@@ -635,7 +635,7 @@ export default function AdminMembershipsPage() {
                           setConfirmEmailKey(null);
                           sendReminder(order);
                         }}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#f59e0b] text-white rounded-full text-xs font-bold hover:brightness-110 transition-all cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#ffc107] text-white rounded-full text-xs font-bold hover:brightness-110 transition-all cursor-pointer"
                       >
                         <BellRing size={14} />
                         Yes, send reminder

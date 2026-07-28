@@ -103,15 +103,15 @@ const OFFERINGS = [
     title: "Teacher Well-being",
     badge: "Teacher Well-being",
     description: "A supportive space where teachers strengthen their social-emotional competencies, prioritise their well-being, and build resilience to navigate the demands of teaching with confidence and purpose.",
-    icon: <Smile className="w-6 h-6 text-[#9333EA]" />,
+    icon: <Smile className="w-6 h-6 text-[#7c3aed]" />,
     theme: {
-      bg: "bg-[#9333EA]/[0.03]",
-      border: "border-[#9333EA]/20",
-      iconBg: "bg-[#9333EA]/10",
-      checkBg: "bg-[#9333EA]/15",
-      checkColor: "text-[#9333EA]",
-      separator: "border-[#9333EA]/15",
-      bottomText: "text-[#9333EA]"
+      bg: "bg-[#7c3aed]/[0.03]",
+      border: "border-[#7c3aed]/20",
+      iconBg: "bg-[#7c3aed]/10",
+      checkBg: "bg-[#7c3aed]/15",
+      checkColor: "text-[#7c3aed]",
+      separator: "border-[#7c3aed]/15",
+      bottomText: "text-[#7c3aed]"
     },
     items: [
       "Well-being & mindfulness practices",
@@ -143,15 +143,15 @@ const OFFERINGS = [
     title: "Leadership for Well-being and School Culture",
     badge: "School Leadership",
     description: "Empowering school leaders to create environments where teachers feel supported, valued, and equipped to foster children's social, emotional, and academic growth.",
-    icon: <Briefcase className="w-6 h-6 text-[#ff7f68]" />,
+    icon: <Briefcase className="w-6 h-6 text-[#ff5c7a]" />,
     theme: {
-      bg: "bg-[#ff7f68]/[0.03]",
-      border: "border-[#ff7f68]/20",
-      iconBg: "bg-[#ff7f68]/10",
-      checkBg: "bg-[#ff7f68]/15",
-      checkColor: "text-[#ff7f68]",
-      separator: "border-[#ff7f68]/15",
-      bottomText: "text-[#ff7f68]"
+      bg: "bg-[#ff5c7a]/[0.03]",
+      border: "border-[#ff5c7a]/20",
+      iconBg: "bg-[#ff5c7a]/10",
+      checkBg: "bg-[#ff5c7a]/15",
+      checkColor: "text-[#ff5c7a]",
+      separator: "border-[#ff5c7a]/15",
+      bottomText: "text-[#ff5c7a]"
     },
     items: [
       "Building a positive school culture",
@@ -218,7 +218,7 @@ export default function TeachersPageClient() {
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
               The Vetaas Way
             </h3>
-            <div className="w-12 h-1 bg-[#0CB0D8] rounded-full mt-4" />
+            <div className="w-12 h-1 bg-[#00cdba] rounded-full mt-4" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -315,7 +315,7 @@ export default function TeachersPageClient() {
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
               Topics We Explore
             </h3>
-            <div className="w-12 h-1 bg-[#9333EA] rounded-full mt-4" />
+            <div className="w-12 h-1 bg-[#7c3aed] rounded-full mt-4" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">

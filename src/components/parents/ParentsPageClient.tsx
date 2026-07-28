@@ -96,15 +96,15 @@ const OFFERINGS = [
     title: "Workshops",
     badge: "Immersive & Practical",
     description: "Immersive, hands-on experiences going beyond traditional advice. We provide a safe space to explore early childhood milestones, tailored for parents of children aged 3 to 6.",
-    icon: <BookOpen className="w-6 h-6 text-[#45bcf6]" />,
+    icon: <BookOpen className="w-6 h-6 text-[#268bff]" />,
     theme: {
-      bg: "bg-[#45bcf6]/[0.03]",
-      border: "border-[#45bcf6]/20",
-      iconBg: "bg-[#45bcf6]/10",
-      checkBg: "bg-[#45bcf6]/15",
-      checkColor: "text-[#45bcf6]",
-      separator: "border-[#45bcf6]/15",
-      bottomText: "text-[#45bcf6]"
+      bg: "bg-[#268bff]/[0.03]",
+      border: "border-[#268bff]/20",
+      iconBg: "bg-[#268bff]/10",
+      checkBg: "bg-[#268bff]/15",
+      checkColor: "text-[#268bff]",
+      separator: "border-[#268bff]/15",
+      bottomText: "text-[#268bff]"
     },
     items: [
       "Social Emotional Learning (SEL)",
@@ -116,15 +116,15 @@ const OFFERINGS = [
     title: "Parent-Child engagement",
     badge: "My Child & Me",
     description: "Unique celebrations of the special bond between you and your child. We believe shared joy is the best catalyst for growth, offering interactive activities and collaborative projects.",
-    icon: <Calendar className="w-6 h-6 text-[#ff7f68]" />,
+    icon: <Calendar className="w-6 h-6 text-[#ff5c7a]" />,
     theme: {
-      bg: "bg-[#ff7f68]/[0.03]",
-      border: "border-[#ff7f68]/20",
-      iconBg: "bg-[#ff7f68]/10",
-      checkBg: "bg-[#ff7f68]/15",
-      checkColor: "text-[#ff7f68]",
-      separator: "border-[#ff7f68]/15",
-      bottomText: "text-[#ff7f68]"
+      bg: "bg-[#ff5c7a]/[0.03]",
+      border: "border-[#ff5c7a]/20",
+      iconBg: "bg-[#ff5c7a]/10",
+      checkBg: "bg-[#ff5c7a]/15",
+      checkColor: "text-[#ff5c7a]",
+      separator: "border-[#ff5c7a]/15",
+      bottomText: "text-[#ff5c7a]"
     },
     items: [
       "Fun developmental games",
@@ -182,7 +182,7 @@ export default function ParentsPageClient() {
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
               What We Believe
             </h3>
-            <div className="w-12 h-1 bg-[#ffa3c9] rounded-full mt-4" />
+            <div className="w-12 h-1 bg-[#ff5c7a] rounded-full mt-4" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -217,7 +217,7 @@ export default function ParentsPageClient() {
             <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-950 font-headline">
               The Vetaas Way
             </h3>
-            <div className="w-12 h-1 bg-[#0CB0D8] rounded-full mt-4" />
+            <div className="w-12 h-1 bg-[#00cdba] rounded-full mt-4" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -257,7 +257,7 @@ export default function ParentsPageClient() {
             <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-950 font-headline">
               Our Offerings
             </h2>
-            <div className="w-12 h-1 bg-[#ffa3c9] rounded-full mt-4" />
+            <div className="w-12 h-1 bg-[#ff5c7a] rounded-full mt-4" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

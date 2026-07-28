@@ -18,12 +18,12 @@ const TEAM = [
     initials: "SB",
     role: "Co-Founder | Pulmonologist | Guitar Player",
     bio: "As a dedicated doctor and passionate advocate for education, I believe that health and education are fundamental human rights. Through Vetaas, I employ my strengths and skills to create environments where learning never stops and where growth and well-being are at the heart of everything we do. At Vetaas we focus on early childhood so that there are greater chances of the children becoming well-rounded adults.",
-    gradient: "from-[#45bcf6] to-[#7C3AED]",
-    borderColor: "border-[#45bcf6]",
+    gradient: "from-[#268bff] to-[#7C3AED]",
+    borderColor: "border-[#268bff]",
     textColor: "text-[#7C3AED]",
-    bgHover: "hover:bg-[#45bcf6]/5",
+    bgHover: "hover:bg-[#268bff]/5",
     activeBg: "bg-[#eff6ff]",
-    activeBorder: "border-[#45bcf6]/30",
+    activeBorder: "border-[#268bff]/30",
     image: "/sameer.webp",
     roleTags: ["Co-Founder", "Doctor", "Guitarist"],
     linkedin: "https://www.linkedin.com/in/sameer-bansal-5498a831/?originalSubdomain=in"
@@ -33,12 +33,12 @@ const TEAM = [
     initials: "KK",
     role: "Co-Founder | Teacher Educator | Esperantist",
     bio: "Education has been my ticket to happiness. All the years that I served in the education sector makes me believe that investing in early childhood education is our best bet at creating happy childhoods. Vetaas was born out of this bold hunger to foster the best early childhood care practices and support parents in their parenting journeys.",
-    gradient: "from-[#ff7f68] to-[#ff7f68]",
-    borderColor: "border-[#ff7f68]",
-    textColor: "text-[#ff7f68]",
-    bgHover: "hover:bg-[#ff7f68]/5",
+    gradient: "from-[#ff5c7a] to-[#ff5c7a]",
+    borderColor: "border-[#ff5c7a]",
+    textColor: "text-[#ff5c7a]",
+    bgHover: "hover:bg-[#ff5c7a]/5",
     activeBg: "bg-[#fff5f5]",
-    activeBorder: "border-[#ff7f68]/30",
+    activeBorder: "border-[#ff5c7a]/30",
     image: "/kirti.webp",
     roleTags: ["Co-Founder", "Teacher Educator", "Esperantist"],
     linkedin: "https://www.linkedin.com/in/kirti-k-9a1729227/?originalSubdomain=in"
@@ -88,7 +88,7 @@ export default function AboutPageClient() {
 
         {/* Glowing blur background blobs */}
         <div className="absolute top-[10%] left-[-10%] w-[350px] h-[350px] rounded-full bg-[#00CDBA]/4 blur-[100px] pointer-events-none z-0" />
-        <div className="absolute bottom-[10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-[#ff7f68]/4 blur-[100px] pointer-events-none z-0" />
+        <div className="absolute bottom-[10%] right-[-10%] w-[350px] h-[350px] rounded-full bg-[#ff5c7a]/4 blur-[100px] pointer-events-none z-0" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[#7C3AED]/3 blur-[120px] pointer-events-none z-0" />
 
         {/* Refined Dot Grid Pattern */}
@@ -110,7 +110,7 @@ export default function AboutPageClient() {
             The Magic{" "}
             <span className="relative inline-block px-5 py-1.5 ml-1">
               {/* Slanted backdrop badge */}
-              <span className="absolute inset-0 bg-gradient-to-r from-[#ff7f68] to-[#ff7f68] rounded-2xl -rotate-1 shadow-md shadow-orange-500/10" />
+              <span className="absolute inset-0 bg-gradient-to-r from-[#ff5c7a] to-[#ff5c7a] rounded-2xl -rotate-1 shadow-md shadow-orange-500/10" />
               <span className="relative text-white font-serif italic font-medium">Formula.</span>
             </span>
           </h2>
@@ -145,7 +145,7 @@ export default function AboutPageClient() {
                 </div>
 
                 {/* Badge */}
-                <span className="bg-[#00CDBA]/10 text-[#2a9d7e] text-[9px] font-black uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-full border border-[#00CDBA]/5 shadow-sm">
+                <span className="bg-[#00CDBA]/10 text-[#00cdba] text-[9px] font-black uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-full border border-[#00CDBA]/5 shadow-sm">
                   Curriculum
                 </span>
               </div>
@@ -180,25 +180,25 @@ export default function AboutPageClient() {
           <motion.div
             whileHover={{ y: -8, scale: 1.01 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="group relative p-8 md:p-10 bg-white/70 backdrop-blur-md rounded-[3rem] border border-[#ff7f68]/10 shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-xl hover:shadow-[#ff7f68]/5 hover:border-[#ff7f68]/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+            className="group relative p-8 md:p-10 bg-white/70 backdrop-blur-md rounded-[3rem] border border-[#ff5c7a]/10 shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-xl hover:shadow-[#ff5c7a]/5 hover:border-[#ff5c7a]/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
           >
             {/* Subtle card accent pattern */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#ff7f68]/5 to-transparent rounded-bl-full pointer-events-none" />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#ff5c7a]/5 to-transparent rounded-bl-full pointer-events-none" />
 
             <div>
               <div className="flex justify-between items-start mb-8">
                 {/* Icon wrapper */}
-                <div className="w-16 h-16 rounded-[1.5rem] bg-[#fff0f1] flex items-center justify-center text-[#ff7f68] shadow-inner relative group-hover:scale-105 transition-transform duration-300">
+                <div className="w-16 h-16 rounded-[1.5rem] bg-[#fff0f1] flex items-center justify-center text-[#ff5c7a] shadow-inner relative group-hover:scale-105 transition-transform duration-300">
                   <Smile size={26} className="transition-transform duration-500 group-hover:scale-110" />
                 </div>
 
                 {/* Badge */}
-                <span className="bg-[#ff7f68]/10 text-[#ff7f68] text-[9px] font-black uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-full border border-[#ff7f68]/5 shadow-sm">
+                <span className="bg-[#ff5c7a]/10 text-[#ff5c7a] text-[9px] font-black uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-full border border-[#ff5c7a]/5 shadow-sm">
                   Enablement
                 </span>
               </div>
 
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 tracking-tight group-hover:text-[#ff7f68] transition-colors duration-300">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 tracking-tight group-hover:text-[#ff5c7a] transition-colors duration-300">
                 Empowering
               </h3>
 
@@ -214,7 +214,7 @@ export default function AboutPageClient() {
                   "Dedicated parent & school support groups"
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-[#ff7f68]/10 flex items-center justify-center text-[#ff7f68] shrink-0 mt-0.5">
+                    <div className="w-5 h-5 rounded-full bg-[#ff5c7a]/10 flex items-center justify-center text-[#ff5c7a] shrink-0 mt-0.5">
                       <Check size={12} strokeWidth={3} />
                     </div>
                     <span className="text-sm font-semibold text-gray-600">{item}</span>
@@ -248,11 +248,11 @@ export default function AboutPageClient() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="group relative bg-white rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-300 overflow-hidden"
             >
-              <div className="absolute -top-6 -right-6 text-[#ff7f68] opacity-5 group-hover:opacity-10 transition-opacity duration-500 group-hover:rotate-12 group-hover:scale-110">
+              <div className="absolute -top-6 -right-6 text-[#ff5c7a] opacity-5 group-hover:opacity-10 transition-opacity duration-500 group-hover:rotate-12 group-hover:scale-110">
                 <Heart size={160} fill="currentColor" />
               </div>
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-14 h-14 rounded-2xl bg-[#ff7f68]/10 flex items-center justify-center text-[#ff7f68] mb-8 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-14 h-14 rounded-2xl bg-[#ff5c7a]/10 flex items-center justify-center text-[#ff5c7a] mb-8 group-hover:scale-110 transition-transform duration-300">
                   <Heart size={28} />
                 </div>
                 <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-4 leading-tight">
@@ -262,7 +262,7 @@ export default function AboutPageClient() {
                   Relationships are at the heart of human development.
                 </p>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#ff7f68] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#ff5c7a] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
             </motion.div>
 
             {/* Tile 2 */}
@@ -298,11 +298,11 @@ export default function AboutPageClient() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="group relative bg-white rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-300 overflow-hidden"
             >
-              <div className="absolute -top-6 -right-6 text-[#45bcf6] opacity-5 group-hover:opacity-10 transition-opacity duration-500 group-hover:rotate-12 group-hover:scale-110">
+              <div className="absolute -top-6 -right-6 text-[#268bff] opacity-5 group-hover:opacity-10 transition-opacity duration-500 group-hover:rotate-12 group-hover:scale-110">
                 <Sprout size={160} fill="currentColor" />
               </div>
               <div className="relative z-10 flex flex-col h-full">
-                <div className="w-14 h-14 rounded-2xl bg-[#45bcf6]/10 flex items-center justify-center text-[#45bcf6] mb-8 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-14 h-14 rounded-2xl bg-[#268bff]/10 flex items-center justify-center text-[#268bff] mb-8 group-hover:scale-110 transition-transform duration-300">
                   <Sprout size={28} />
                 </div>
                 <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-4 leading-tight">
@@ -312,7 +312,7 @@ export default function AboutPageClient() {
                   Children thrive when caring adults and communities grow alongside them.
                 </p>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#45bcf6] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#268bff] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
             </motion.div>
           </div>
         </div>
@@ -333,19 +333,19 @@ export default function AboutPageClient() {
             >
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-headline text-[#111827] tracking-tight leading-[1.1] mb-6">
                 Our Work With <br />
-                <span className="inline-block bg-[#ff7f68] text-white px-4 py-0.5 rounded-xl rotate-1 shadow-sm font-semibold mt-2">Parents.</span>
+                <span className="inline-block bg-[#ff5c7a] text-white px-4 py-0.5 rounded-xl rotate-1 shadow-sm font-semibold mt-2">Parents.</span>
               </h2>
               <div className="space-y-5 text-gray-500 font-medium leading-relaxed mb-8 text-base md:text-lg">
                 <p>
                   Every child deserves both holistic and wholesome care, especially during their early years. Research and experience provide sufficient evidence that informed parenting offers the best shot at promising happy childhoods.
                 </p>
-                <div className="bg-[#fffbfa] p-6 rounded-2xl border-l-4 border-[#ff7f68] border border-gray-100">
+                <div className="bg-[#fffbfa] p-6 rounded-2xl border-l-4 border-[#ff5c7a] border border-gray-100">
                   <p className="text-[#111827] font-bold text-sm md:text-base">At Vetaas, we provide resources for home activities and Practical SEL support.</p>
                 </div>
               </div>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-[#ff7f68] hover:bg-[#ff7f68] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
+                className="inline-flex items-center gap-2 bg-[#ff5c7a] hover:bg-[#ff5c7a] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
               >
                 Get Resources <ArrowRight size={16} />
               </Link>
@@ -353,9 +353,9 @@ export default function AboutPageClient() {
 
             {/* Redesigned Parent Kit Card (No Image) */}
             <div className="lg:w-1/2 w-full max-w-[480px]">
-              <div className="bg-[#fffbfa] p-8 md:p-10 rounded-[2.5rem] border border-[#ff7f68]/20 shadow-md rotate-2 transition-transform duration-500 hover:rotate-0">
+              <div className="bg-[#fffbfa] p-8 md:p-10 rounded-[2.5rem] border border-[#ff5c7a]/20 shadow-md rotate-2 transition-transform duration-500 hover:rotate-0">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-[#fff0f1] flex items-center justify-center text-[#ff7f68]">
+                  <div className="w-10 h-10 rounded-xl bg-[#fff0f1] flex items-center justify-center text-[#ff5c7a]">
                     <Heart size={20} fill="currentColor" />
                   </div>
                   <h3 className="font-bold text-xl text-[#111827]">SEL for Parents</h3>
@@ -368,7 +368,7 @@ export default function AboutPageClient() {
                     { title: "Parenting is a journey of learning and growth.", desc: "Children flourish when parents have opportunities to reflect, learn, and respond intentionally to their evolving needs." }
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-[#ff7f68]/10 flex items-center justify-center text-[#ff7f68] shrink-0 mt-0.5">
+                      <div className="w-5 h-5 rounded-full bg-[#ff5c7a]/10 flex items-center justify-center text-[#ff5c7a] shrink-0 mt-0.5">
                         <Check size={12} strokeWidth={3} />
                       </div>
                       <div className="flex flex-col">
@@ -379,8 +379,8 @@ export default function AboutPageClient() {
                   ))}
                 </ul>
 
-                <div className="mt-8 pt-6 border-t border-[#ff7f68]/10 text-center">
-                  <span className="text-xs font-bold text-[#ff7f68] uppercase tracking-wider">Empowering happy childhoods</span>
+                <div className="mt-8 pt-6 border-t border-[#ff5c7a]/10 text-center">
+                  <span className="text-xs font-bold text-[#ff5c7a] uppercase tracking-wider">Empowering happy childhoods</span>
                 </div>
               </div>
             </div>
@@ -397,7 +397,7 @@ export default function AboutPageClient() {
             >
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-headline text-[#111827] tracking-tight leading-[1.1] mb-6">
                 Our Work With <br />
-                <span className="inline-block bg-[#45bcf6] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-2">Teachers.</span>
+                <span className="inline-block bg-[#268bff] text-white px-4 py-0.5 rounded-xl -rotate-1 shadow-sm font-semibold mt-2">Teachers.</span>
               </h2>
               <div className="space-y-5 text-gray-500 font-medium leading-relaxed mb-8 text-base md:text-lg">
                 <p>
@@ -409,7 +409,7 @@ export default function AboutPageClient() {
               </div>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-[#45bcf6] hover:bg-[#45bcf6] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
+                className="inline-flex items-center gap-2 bg-[#268bff] hover:bg-[#268bff] text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:scale-105 transition-all shadow-md active:scale-95"
               >
                 Teacher Programs <ArrowRight size={16} />
               </Link>
@@ -417,9 +417,9 @@ export default function AboutPageClient() {
 
             {/* Redesigned Teacher Hub Card (No Image) */}
             <div className="lg:w-1/2 w-full max-w-[480px]">
-              <div className="bg-[#eff6ff] p-8 md:p-10 rounded-[2.5rem] border border-[#45bcf6]/20 shadow-md -rotate-2 transition-transform duration-500 hover:rotate-0">
+              <div className="bg-[#eff6ff] p-8 md:p-10 rounded-[2.5rem] border border-[#268bff]/20 shadow-md -rotate-2 transition-transform duration-500 hover:rotate-0">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-[#dbeafe] flex items-center justify-center text-[#45bcf6]">
+                  <div className="w-10 h-10 rounded-xl bg-[#dbeafe] flex items-center justify-center text-[#268bff]">
                     <BookOpen size={20} />
                   </div>
                   <h3 className="font-bold text-xl text-[#111827]">SEL for Teachers</h3>
@@ -432,7 +432,7 @@ export default function AboutPageClient() {
                     { title: "Reflective teachers build responsive classrooms.", desc: "Children learn best when educators are empowered to understand, adapt, and grow alongside them." }
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-[#45bcf6]/10 flex items-center justify-center text-[#45bcf6] shrink-0 mt-0.5">
+                      <div className="w-5 h-5 rounded-full bg-[#268bff]/10 flex items-center justify-center text-[#268bff] shrink-0 mt-0.5">
                         <Check size={12} strokeWidth={3} />
                       </div>
                       <div className="flex flex-col">
@@ -443,8 +443,8 @@ export default function AboutPageClient() {
                   ))}
                 </ul>
 
-                <div className="mt-8 pt-6 border-t border-[#45bcf6]/10 text-center">
-                  <span className="text-xs font-bold text-[#45bcf6] uppercase tracking-wider">Creating active learning ecosystems</span>
+                <div className="mt-8 pt-6 border-t border-[#268bff]/10 text-center">
+                  <span className="text-xs font-bold text-[#268bff] uppercase tracking-wider">Creating active learning ecosystems</span>
                 </div>
               </div>
             </div>

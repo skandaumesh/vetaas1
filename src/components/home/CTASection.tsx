@@ -14,7 +14,7 @@ export default function CTASection() {
       <div className="absolute top-[-5%] right-[10%] w-[350px] h-[350px] rounded-full bg-[#00CDBA]/3 blur-[110px] md:animate-pulse-slow pointer-events-none z-0" />
 
       {/* Morphing organic blobs */}
-      <div className="absolute top-[8%] left-[10%] w-[250px] h-[250px] bg-gradient-to-br from-[#7C3AED]/6 to-[#1E90FF]/5 md:animate-morph pointer-events-none z-0 blur-[55px]" />
+      <div className="absolute top-[8%] left-[10%] w-[250px] h-[250px] bg-gradient-to-br from-[#7C3AED]/6 to-[#268bff]/5 md:animate-morph pointer-events-none z-0 blur-[55px]" />
       <div className="absolute bottom-[5%] right-[8%] w-[280px] h-[280px] bg-gradient-to-tr from-[#FF5C7A]/6 to-[#FFC107]/5 md:animate-morph pointer-events-none z-0 blur-[60px]" style={{ animationDelay: '-3s' }} />
       <div className="absolute top-[50%] left-[40%] w-[220px] h-[220px] bg-gradient-to-br from-[#00CDBA]/5 to-[#FFC107]/4 md:animate-morph pointer-events-none z-0 blur-[50px]" style={{ animationDelay: '-7s' }} />
 

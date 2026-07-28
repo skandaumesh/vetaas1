@@ -289,8 +289,8 @@ function ShareButton({ event, variant = "light" }: { event: any; variant?: "ligh
     >
       {copied ? (
         <>
-          <Check size={13} className="text-[#7ddfc3]" />
-          <span className="text-[10px] text-[#7ddfc3] uppercase tracking-wider font-bold">Copied</span>
+          <Check size={13} className="text-[#00cdba]" />
+          <span className="text-[10px] text-[#00cdba] uppercase tracking-wider font-bold">Copied</span>
         </>
       ) : (
         <>
@@ -375,14 +375,14 @@ function EventCard({
     >
       {/* Floating Highlight Badge */}
       {isHighlighted && (
-        <div className="absolute -top-3 -right-2 z-30 flex items-center gap-1.5 bg-[#ff7f68] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-lg shadow-[#ff7f68]/30 border-2 border-white animate-pulse">
+        <div className="absolute -top-3 -right-2 z-30 flex items-center gap-1.5 bg-[#ff5c7a] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-lg shadow-[#ff5c7a]/30 border-2 border-white animate-pulse">
           <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
           Selected Event
         </div>
       )}
       <div className={`group flex flex-col h-full p-5 rounded-3xl border transition-all duration-500 hover:-translate-y-1 hover:shadow-xl ${
         isHighlighted
-          ? "ring-4 ring-[#ff7f68] border-[#ff7f68] bg-gradient-to-br from-white to-[#ff7f68]/5 shadow-[0_15px_40px_rgba(255,127,104,0.3)]"
+          ? "ring-4 ring-[#ff5c7a] border-[#ff5c7a] bg-gradient-to-br from-white to-[#ff5c7a]/5 shadow-[0_15px_40px_rgba(255,127,104,0.3)]"
           : "border-[#00CDBA]/25 bg-gradient-to-br from-white to-[#00CDBA]/5 shadow-[0_4px_20px_rgba(54,186,152,0.03)] hover:border-[#00CDBA]/40"
       }`}>
         {/* Card Image */}
@@ -401,7 +401,7 @@ function EventCard({
         {/* Card Body */}
         <div className="flex gap-4 flex-1">
           {/* Left: Date Badge */}
-          <div className={`shrink-0 ${hasRange ? 'w-12 sm:w-14' : 'w-10'} text-center bg-gradient-to-br from-[#00CDBA] to-[#2a9d7e] rounded-xl py-2 flex flex-col justify-center h-fit select-none shadow-sm shadow-[#00CDBA]/10 group-hover:scale-105 transition-all duration-300`}>
+          <div className={`shrink-0 ${hasRange ? 'w-12 sm:w-14' : 'w-10'} text-center bg-gradient-to-br from-[#00CDBA] to-[#00cdba] rounded-xl py-2 flex flex-col justify-center h-fit select-none shadow-sm shadow-[#00CDBA]/10 group-hover:scale-105 transition-all duration-300`}>
             <span className={`font-headline font-bold text-white leading-none ${hasRange ? 'text-xs sm:text-sm' : 'text-lg sm:text-xl'}`}>{day}</span>
             <span className="text-[7px] font-black uppercase tracking-[0.05em] text-white/90 mt-1">{monthStr}</span>
             <span className="text-[6.5px] font-semibold text-white/75 mt-0.5">{yearStr}</span>
@@ -413,7 +413,7 @@ function EventCard({
               <span className={`inline-block text-[8px] font-black uppercase tracking-[0.2em] px-2.5 py-0.5 rounded-full ${
                 isCompleted
                   ? "bg-gray-100 text-gray-400"
-                  : "bg-[#00CDBA]/10 text-[#2a9d7e]"
+                  : "bg-[#00CDBA]/10 text-[#00cdba]"
               }`}>
                 {isCompleted ? "Completed" : "Upcoming"}
               </span>
@@ -562,14 +562,14 @@ function MemoryCard({
     >
       {/* Floating Highlight Badge */}
       {isHighlighted && (
-        <div className="absolute -top-3 -right-2 z-30 flex items-center gap-1.5 bg-[#ff7f68] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-lg shadow-[#ff7f68]/30 border-2 border-white animate-pulse">
+        <div className="absolute -top-3 -right-2 z-30 flex items-center gap-1.5 bg-[#ff5c7a] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-lg shadow-[#ff5c7a]/30 border-2 border-white animate-pulse">
           <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
           Selected Event
         </div>
       )}
       <div className={`group flex flex-col h-full p-5 rounded-3xl border transition-all duration-500 hover:-translate-y-1 hover:shadow-xl ${
         isHighlighted
-          ? "ring-4 ring-[#ff7f68] border-[#ff7f68] bg-gradient-to-br from-white to-[#ff7f68]/5 shadow-[0_15px_40px_rgba(255,127,104,0.3)]"
+          ? "ring-4 ring-[#ff5c7a] border-[#ff5c7a] bg-gradient-to-br from-white to-[#ff5c7a]/5 shadow-[0_15px_40px_rgba(255,127,104,0.3)]"
           : "border-gray-200/60 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-gray-300"
       }`}>
         {/* Card Image */}

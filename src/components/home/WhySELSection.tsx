@@ -18,7 +18,7 @@ export default function WhySELSection() {
     {
       pin: "/pin2.png",
       pinPosition: "left-6 md:left-8", 
-      color: "bg-[#1E90FF]", // Blue
+      color: "bg-[#268bff]", // Blue
       textColor: "text-white",
       rotation: "rotate-2 md:rotate-2",
       zIndex: 20,
@@ -28,7 +28,7 @@ export default function WhySELSection() {
     {
       pin: "/pin3.png",
       pinPosition: "left-1/2 -translate-x-1/2", 
-      color: "bg-[#ff7a43]", // Orange
+      color: "bg-[#ffc107]", // Orange
       textColor: "text-white",
       rotation: "-rotate-2 md:-rotate-2",
       zIndex: 30,
@@ -67,16 +67,16 @@ export default function WhySELSection() {
       <div className="absolute bottom-[10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-[#FFC107]/5 blur-[130px] md:animate-pulse-slow pointer-events-none z-0" />
 
       {/* Morphing organic blob — top right */}
-      <div className="absolute top-[5%] right-[5%] w-[280px] h-[280px] bg-gradient-to-br from-[#00CDBA]/8 to-[#1E90FF]/6 md:animate-morph pointer-events-none z-0 blur-[60px]" />
+      <div className="absolute top-[5%] right-[5%] w-[280px] h-[280px] bg-gradient-to-br from-[#00CDBA]/8 to-[#268bff]/6 md:animate-morph pointer-events-none z-0 blur-[60px]" />
       {/* Morphing organic blob — bottom left */}
-      <div className="absolute bottom-[8%] left-[3%] w-[320px] h-[320px] bg-gradient-to-tr from-[#FFC107]/8 to-[#ff7a43]/6 md:animate-morph pointer-events-none z-0 blur-[70px]" style={{ animationDelay: '-4s' }} />
+      <div className="absolute bottom-[8%] left-[3%] w-[320px] h-[320px] bg-gradient-to-tr from-[#FFC107]/8 to-[#ffc107]/6 md:animate-morph pointer-events-none z-0 blur-[70px]" style={{ animationDelay: '-4s' }} />
 
       {/* Drifting geometric ring accent — top left */}
       <div className="absolute top-[12%] left-[8%] w-[120px] h-[120px] rounded-full border-2 border-[#00CDBA]/10 md:animate-drift pointer-events-none z-0" />
       {/* Drifting geometric ring accent — bottom right */}
       <div className="absolute bottom-[15%] right-[10%] w-[90px] h-[90px] rounded-full border-2 border-[#FFC107]/12 md:animate-drift-reverse pointer-events-none z-0" />
       {/* Small orbiting dot */}
-      <div className="absolute top-[30%] right-[20%] w-[10px] h-[10px] rounded-full bg-[#1E90FF]/15 md:animate-orbit pointer-events-none z-0" />
+      <div className="absolute top-[30%] right-[20%] w-[10px] h-[10px] rounded-full bg-[#268bff]/15 md:animate-orbit pointer-events-none z-0" />
 
       {/* Layered SVG journey lines */}
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -100,7 +100,7 @@ export default function WhySELSection() {
           {/* Thin accent curve */}
           <path 
             d="M-50,500 C200,350 500,600 800,400 C1100,250 1300,500 1500,420" 
-            stroke="#1E90FF" 
+            stroke="#268bff" 
             strokeWidth="1.5" 
             strokeLinecap="round" 
             strokeDasharray="12 8"
@@ -109,7 +109,7 @@ export default function WhySELSection() {
           {/* Decorative circles */}
           <circle cx="200" cy="150" r="60" stroke="#00CDBA" strokeWidth="1" opacity="0.05" />
           <circle cx="1200" cy="700" r="80" stroke="#FFC107" strokeWidth="1" opacity="0.05" />
-          <circle cx="700" cy="100" r="35" stroke="#ff7a43" strokeWidth="1.5" opacity="0.06" />
+          <circle cx="700" cy="100" r="35" stroke="#ffc107" strokeWidth="1.5" opacity="0.06" />
         </svg>
       </div>
 
@@ -123,7 +123,7 @@ export default function WhySELSection() {
           transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto mb-16"
         >
-          <div className="inline-flex items-center justify-center bg-[#1E90FF] text-white px-4 py-1.5 rounded-full mb-4 shadow-sm rotate-1">
+          <div className="inline-flex items-center justify-center bg-[#268bff] text-white px-4 py-1.5 rounded-full mb-4 shadow-sm rotate-1">
             <span className="text-xs font-semibold uppercase tracking-wider">Why Social Emotional Learning?</span>
           </div>
           
@@ -141,21 +141,21 @@ export default function WhySELSection() {
           
           {/* Mobile-only decorative connector line running behind cards */}
           <div className="absolute left-1/2 top-0 bottom-0 w-[3px] -translate-x-1/2 md:hidden z-0 overflow-hidden">
-            <div className="w-full h-full bg-gradient-to-b from-[#00CDBA]/15 via-[#1E90FF]/12 to-[#FFC107]/15 rounded-full" />
+            <div className="w-full h-full bg-gradient-to-b from-[#00CDBA]/15 via-[#268bff]/12 to-[#FFC107]/15 rounded-full" />
           </div>
 
           {/* Mobile-only floating accents scattered between card positions (stationary on mobile for performance) */}
           <div className="absolute left-[10%] top-[12%] w-[40px] h-[40px] rounded-full border-2 border-[#00CDBA]/15 pointer-events-none z-[1] md:hidden" />
-          <div className="absolute right-[8%] top-[25%] w-[28px] h-[28px] rounded-full bg-gradient-to-br from-[#1E90FF]/12 to-[#00CDBA]/8 pointer-events-none z-[1] md:hidden" />
-          <div className="absolute left-[5%] top-[40%] w-[22px] h-[22px] rounded-full border border-[#ff7a43]/15 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute right-[8%] top-[25%] w-[28px] h-[28px] rounded-full bg-gradient-to-br from-[#268bff]/12 to-[#00CDBA]/8 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute left-[5%] top-[40%] w-[22px] h-[22px] rounded-full border border-[#ffc107]/15 pointer-events-none z-[1] md:hidden" />
           <div className="absolute right-[12%] top-[55%] w-[35px] h-[35px] rounded-full border-2 border-[#FFC107]/15 pointer-events-none z-[1] md:hidden" />
-          <div className="absolute left-[8%] top-[70%] w-[18px] h-[18px] rounded-full bg-gradient-to-br from-[#ff7a43]/10 to-[#FF5C7A]/8 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute left-[8%] top-[70%] w-[18px] h-[18px] rounded-full bg-gradient-to-br from-[#ffc107]/10 to-[#FF5C7A]/8 pointer-events-none z-[1] md:hidden" />
           <div className="absolute right-[6%] top-[85%] w-[30px] h-[30px] rounded-full border border-[#7C3AED]/12 pointer-events-none z-[1] md:hidden" />
 
           {/* Mobile-only small dots — scattered like confetti (stationary on mobile for performance) */}
           <div className="absolute left-[18%] top-[8%] w-[8px] h-[8px] rounded-full bg-[#00CDBA]/20 pointer-events-none z-[1] md:hidden" />
-          <div className="absolute right-[20%] top-[18%] w-[6px] h-[6px] rounded-full bg-[#1E90FF]/18 pointer-events-none z-[1] md:hidden" />
-          <div className="absolute left-[15%] top-[35%] w-[10px] h-[10px] rounded-full bg-[#ff7a43]/15 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute right-[20%] top-[18%] w-[6px] h-[6px] rounded-full bg-[#268bff]/18 pointer-events-none z-[1] md:hidden" />
+          <div className="absolute left-[15%] top-[35%] w-[10px] h-[10px] rounded-full bg-[#ffc107]/15 pointer-events-none z-[1] md:hidden" />
           <div className="absolute right-[15%] top-[48%] w-[7px] h-[7px] rounded-full bg-[#FFC107]/20 pointer-events-none z-[1] md:hidden" />
           <div className="absolute left-[20%] top-[62%] w-[9px] h-[9px] rounded-full bg-[#7C3AED]/15 pointer-events-none z-[1] md:hidden" />
           <div className="absolute right-[18%] top-[78%] w-[8px] h-[8px] rounded-full bg-[#00CDBA]/18 pointer-events-none z-[1] md:hidden" />
@@ -163,12 +163,12 @@ export default function WhySELSection() {
           {/* Mobile SVG curves between cards */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-[1] md:hidden" preserveAspectRatio="none" viewBox="0 0 400 1200" fill="none">
             <path d="M50,100 C150,180 300,120 350,200" stroke="#00CDBA" strokeWidth="1.5" strokeLinecap="round" opacity="0.1" />
-            <path d="M350,300 C250,380 100,320 50,400" stroke="#1E90FF" strokeWidth="1.5" strokeLinecap="round" opacity="0.08" />
-            <path d="M50,500 C150,580 300,520 350,600" stroke="#ff7a43" strokeWidth="1.5" strokeLinecap="round" opacity="0.1" />
+            <path d="M350,300 C250,380 100,320 50,400" stroke="#268bff" strokeWidth="1.5" strokeLinecap="round" opacity="0.08" />
+            <path d="M50,500 C150,580 300,520 350,600" stroke="#ffc107" strokeWidth="1.5" strokeLinecap="round" opacity="0.1" />
             <path d="M350,700 C250,780 100,720 50,800" stroke="#FFC107" strokeWidth="1.5" strokeLinecap="round" opacity="0.1" />
             <path d="M50,900 C150,980 300,920 350,1000" stroke="#7C3AED" strokeWidth="1.5" strokeLinecap="round" opacity="0.08" />
-            <circle cx="80" cy="250" r="20" stroke="#1E90FF" strokeWidth="1" opacity="0.06" />
-            <circle cx="320" cy="450" r="25" stroke="#ff7a43" strokeWidth="1" opacity="0.06" />
+            <circle cx="80" cy="250" r="20" stroke="#268bff" strokeWidth="1" opacity="0.06" />
+            <circle cx="320" cy="450" r="25" stroke="#ffc107" strokeWidth="1" opacity="0.06" />
             <circle cx="100" cy="650" r="18" stroke="#FFC107" strokeWidth="1" opacity="0.07" />
             <circle cx="300" cy="850" r="22" stroke="#00CDBA" strokeWidth="1" opacity="0.06" />
           </svg>

@@ -38,7 +38,7 @@ const SECTIONS = [
     id: 'social-awareness',
     title: 'Social Awareness',
     description: 'Empathy, listening, kindness, and respecting others.',
-    color: '#1E90FF', // Sky Blue
+    color: '#268bff', // Sky Blue
     icon: <CheckCircle2 className="w-6 h-6 text-white" />,
     questions: [
       { id: 'q9', text: 'Notices when someone else is upset.' },
@@ -160,7 +160,7 @@ export default function SelAssessment() {
     <div className="relative w-full flex flex-col items-center justify-start py-12 px-4 bg-[#FAFAFA] font-[family-name:var(--font-poppins)] overflow-hidden min-h-[80vh]">
       
       {/* Minimalist soft glow */}
-      <div className="absolute top-[20%] left-[10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tr from-[#1E90FF]/5 to-[#00CDBA]/5 blur-[100px] pointer-events-none z-0"></div>
+      <div className="absolute top-[20%] left-[10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-tr from-[#268bff]/5 to-[#00CDBA]/5 blur-[100px] pointer-events-none z-0"></div>
       <div className="absolute bottom-[10%] right-[5%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-gradient-to-bl from-[#FF5C7A]/5 to-[#FFC107]/5 blur-[120px] pointer-events-none z-0"></div>
       
       {currentStep > -1 && currentStep < 6 && renderProgressBar()}

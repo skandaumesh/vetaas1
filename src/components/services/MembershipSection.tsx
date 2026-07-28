@@ -39,8 +39,10 @@ type Plan = {
   tagline: string;
   price: number;
   siblingDiscount: number; // fraction off each additional membership
-  accent: string;
-  headerText: string;
+  accent: string; // soft card background
+  headerText: string; // label + price colour
+  buttonBg: string; // button background (palette colour)
+  buttonText: string; // readable text on the button
   features: { label: string; included: boolean }[];
 };
 
@@ -52,8 +54,10 @@ const PLANS: Plan[] = [
     price: 2999,
 
     siblingDiscount: 0.05,
-    accent: "#fbf3e4",
-    headerText: "#d97706",
+    accent: "#fff8e6",
+    headerText: "#ffc107",
+    buttonBg: "#ffc107",
+    buttonText: "#111827",
     features: [
       { label: "7 flexible workshops / month", included: true },
       { label: "Recommended usage: 1–2 visits per week", included: true },
@@ -71,8 +75,10 @@ const PLANS: Plan[] = [
     price: 5999,
 
     siblingDiscount: 0.1,
-    accent: "#fdecef",
-    headerText: "#e23d6d",
+    accent: "#fff0f2",
+    headerText: "#ff5c7a",
+    buttonBg: "#ff5c7a",
+    buttonText: "#ffffff",
     features: [
       { label: "14 flexible workshops / month", included: true },
       { label: "Recommended usage: 3 visits per week", included: true },
@@ -90,8 +96,10 @@ const PLANS: Plan[] = [
     price: 9999,
 
     siblingDiscount: 0.2,
-    accent: "#eaf2fb",
-    headerText: "#2563eb",
+    accent: "#eaf3ff",
+    headerText: "#268bff",
+    buttonBg: "#268bff",
+    buttonText: "#ffffff",
     features: [
       { label: "All Children, Parent and/or Family workshops", included: true },
       { label: "Attend as often as your schedule allows", included: true },
@@ -299,7 +307,7 @@ NEST MEMBERSHIP GUIDE
           transition={{ duration: 0.7, delay: 0.1 }}
           className="text-3xl md:text-4xl lg:text-5xl font-extrabold font-headline text-[#111827] tracking-tight mb-6"
         >
-          Membership <span className="inline-block bg-[#38d38b] text-white px-5 py-1 rounded-2xl -rotate-1 shadow-sm font-semibold">Plans.</span>
+          Membership <span className="inline-block bg-[#00cdba] text-white px-5 py-1 rounded-2xl -rotate-1 shadow-sm font-semibold">Plans.</span>
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -366,8 +374,8 @@ NEST MEMBERSHIP GUIDE
 
             <button
               onClick={() => addToCart(plan.id)}
-              style={{ backgroundColor: plan.headerText }}
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 text-white font-bold text-sm rounded-full hover:brightness-110 hover:scale-[1.02] transition-all shadow-md cursor-pointer"
+              style={{ backgroundColor: plan.buttonBg, color: plan.buttonText }}
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 font-bold text-sm rounded-full hover:brightness-105 hover:scale-[1.02] transition-all shadow-md cursor-pointer"
             >
               <ShoppingCart size={16} />
               Choose {plan.name}
@@ -457,7 +465,7 @@ NEST MEMBERSHIP GUIDE
               <div className="p-6 space-y-4">
                 {submitted && (
                   <div className="text-center mt-12 px-4">
-                    <CheckCircle2 size={48} className="text-[#38d38b] mx-auto mb-4" />
+                    <CheckCircle2 size={48} className="text-[#00cdba] mx-auto mb-4" />
                     <p className="font-extrabold text-[#111827] text-lg mb-2">Order received!</p>
                     <p className="text-gray-500 font-medium text-sm leading-relaxed">
                       We&apos;ve got your payment details. We&apos;ll verify the payment and email
@@ -558,7 +566,7 @@ NEST MEMBERSHIP GUIDE
                         {/* Mobile: open the UPI app directly — you can't scan your own screen */}
                         <a
                           href={upiUri}
-                          className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#5f259f] text-white font-bold text-sm rounded-full hover:brightness-110 transition-all md:hidden"
+                          className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#7c3aed] text-white font-bold text-sm rounded-full hover:brightness-110 transition-all md:hidden"
                         >
                           Open UPI app to pay
                           <ArrowRight size={16} />
@@ -574,7 +582,7 @@ NEST MEMBERSHIP GUIDE
                         >
                           {upiCopied ? (
                             <>
-                              <Check size={13} className="text-[#38d38b]" /> UPI ID copied!
+                              <Check size={13} className="text-[#00cdba]" /> UPI ID copied!
                             </>
                           ) : (
                             <>or pay to UPI ID: <span className="font-extrabold text-gray-700">{UPI!.id}</span> (tap to copy)</>

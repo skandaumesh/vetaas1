@@ -30,7 +30,7 @@ export default function AboutHero() {
         <motion.div
           animate={{ y: [0, 15, 0], rotate: [0, -10, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute right-[8%] top-[18%] text-[#ff7a43] opacity-65"
+          className="absolute right-[8%] top-[18%] text-[#ffc107] opacity-65"
         >
           <Heart size={32} fill="currentColor" />
         </motion.div>
@@ -44,7 +44,7 @@ export default function AboutHero() {
         <motion.div
           animate={{ y: [0, 12, 0], rotate: [0, -4, 0] }}
           transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute right-[5%] bottom-[20%] text-[#1E90FF] opacity-80"
+          className="absolute right-[5%] bottom-[20%] text-[#268bff] opacity-80"
         >
           <Smile size={36} />
         </motion.div>
@@ -98,7 +98,7 @@ export default function AboutHero() {
           >
             <a 
               href="#formula-section"
-              className="inline-flex items-center gap-2 bg-[#00CDBA] hover:bg-[#2da182] text-white font-semibold text-sm px-8 py-4 rounded-full hover:scale-105 transition-all shadow-md active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 bg-[#00CDBA] hover:bg-[#00cdba] text-white font-semibold text-sm px-8 py-4 rounded-full hover:scale-105 transition-all shadow-md active:scale-95 cursor-pointer"
             >
               Explore Our Story <ArrowRight size={16} />
             </a>
@@ -115,7 +115,7 @@ export default function AboutHero() {
             className="relative w-full max-w-[400px] lg:max-w-[450px] aspect-square flex items-center justify-center"
           >
             {/* Background glowing gradients */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#00CDBA]/10 via-[#eff6ff]/10 to-[#ff7a43]/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#00CDBA]/10 via-[#eff6ff]/10 to-[#ffc107]/5 rounded-full blur-2xl pointer-events-none" />
             
             {/* Floating illustration container */}
             <motion.div

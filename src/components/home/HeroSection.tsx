@@ -95,7 +95,7 @@ export default function HeroSection() {
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto z-20">
-            <Link href="/children" className="w-full sm:w-auto bg-[#00CDBA] text-white font-semibold text-sm px-8 py-4 rounded-full flex items-center justify-center gap-2 hover:bg-[#2fa385] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+            <Link href="/children" className="w-full sm:w-auto bg-[#00CDBA] text-white font-semibold text-sm px-8 py-4 rounded-full flex items-center justify-center gap-2 hover:bg-[#00cdba] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
               SEL for Children <Sparkles size={16} fill="currentColor" />
             </Link>
             <Link href="/teachers" className="w-full sm:w-auto bg-[#7C3AED] text-white font-semibold text-sm px-8 py-4 rounded-full flex items-center justify-center gap-2 hover:bg-[#153a7a] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
