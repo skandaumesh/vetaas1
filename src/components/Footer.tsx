@@ -71,8 +71,8 @@ export default function Footer() {
                 <div className="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-[#7C3AED]">
                   <Mail size={16} />
                 </div>
-                <a href="mailto:kirti.vetaas@gmail.com" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold break-all">
-                  kirti.vetaas@gmail.com
+                <a href="mailto:kirti@vetaas.in" className="text-gray-700 hover:text-[#111827] transition-colors font-semibold break-all">
+                  kirti@vetaas.in
                 </a>
               </li>
               <li className="flex items-center gap-3">

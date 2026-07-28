@@ -37,9 +37,9 @@ export default function WhySELSection() {
     },
     {
       pin: "/pin4.png",
-      pinPosition: "left-6 md:left-8", 
-      color: "bg-[#FFC107]", // Yellow
-      textColor: "text-black",
+      pinPosition: "left-6 md:left-8",
+      color: "bg-[#FF5C7A]", // Pink
+      textColor: "text-white",
       rotation: "rotate-3 md:rotate-4",
       zIndex: 40,
       title: "Relationships",

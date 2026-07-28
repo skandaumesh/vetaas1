@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Link from "next/link";
@@ -103,11 +103,6 @@ export default function EventBanner() {
   useEffect(() => {
     if (event && !dismissed) initLumaCheckout();
   }, [event, dismissed]);
-
-  const dots = useMemo(
-    () => Array.from({ length: events.length }, (_, i) => i),
-    [events.length]
-  );
 
   const go = (dir: number) =>
     setIndex((i) => (i + dir + events.length) % events.length);
@@ -212,22 +207,6 @@ export default function EventBanner() {
                 >
                   <ChevronRight size={16} />
                 </button>
-              )}
-
-              {/* Dots (multi-event only) */}
-              {events.length > 1 && (
-                <div className="flex items-center gap-1.5 shrink-0 ml-1">
-                  {dots.map((i) => (
-                    <button
-                      key={i}
-                      onClick={() => setIndex(i)}
-                      aria-label={`Show event ${i + 1}`}
-                      className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                        i === safeIndex ? "w-4 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
-                      }`}
-                    />
-                  ))}
-                </div>
               )}
 
               {/* Dismiss */}

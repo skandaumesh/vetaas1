@@ -89,20 +89,22 @@ export default function HeroSection() {
             </span>
           </motion.div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-[2.5rem] font-bold font-headline leading-[1.3] text-[#FF5C7A] tracking-tight mb-8 max-w-2xl">
-            Enriching early childhood education by bringing Social Emotional Learning (SEL) research to classrooms.
+          <h1 className="text-2xl sm:text-3xl lg:text-[1.8rem] xl:text-[2rem] font-extrabold leading-[1.4] text-[#FF5C7A] tracking-tight mb-8 max-w-xl" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
+            Enriching early childhood education by bringing{" "}
+            <span className="text-[#1a2d4c]">Social Emotional Learning (SEL)</span>{" "}
+            research to classrooms.
           </h1>
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto z-20">
-            <Link href="/children" className="w-full sm:w-auto bg-[#00CDBA] text-white font-semibold text-sm px-8 py-4 rounded-full flex items-center justify-center gap-2 hover:bg-[#00cdba] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
-              SEL for Children <Sparkles size={16} fill="currentColor" />
+            <Link href="/children" className="w-full sm:w-auto whitespace-nowrap bg-[#00CDBA] text-white font-semibold text-sm px-5 py-2.5 rounded-full flex items-center justify-center gap-2 hover:brightness-105 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+              SEL for Children <Sparkles size={15} fill="currentColor" />
             </Link>
-            <Link href="/teachers" className="w-full sm:w-auto bg-[#7C3AED] text-white font-semibold text-sm px-8 py-4 rounded-full flex items-center justify-center gap-2 hover:bg-[#153a7a] transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
-              SEL for Teachers <Zap size={16} fill="currentColor" />
+            <Link href="/teachers" className="w-full sm:w-auto whitespace-nowrap bg-[#7C3AED] text-white font-semibold text-sm px-5 py-2.5 rounded-full flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+              SEL for Teachers <Zap size={15} fill="currentColor" />
             </Link>
-            <Link href="/parents" className="w-full sm:w-auto bg-white text-[#111827] font-semibold text-sm px-8 py-4 rounded-full border border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center justify-center gap-2">
-              SEL for Parents <Heart size={16} className="text-[#FF5C7A]" fill="currentColor" />
+            <Link href="/parents" className="w-full sm:w-auto whitespace-nowrap bg-white text-[#111827] font-semibold text-sm px-5 py-2.5 rounded-full border border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              SEL for Parents <Heart size={15} className="text-[#FF5C7A]" fill="currentColor" />
             </Link>
           </div>
 

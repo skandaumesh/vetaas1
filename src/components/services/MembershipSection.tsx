@@ -54,10 +54,10 @@ const PLANS: Plan[] = [
     price: 2999,
 
     siblingDiscount: 0.05,
-    accent: "#fff8e6",
-    headerText: "#ffc107",
-    buttonBg: "#ffc107",
-    buttonText: "#111827",
+    accent: "#e7faf6",
+    headerText: "#00cdba",
+    buttonBg: "#00cdba",
+    buttonText: "#ffffff",
     features: [
       { label: "7 flexible workshops / month", included: true },
       { label: "Recommended usage: 1–2 visits per week", included: true },
