@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Zap, Star, Heart, Sparkles, ArrowRight } from "lucide-react";
+import { Star, ArrowRight, Blocks, GraduationCap, HeartHandshake } from "lucide-react";
  
 export default function HeroSection() {
   return (
@@ -98,13 +98,13 @@ export default function HeroSection() {
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto z-20">
             <Link href="/children" className="w-full sm:w-auto whitespace-nowrap bg-[#00CDBA] text-white font-semibold text-sm px-5 py-2.5 rounded-full flex items-center justify-center gap-2 hover:brightness-105 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
-              SEL for Children <Sparkles size={15} fill="currentColor" />
+              SEL for Children <Blocks size={16} />
             </Link>
             <Link href="/teachers" className="w-full sm:w-auto whitespace-nowrap bg-[#7C3AED] text-white font-semibold text-sm px-5 py-2.5 rounded-full flex items-center justify-center gap-2 hover:brightness-110 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
-              SEL for Teachers <Zap size={15} fill="currentColor" />
+              SEL for Teachers <GraduationCap size={16} />
             </Link>
-            <Link href="/parents" className="w-full sm:w-auto whitespace-nowrap bg-white text-[#111827] font-semibold text-sm px-5 py-2.5 rounded-full border border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center justify-center gap-2">
-              SEL for Parents <Heart size={15} className="text-[#FF5C7A]" fill="currentColor" />
+            <Link href="/parents" className="w-full sm:w-auto whitespace-nowrap bg-[#FF5C7A] text-white font-semibold text-sm px-5 py-2.5 rounded-full flex items-center justify-center gap-2 hover:brightness-105 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
+              SEL for Parents <HeartHandshake size={16} />
             </Link>
           </div>
 
