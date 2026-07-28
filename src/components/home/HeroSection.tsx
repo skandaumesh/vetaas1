@@ -91,7 +91,7 @@ export default function HeroSection() {
 
           <h1 className="text-2xl sm:text-3xl lg:text-[1.8rem] xl:text-[2rem] font-extrabold leading-[1.4] text-[#FF5C7A] tracking-tight mb-8 max-w-xl" style={{ fontFamily: "var(--font-poppins), sans-serif" }}>
             Enriching early childhood education by bringing{" "}
-            <span className="text-[#1a2d4c]">Social Emotional Learning (SEL)</span>{" "}
+            <span className="text-[#7c3aed]">Social Emotional Learning (SEL)</span>{" "}
             research to classrooms.
           </h1>
 
