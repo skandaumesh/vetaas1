@@ -108,25 +108,36 @@ export default function HeroSection() {
             </Link>
           </div>
 
-          {/* Membership plans CTA */}
-          <div className="mt-5 z-20">
+          {/* Membership plans CTA — highlighted gradient pill */}
+          <motion.div
+            className="mt-6 z-20 rounded-full w-max"
+            animate={{
+              boxShadow: [
+                "0 6px 18px rgba(255,193,7,0.30)",
+                "0 8px 28px rgba(255,193,7,0.60)",
+                "0 6px 18px rgba(255,193,7,0.30)",
+              ],
+            }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          >
             <Link
               href="/services#membership"
-              className="group inline-flex items-center gap-3 bg-white pl-2 pr-5 py-2 rounded-full border border-[#7C3AED]/20 shadow-sm hover:shadow-md hover:border-[#7C3AED]/40 hover:-translate-y-0.5 transition-all"
+              className="group relative overflow-hidden inline-flex items-center gap-2.5 pl-2 pr-5 py-2 rounded-full text-[#111827] bg-gradient-to-r from-[#FFD54F] to-[#FFB300] hover:-translate-y-0.5 transition-transform"
             >
-              <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#7C3AED] text-white shadow-sm">
+              {/* shine sweep on hover */}
+              <span className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-white/40 blur-md -translate-x-full group-hover:translate-x-[500%] transition-transform duration-700" />
+              <span className="relative flex items-center justify-center w-9 h-9 rounded-full bg-black/10">
                 <Star size={16} fill="currentColor" />
               </span>
-              <span className="text-sm font-semibold text-[#111827]">
-                Explore our{" "}
-                <span className="text-[#7C3AED]">membership plans</span>
+              <span className="relative text-sm font-bold tracking-wide">
+                Explore our membership plans
               </span>
               <ArrowRight
-                size={16}
-                className="text-[#7C3AED] group-hover:translate-x-1 transition-transform"
+                size={17}
+                className="relative group-hover:translate-x-1 transition-transform"
               />
             </Link>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
 

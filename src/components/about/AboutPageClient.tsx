@@ -44,6 +44,21 @@ const TEAM = [
     linkedin: "https://www.linkedin.com/in/kirti-k-9a1729227/?originalSubdomain=in"
   },
   {
+    name: "Nhanthini S M",
+    initials: "NS",
+    role: "Head - SEL Programs and School Engagement",
+    bio: "As an Educational Psychologist and educator, I believe emotional safety is the foundation of meaningful learning. Through Vetaas, I weave together psychology and expressive arts to design experiential learning experiences that invite children, parents and educators to reflect, connect and grow—making social-emotional learning a way of life, not just something we teach.",
+    gradient: "from-[#7C3AED] to-[#7C3AED]",
+    borderColor: "border-[#7C3AED]",
+    textColor: "text-[#7C3AED]",
+    bgHover: "hover:bg-[#7C3AED]/5",
+    activeBg: "bg-[#f5f3ff]",
+    activeBorder: "border-[#7C3AED]/30",
+    image: "/Nhanthini.png",
+    roleTags: ["Educational Psychologist", "SEL Programs", "School Engagement"],
+    linkedin: "https://www.linkedin.com/in/nhanthini-muruganantham-307235154/"
+  },
+  {
     name: "Tanisha",
     initials: "T",
     role: "Social Media Head | OneZeroLabs",
@@ -624,14 +639,16 @@ export default function AboutPageClient() {
                           </p>
 
                           <div className="flex flex-wrap gap-4 md:gap-6 justify-center md:justify-start">
-                            <a
-                              href={member.linkedin}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`inline-flex items-center gap-2 font-bold text-xs uppercase tracking-wider ${member.textColor} hover:gap-3 transition-all pb-1 border-b-2 border-transparent hover:border-current`}
-                            >
-                              Let&apos;s Connect <LinkedinIcon size={14} />
-                            </a>
+                            {member.linkedin && (
+                              <a
+                                href={member.linkedin}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`inline-flex items-center gap-2 font-bold text-xs uppercase tracking-wider ${member.textColor} hover:gap-3 transition-all pb-1 border-b-2 border-transparent hover:border-current`}
+                              >
+                                Let&apos;s Connect <LinkedinIcon size={14} />
+                              </a>
+                            )}
 
                             {member.website && (
                               <a
