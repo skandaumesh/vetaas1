@@ -1,12 +1,13 @@
-import SelAssessment from "@/components/products/SelAssessment";
+import QuizzesSection from "@/components/products/QuizzesSection";
 
 export const metadata = {
-  title: "SEL Assessment",
-  description: "Understanding your child beyond academics with the Vetaas SEL Assessment Game — a playful way to measure social and emotional growth.",
+  title: "Self-Assessments",
+  description:
+    "Short, reflective self-assessments for parents and children from Vetaas — explore your child's social-emotional skills or reflect on your own parenting.",
   alternates: { canonical: "/products" },
   openGraph: {
-    title: "SEL Assessment | Vetaas Education Foundation",
-    description: "Understanding your child beyond academics with our SEL Assessment Game.",
+    title: "Self-Assessments | Vetaas Education Foundation",
+    description: "Reflective self-assessments for parents and children.",
     url: "/products",
     type: "website",
   },
@@ -14,8 +15,8 @@ export const metadata = {
 
 export default function ProductsPage() {
   return (
-    <main className="min-h-screen bg-blue-50 py-12">
-      <SelAssessment />
+    <main className="min-h-screen bg-white">
+      <QuizzesSection />
     </main>
   );
 }
