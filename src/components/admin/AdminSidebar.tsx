@@ -6,10 +6,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { Calendar, ExternalLink, LogOut, Users } from "lucide-react";
+import { Calendar, ClipboardList, ExternalLink, LogOut, Send, Users } from "lucide-react";
 
 const NAV = [
   { href: "/admin/memberships", label: "Memberships", icon: Users },
+  { href: "/admin/quizzes", label: "Quizzes", icon: ClipboardList },
+  { href: "/admin/broadcast", label: "Broadcast", icon: Send },
   { href: "/admin/events", label: "Events", icon: Calendar },
 ];
 

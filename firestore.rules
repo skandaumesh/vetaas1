@@ -34,6 +34,27 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Quiz submissions: a visitor may only file a new, well-formed result;
+    // a Cloud Function emails the score. Only an admin can read them back.
+    match /quizSubmissions/{subId} {
+      allow create: if request.auth != null
+        && request.resource.data.quizId is string
+        && request.resource.data.quizId.size() < 60
+        && request.resource.data.quizName is string
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() < 120
+        && request.resource.data.email is string
+        && request.resource.data.email.matches('.+@.+[.].+')
+        && request.resource.data.email.size() < 200
+        && request.resource.data.percentage is number
+        && request.resource.data.percentage >= 0
+        && request.resource.data.percentage <= 100
+        && request.resource.data.answers is list
+        && request.resource.data.answers.size() <= 40;
+      allow read, update, delete: if isAdmin();
+    }
+
     // Email queue: only an admin can enqueue; the sending Cloud Function uses
     // the Admin SDK and bypasses these rules
     match /mail/{mailId} {

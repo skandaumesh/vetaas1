@@ -341,6 +341,19 @@ export default function AdminEventsPage() {
   };
 
   // Automated status update handles completion status based on current date
+  const isEventPast = (event: any) => {
+    if (!event.date) return true;
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const checkDate = event.endDate || event.date;
+      const eventDate = new Date(checkDate);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate < today;
+    } catch {
+      return false;
+    }
+  };
 
   const handleUpdateHighlights = async (id: string, highlightsUrl: string) => {
     try {
@@ -352,6 +365,147 @@ export default function AdminEventsPage() {
       showToast("Failed to update highlights URL.", "error");
     }
   };
+
+  const renderCard = (event: any) => {
+    const computedStatus = isEventPast(event) ? "completed" : "upcoming";
+    return (
+      <div
+        key={event.id}
+        className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all duration-300 relative overflow-hidden flex flex-col gap-4 group"
+      >
+        <div className="flex gap-4 items-start">
+          {event.image ? (
+            <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-100">
+              <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="w-16 h-16 rounded-xl bg-gray-50 border border-slate-100 flex items-center justify-center text-gray-400 shrink-0">
+              <Calendar size={20} className="text-gray-300" />
+            </div>
+          )}
+
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2 mb-1.5">
+              <h3 className="font-bold text-gray-900 text-base truncate flex-1 min-w-[120px]">
+                {event.title}
+              </h3>
+              <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-full leading-none shrink-0 ${
+                computedStatus === 'completed'
+                  ? 'bg-gray-100 text-gray-500'
+                  : 'bg-green-100 text-green-700'
+              }`}>
+                {computedStatus}
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-1 text-[11px] text-gray-500 font-medium">
+              <span className="flex items-center gap-1.5">
+                <Calendar size={11} className="text-gray-400 shrink-0" />
+                <span>{event.date}{event.endDate ? ` - ${event.endDate}` : ""}</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <MapPin size={11} className="text-gray-400 shrink-0" />
+                <span className="truncate">{event.location}</span>
+              </span>
+              {event.registrationUrl && (
+                <span className="flex items-center gap-1.5 text-blue-500">
+                  <Link2 size={11} className="text-blue-400 shrink-0" />
+                  <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer" className="truncate hover:underline">
+                    {event.registrationUrl}
+                  </a>
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Highlights / Reel Management block */}
+        {computedStatus === "completed" && (
+          <div className="mt-1 border-t border-gray-100 pt-3">
+            {event.highlightsUrl && editingHighlightsId !== event.id ? (
+              <div className="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3">
+                <div className="flex-1 min-w-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-0.5">Highlights Reel / Link</span>
+                  <a
+                    href={event.highlightsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#7C3AED] hover:underline font-semibold truncate block"
+                  >
+                    {event.highlightsUrl}
+                  </a>
+                </div>
+                <button
+                  onClick={() => setEditingHighlightsId(event.id)}
+                  className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-white border border-gray-200 hover:bg-gray-100 text-gray-600 rounded-lg transition cursor-pointer shrink-0"
+                >
+                  <Edit2 size={10} /> Edit
+                </button>
+              </div>
+            ) : (
+              <div className="bg-[#faf9f7] border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-2">
+                <span className="text-[9px] font-black uppercase tracking-wider text-gray-500 block">Reel / Highlights URL</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="url"
+                    placeholder="Instagram Reel or YouTube Link"
+                    defaultValue={event.highlightsUrl || ""}
+                    id={`highlights-input-${event.id}`}
+                    className="flex-1 text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] outline-none bg-white"
+                  />
+                  <div className="flex gap-1 shrink-0">
+                    <button
+                      onClick={async () => {
+                        const val = (document.getElementById(`highlights-input-${event.id}`) as HTMLInputElement)?.value || "";
+                        await handleUpdateHighlights(event.id, val);
+                        setEditingHighlightsId(null);
+                      }}
+                      className="text-[10px] font-black uppercase tracking-widest px-3 py-2 bg-[#00CDBA] hover:bg-[#00b0a0] text-white rounded-xl transition cursor-pointer"
+                    >
+                      Save
+                    </button>
+                    {event.highlightsUrl && (
+                      <button
+                        onClick={() => setEditingHighlightsId(null)}
+                        className="text-[10px] font-black uppercase tracking-widest px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl transition cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Actions row */}
+        <div className="flex justify-end gap-2 border-t border-slate-100/80 pt-3 pr-2 pl-2">
+          <div className="flex items-center gap-2 mt-4 ml-auto">
+            <button
+              onClick={() => handleEditClick(event)}
+              className="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-500 rounded-xl transition duration-200 shadow-sm flex items-center justify-center cursor-pointer"
+              title="Edit Event"
+            >
+              <Edit2 size={16} />
+            </button>
+            <button
+              onClick={() => handleDeleteClick(event.id)}
+              className="p-2.5 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-xl transition duration-200 shadow-sm flex items-center justify-center cursor-pointer"
+              title="Delete Event"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const upcomingEvents = events
+    .filter((e) => !isEventPast(e))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const completedEvents = events.filter((e) => isEventPast(e));
 
   // Authenticated Admin Panel
   return (
@@ -693,156 +847,42 @@ export default function AdminEventsPage() {
                 No events yet. Click &quot;Add Event&quot; to create your first one.
               </p>
             ) : (
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 font-body items-start">
-                {events.map((event) => {
-                  const isPast = (() => {
-                    if (!event.date) return true;
-                    try {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      const checkDate = event.endDate || event.date;
-                      const eventDate = new Date(checkDate);
-                      eventDate.setHours(0, 0, 0, 0);
-                      return eventDate < today;
-                    } catch {
-                      return false;
-                    }
-                  })();
-                  const computedStatus = isPast ? "completed" : "upcoming";
-
-                  return (
-                    <div
-                      key={event.id}
-                      className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all duration-300 relative overflow-hidden flex flex-col gap-4 group"
-                    >
-                      <div className="flex gap-4 items-start">
-                        {event.image ? (
-                          <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-100">
-                            <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
-                          </div>
-                        ) : (
-                          <div className="w-16 h-16 rounded-xl bg-gray-50 border border-slate-100 flex items-center justify-center text-gray-400 shrink-0">
-                            <Calendar size={20} className="text-gray-300" />
-                          </div>
-                        )}
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                            <h3 className="font-bold text-gray-900 text-base truncate flex-1 min-w-[120px]">
-                              {event.title}
-                            </h3>
-                            <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-full leading-none shrink-0 ${
-                              computedStatus === 'completed'
-                                ? 'bg-gray-100 text-gray-500'
-                                : 'bg-green-100 text-green-700'
-                            }`}>
-                              {computedStatus}
-                            </span>
-                          </div>
-                          
-                          <div className="flex flex-col gap-1 text-[11px] text-gray-500 font-medium">
-                            <span className="flex items-center gap-1.5">
-                              <Calendar size={11} className="text-gray-400 shrink-0" />
-                              <span>{event.date}{event.endDate ? ` - ${event.endDate}` : ""}</span>
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                              <MapPin size={11} className="text-gray-400 shrink-0" />
-                              <span className="truncate">{event.location}</span>
-                            </span>
-                            {event.registrationUrl && (
-                              <span className="flex items-center gap-1.5 text-blue-500">
-                                <Link2 size={11} className="text-blue-400 shrink-0" />
-                                <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer" className="truncate hover:underline">
-                                  {event.registrationUrl}
-                                </a>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Highlights / Reel Management block */}
-                      {computedStatus === "completed" && (
-                        <div className="mt-1 border-t border-gray-100 pt-3">
-                          {event.highlightsUrl && editingHighlightsId !== event.id ? (
-                            <div className="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3">
-                              <div className="flex-1 min-w-0">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 block mb-0.5">Highlights Reel / Link</span>
-                                <a
-                                  href={event.highlightsUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xs text-[#7C3AED] hover:underline font-semibold truncate block"
-                                >
-                                  {event.highlightsUrl}
-                                </a>
-                              </div>
-                              <button
-                                onClick={() => setEditingHighlightsId(event.id)}
-                                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-white border border-gray-200 hover:bg-gray-100 text-gray-600 rounded-lg transition cursor-pointer shrink-0"
-                              >
-                                <Edit2 size={10} /> Edit
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="bg-[#faf9f7] border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-2">
-                              <span className="text-[9px] font-black uppercase tracking-wider text-gray-500 block">Reel / Highlights URL</span>
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="url"
-                                  placeholder="Instagram Reel or YouTube Link"
-                                  defaultValue={event.highlightsUrl || ""}
-                                  id={`highlights-input-${event.id}`}
-                                  className="flex-1 text-xs px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] outline-none bg-white"
-                                />
-                                <div className="flex gap-1 shrink-0">
-                                  <button
-                                    onClick={async () => {
-                                      const val = (document.getElementById(`highlights-input-${event.id}`) as HTMLInputElement)?.value || "";
-                                      await handleUpdateHighlights(event.id, val);
-                                      setEditingHighlightsId(null);
-                                    }}
-                                    className="text-[10px] font-black uppercase tracking-widest px-3 py-2 bg-[#00CDBA] hover:bg-[#00b0a0] text-white rounded-xl transition cursor-pointer"
-                                  >
-                                    Save
-                                  </button>
-                                  {event.highlightsUrl && (
-                                    <button
-                                      onClick={() => setEditingHighlightsId(null)}
-                                      className="text-[10px] font-black uppercase tracking-widest px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl transition cursor-pointer"
-                                    >
-                                      Cancel
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Actions row */}
-                      <div className="flex justify-end gap-2 border-t border-slate-100/80 pt-3 pr-2 pl-2">
-                          <div className="flex items-center gap-2 mt-4 ml-auto">
-                            <button
-                              onClick={() => handleEditClick(event)}
-                              className="p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-500 rounded-xl transition duration-200 shadow-sm flex items-center justify-center cursor-pointer"
-                              title="Edit Event"
-                            >
-                              <Edit2 size={16} />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(event.id)}
-                              className="p-2.5 bg-rose-50 hover:bg-rose-100 text-rose-500 rounded-xl transition duration-200 shadow-sm flex items-center justify-center cursor-pointer"
-                              title="Delete Event"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                      </div>
+              <div className="space-y-10">
+                {/* Upcoming events — first section */}
+                <section>
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="w-2 h-2 rounded-full bg-green-500" />
+                    <h3 className="text-sm font-extrabold uppercase tracking-wider text-gray-500">
+                      Upcoming
+                    </h3>
+                    <span className="text-xs font-bold text-gray-400">{upcomingEvents.length}</span>
+                  </div>
+                  {upcomingEvents.length === 0 ? (
+                    <p className="text-gray-400 font-body py-6 text-center bg-white rounded-2xl border border-dashed border-gray-200 text-sm">
+                      No upcoming events. Click &quot;Add Event&quot; to schedule one.
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 font-body items-start">
+                      {upcomingEvents.map(renderCard)}
                     </div>
-                  );
-                })}
+                  )}
+                </section>
+
+                {/* Completed events — second section */}
+                {completedEvents.length > 0 && (
+                  <section>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="w-2 h-2 rounded-full bg-gray-400" />
+                      <h3 className="text-sm font-extrabold uppercase tracking-wider text-gray-500">
+                        Completed
+                      </h3>
+                      <span className="text-xs font-bold text-gray-400">{completedEvents.length}</span>
+                    </div>
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 font-body items-start">
+                      {completedEvents.map(renderCard)}
+                    </div>
+                  </section>
+                )}
               </div>
             )}
         </div>

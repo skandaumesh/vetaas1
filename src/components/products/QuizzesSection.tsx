@@ -12,7 +12,7 @@ const QUIZZES = [
     href: "/products/sel-assessment",
     accent: "#7C3AED",
     tint: "#f5f3ff",
-    tag: "For Parents · ~5 min",
+    tag: "For Parents · ~2 min",
     icon: Sparkles,
   },
   {
@@ -22,7 +22,7 @@ const QUIZZES = [
     href: "/products/parent-reflection",
     accent: "#FF5C7A",
     tint: "#fff0f2",
-    tag: "For Parents · ~7 min",
+    tag: "For Parents · ~2 min",
     icon: Heart,
   },
 ];
