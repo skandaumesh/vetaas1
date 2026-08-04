@@ -75,9 +75,10 @@ const TEAM = [
     website: ""
   },
   {
-    name: "Skanda Umesh",
+    name: "OneZeroLabs",
+    personName: "Skanda Umesh",
     initials: "SU",
-    role: "Technology Partner | Tech Support | Founder, OneZeroLabs",
+    role: "Technology Partner | Tech Support | Founder",
     bio: "As Vetaas's technology partner and the founder of OneZeroLabs, I provide the foundational tech support and technical direction for Vetaas — ensuring our digital platforms are robust, modern, and capable of scaling our impact in early childhood education.",
     gradient: "from-[#FFC107] to-[#FFC107]",
     borderColor: "border-[#FFC107]",
@@ -85,7 +86,7 @@ const TEAM = [
     bgHover: "hover:bg-[#FFC107]/5",
     activeBg: "bg-[#fffbf0]",
     activeBorder: "border-[#FFC107]/30",
-    image: "/skanda.jpeg",
+    image: "/skanda2.jpeg",
     roleTags: ["Technology Partner", "Tech Support", "Founder, OneZeroLabs"],
     linkedin: "https://www.linkedin.com/in/skanda-umesh-88b16432b/",
     website: "https://onezerolabs.in"
@@ -620,6 +621,9 @@ export default function AboutPageClient() {
 
                         {/* Bio & Details */}
                         <div className="flex-grow flex flex-col items-center md:items-start text-center md:text-left">
+                          {member.personName && (
+                            <h4 className="text-lg font-bold text-gray-900 mb-3">{member.personName}</h4>
+                          )}
                           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
                             {member.roleTags.map((tag, tIdx) => (
                               <span

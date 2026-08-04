@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Star, ArrowRight, Blocks, GraduationCap, HeartHandshake } from "lucide-react";
+import { Star, ArrowRight, Blocks, GraduationCap, HeartHandshake, Sparkles } from "lucide-react";
  
 export default function HeroSection() {
   return (
@@ -108,9 +108,11 @@ export default function HeroSection() {
             </Link>
           </div>
 
+          {/* Secondary CTAs — membership plan + take a quiz */}
+          <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 z-20">
           {/* Membership plans CTA — highlighted gradient pill */}
           <motion.div
-            className="mt-6 z-20 rounded-full w-max"
+            className="rounded-full w-max"
             animate={{
               boxShadow: [
                 "0 6px 18px rgba(255,193,7,0.30)",
@@ -138,6 +140,17 @@ export default function HeroSection() {
               />
             </Link>
           </motion.div>
+
+          {/* Take a free quiz */}
+          <Link
+            href="/products"
+            className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-[#7C3AED]/25 text-[#7C3AED] font-bold text-sm hover:bg-[#7C3AED]/5 hover:-translate-y-0.5 transition-all shadow-sm w-max"
+          >
+            <Sparkles size={16} />
+            Take a free quiz
+            <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+          </div>
         </motion.div>
       </div>
 
