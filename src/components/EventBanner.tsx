@@ -5,7 +5,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { parseLumaUrl, initLumaCheckout, formatShortDateRange } from "@/lib/luma";
 
 interface Event {
@@ -135,10 +135,6 @@ export default function EventBanner() {
               animate={{ x: "350%" }}
               transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", repeatDelay: 1.6 }}
             />
-            {/* Decorative sparkles */}
-            <Sparkles size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/40 hidden sm:block" />
-            <Sparkles size={11} className="pointer-events-none absolute left-[46%] top-1.5 text-white/30 hidden md:block" />
-
             <div className="relative w-full pl-4 pr-11 sm:px-10 py-2.5 flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 sm:gap-3">
               {/* Prev arrow (multi-event only) */}
               {events.length > 1 && (

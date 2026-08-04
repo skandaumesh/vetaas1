@@ -184,7 +184,7 @@ exports.sendQuizResult = onDocumentCreated(
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;">
         <tr>
-          <td align="center" style="background-color:#111827;padding:28px 24px;">
+          <td align="center" bgcolor="#7C3AED" style="background-color:#7C3AED;background-image:linear-gradient(135deg,#7C3AED 0%,#00CDBA 100%);padding:28px 24px;">
             <img src="${LOGO_SRC}" width="56" height="56" alt="Vetaas" style="border-radius:50%;display:block;margin:0 auto 10px;background:#ffffff;" />
             <h1 style="margin:0;font-size:19px;color:#ffffff;">${s.quizName || "Your Assessment Result"}</h1>
           </td>
@@ -267,7 +267,7 @@ exports.sendQuizResult = onDocumentCreated(
           (s.answers || []).map((a) => `- ${a.question}\n  -> ${a.answer}`).join("\n"),
         html: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#f4f4f5;padding:24px 12px;">
           <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border-radius:14px;overflow:hidden;margin:0 auto;">
-            <tr><td style="background:#111827;padding:20px 24px;color:#fff;font-size:16px;font-weight:bold;">📝 New quiz lead — ${s.quizName || "Quiz"}</td></tr>
+            <tr><td bgcolor="#7C3AED" style="background-color:#7C3AED;background-image:linear-gradient(135deg,#7C3AED,#00CDBA);padding:20px 24px;color:#fff;font-size:16px;font-weight:bold;">📝 New quiz lead — ${s.quizName || "Quiz"}</td></tr>
             <tr><td style="padding:24px 28px;">
               <p style="margin:0 0 6px;font-size:14px;color:#374151;"><b>${s.name || "(no name)"}</b> &lt;<a href="mailto:${s.email}" style="color:#7C3AED;">${s.email}</a>&gt;</p>
               <p style="margin:0 0 18px;font-size:22px;color:#7C3AED;font-weight:800;">${pct}% — <span style="color:#111827;font-size:15px;">${s.band || ""}</span></p>

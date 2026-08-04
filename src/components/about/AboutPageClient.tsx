@@ -61,8 +61,8 @@ const TEAM = [
   {
     name: "Tanisha",
     initials: "T",
-    role: "Social Media Head | OneZeroLabs",
-    bio: "Representing OneZeroLabs, I lead the social media presence and digital campaigns for Vetaas. I specialize in creative storytelling, visual communication, and building interactive online communities to spread awareness about Social Emotional Learning (SEL) in early childhood.",
+    role: "Social Media, Marketing and Data Analyst",
+    bio: "I lead the social media presence and digital campaigns for Vetaas. I specialize in creative storytelling, visual communication, and building interactive online communities to spread awareness about Social Emotional Learning (SEL) in early childhood.",
     gradient: "from-[#00CDBA] to-[#00CDBA]",
     borderColor: "border-[#00CDBA]",
     textColor: "text-[#00CDBA]",
@@ -70,15 +70,15 @@ const TEAM = [
     activeBg: "bg-[#f0fdf4]",
     activeBorder: "border-[#00CDBA]/30",
     image: "/tanisha.jpeg",
-    roleTags: ["Social Media Head", "OneZeroLabs"],
+    roleTags: ["Social Media, Marketing and Data Analyst"],
     linkedin: "https://www.linkedin.com/in/tanisha-karve/",
-    website: "https://onezerolabs.in"
+    website: ""
   },
   {
     name: "Skanda Umesh",
     initials: "SU",
-    role: "Founder, OneZeroLabs | Tech Support",
-    bio: "As the founder of OneZeroLabs, I provide the foundational tech support and technical direction for Vetaas, ensuring our digital platforms are robust, modern, and capable of scaling our impact in early childhood education.",
+    role: "Technology Partner | Tech Support | Founder, OneZeroLabs",
+    bio: "As Vetaas's technology partner and the founder of OneZeroLabs, I provide the foundational tech support and technical direction for Vetaas — ensuring our digital platforms are robust, modern, and capable of scaling our impact in early childhood education.",
     gradient: "from-[#FFC107] to-[#FFC107]",
     borderColor: "border-[#FFC107]",
     textColor: "text-[#FFC107]",
@@ -86,7 +86,7 @@ const TEAM = [
     activeBg: "bg-[#fffbf0]",
     activeBorder: "border-[#FFC107]/30",
     image: "/skanda.jpeg",
-    roleTags: ["Founder, OneZeroLabs", "Tech Support"],
+    roleTags: ["Technology Partner", "Tech Support", "Founder, OneZeroLabs"],
     linkedin: "https://www.linkedin.com/in/skanda-umesh-88b16432b/",
     website: "https://onezerolabs.in"
   },
@@ -176,9 +176,9 @@ export default function AboutPageClient() {
               {/* Checklist details */}
               <ul className="space-y-3.5 border-t border-dashed border-gray-100 pt-6">
                 {[
-                  "Social-emotional framework integration",
-                  "Age-appropriate ECE learning journeys",
-                  "Holistic milestones and growth mapping"
+                  "Integration of Social Emotional Learning",
+                  "Whole system approach (Parents-Teachers-School)",
+                  "Start of a rich learning journey for children"
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <div className="w-5 h-5 rounded-full bg-[#00CDBA]/10 flex items-center justify-center text-[#00CDBA] shrink-0 mt-0.5">
@@ -224,9 +224,9 @@ export default function AboutPageClient() {
               {/* Checklist details */}
               <ul className="space-y-3.5 border-t border-dashed border-gray-100 pt-6">
                 {[
-                  "SEL 101 course for educators' capacity",
-                  "Playful parenting workshop frameworks",
-                  "Dedicated parent & school support groups"
+                  "SEL workshops for teachers and educators",
+                  "Well-being workshops for parents and teachers",
+                  "Expert led awareness sessions for parents"
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <div className="w-5 h-5 rounded-full bg-[#ff5c7a]/10 flex items-center justify-center text-[#ff5c7a] shrink-0 mt-0.5">

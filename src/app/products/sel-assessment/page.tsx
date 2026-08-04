@@ -3,7 +3,7 @@ import SelAssessment from "@/components/products/SelAssessment";
 export const metadata = {
   title: "SEL Assessment for Children",
   description:
-    "A playful 5-minute assessment to explore your child's social and emotional skills across five key areas.",
+    "A playful 3-minute assessment to explore your child's social and emotional skills across five key areas.",
   alternates: { canonical: "/products/sel-assessment" },
 };
 

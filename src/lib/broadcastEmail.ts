@@ -43,7 +43,7 @@ export function buildBroadcastHtml(body: string, name: string): string {
     <tr><td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;">
         <tr>
-          <td align="center" style="background-color:#111827;padding:26px 24px;">
+          <td align="center" bgcolor="#7C3AED" style="background-color:#7C3AED;background-image:linear-gradient(135deg,#7C3AED 0%,#00CDBA 100%);padding:26px 24px;">
             <img src="${LOGO_URL}" width="52" height="52" alt="Vetaas" style="border-radius:50%;display:block;margin:0 auto;background:#ffffff;" />
           </td>
         </tr>
