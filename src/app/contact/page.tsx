@@ -91,8 +91,8 @@ function ContactFormContent() {
               icon={<Mail size={22} />}
               color="#00CDBA"
               label="Email Us"
-              href="mailto:kirti.vetaas@gmail.com"
-              value="kirti.vetaas@gmail.com"
+              href="mailto:kirti@vetaas.in"
+              value="kirti@vetaas.in"
             />
             <InfoCard
               icon={<MapPin size={22} />}
@@ -145,7 +145,7 @@ function ContactFormContent() {
                     e.preventDefault();
                     
                     const formData = new FormData(e.currentTarget);
-                    formData.append("access_key", "2c7413a4-1b05-4c31-b815-d159bc0214d1");
+                    formData.append("access_key", "5217f7fc-d831-4367-8417-a5e4326d65e4");
                     
                     const object = Object.fromEntries(formData);
                     const json = JSON.stringify(object);

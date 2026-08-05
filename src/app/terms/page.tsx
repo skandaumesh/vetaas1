@@ -49,7 +49,7 @@ export default function TermsPage() {
 
               <h2 className="text-2xl font-bold font-headline text-[#111827] mt-8 mb-4">6. Contact Us</h2>
               <p>
-                In order to resolve a complaint regarding the Site or to receive further information regarding use of the Site, please contact us at: kirti.vetaas@gmail.com.
+                In order to resolve a complaint regarding the Site or to receive further information regarding use of the Site, please contact us at: kirti@vetaas.in.
               </p>
             </div>
           </div>

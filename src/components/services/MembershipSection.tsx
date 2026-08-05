@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 
 const WHATSAPP_NUMBER = "918951004160";
-const CONTACT_EMAIL = "kirti.vetaas@gmail.com";
+const CONTACT_EMAIL = "kirti@vetaas.in";
 const CART_STORAGE_KEY = "vetaas-membership-cart";
 
 // Payment screenshots go to this WhatsApp number (not the general enquiry line).

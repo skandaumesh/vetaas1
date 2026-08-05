@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
               
               <h2 className="text-2xl font-bold font-headline text-[#111827] mt-8 mb-4">1. Introduction</h2>
               <p>
-                Welcome to Vetaas Education Foundation. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice or our practices with regard to your personal information, please contact us at kirti.vetaas@gmail.com.
+                Welcome to Vetaas Education Foundation. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice or our practices with regard to your personal information, please contact us at kirti@vetaas.in.
               </p>
 
               <h2 className="text-2xl font-bold font-headline text-[#111827] mt-8 mb-4">2. Information We Collect</h2>
@@ -50,7 +50,7 @@ export default function PrivacyPolicyPage() {
 
               <h2 className="text-2xl font-bold font-headline text-[#111827] mt-8 mb-4">5. Contact Us</h2>
               <p>
-                If you have questions or comments about this notice, you may email us at kirti.vetaas@gmail.com.
+                If you have questions or comments about this notice, you may email us at kirti@vetaas.in.
               </p>
             </div>
           </div>
