@@ -98,6 +98,7 @@ function ContactFormContent() {
               icon={<MapPin size={22} />}
               color="#FF5C7A"
               label="Visit Us"
+              href="/find-us"
               value="Bangalore, India"
             />
           </motion.div>
