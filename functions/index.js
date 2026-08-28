@@ -437,7 +437,7 @@ const MEMBERSHIP_ID_PREFIX = "VET-";
 // functions redeployed) before the new checkout is exposed to real customers,
 // or anyone can buy a ₹9,999 membership for ₹3.
 // Keep in sync with TEST_PRICING in src/components/services/MembershipSection.tsx.
-const TEST_PRICING = true;
+const TEST_PRICING = false;
 
 const PLAN_PRICES = {
   curious: { name: "Curious", price: TEST_PRICING ? 1 : 2999, siblingDiscount: 0.05 },

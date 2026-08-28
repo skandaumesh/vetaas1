@@ -28,7 +28,7 @@ const CART_STORAGE_KEY = "vetaas-membership-cart";
 // is exposed to real customers. The server has its own copy of this flag in
 // functions/index.js — BOTH must be flipped, or checkout will fail with a
 // price mismatch between what's shown and what's charged.
-const TEST_PRICING = true;
+const TEST_PRICING = false;
 
 type Plan = {
   id: string;
