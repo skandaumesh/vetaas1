@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { getFunctions } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCPX8GqGLLFDzRGnjhjJj_ovy88ulpK-D4",
@@ -19,6 +20,7 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const auth = getAuth(app);
+export const functions = getFunctions(app, "us-central1");
 
 // Keep visitors signed in anonymously (required to submit membership orders),
 // but never replace an existing session — signing in anonymously while the

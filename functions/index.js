@@ -1,13 +1,20 @@
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { defineSecret } = require("firebase-functions/params");
+const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
+const { defineSecret, defineString } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 const path = require("path");
+const crypto = require("crypto");
+const Razorpay = require("razorpay");
+const { EMAIL_SUBJECT: MEMBERSHIP_EMAIL_SUBJECT, buildEmailText: buildMembershipEmailText, buildEmailHtml: buildMembershipEmailHtml } = require("./membershipEmail");
 
 admin.initializeApp();
 
 const smtpPassword = defineSecret("SMTP_PASSWORD"); // v3
+const razorpayKeyId = defineString("RAZORPAY_KEY_ID");
+const razorpayKeySecret = defineSecret("RAZORPAY_KEY_SECRET");
+const razorpayWebhookSecret = defineSecret("RAZORPAY_WEBHOOK_SECRET");
 
 const SMTP_HOST = "smtp.hostinger.com";
 const SMTP_PORT = 465;
@@ -294,7 +301,10 @@ exports.notifyNewOrder = onDocumentCreated(
     const snap = event.data;
     if (!snap) return;
     const o = snap.data();
-    if (!o || o.status !== "pending") return;
+    // Razorpay-flow orders are created in "pending" the instant checkout
+    // starts, before payment completes — there's nothing to verify yet, so
+    // skip this and notify from approvePaidOrder once payment is confirmed.
+    if (!o || o.status !== "pending" || o.razorpayOrderId) return;
 
     const inr = (n) => `₹${Math.round(n || 0).toLocaleString("en-IN")}`;
     const items = (o.items || [])
@@ -409,5 +419,257 @@ exports.notifyNewOrder = onDocumentCreated(
       orderId: snap.id,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Razorpay membership checkout: automates the manual UPI-screenshot flow
+// above. The client never dictates the amount — it's always recomputed here
+// from this price table, which must be kept in sync with the PLANS array in
+// src/components/services/MembershipSection.tsx.
+// ---------------------------------------------------------------------------
+
+const MEMBERSHIP_DAYS = 30;
+const MEMBERSHIP_ID_PREFIX = "VET-";
+
+// ⚠️⚠️ TEST PRICING — charges ₹1/₹2/₹3 instead of the real prices so live-mode
+// payments can be verified cheaply. MUST be set back to false (and the
+// functions redeployed) before the new checkout is exposed to real customers,
+// or anyone can buy a ₹9,999 membership for ₹3.
+// Keep in sync with TEST_PRICING in src/components/services/MembershipSection.tsx.
+const TEST_PRICING = true;
+
+const PLAN_PRICES = {
+  curious: { name: "Curious", price: TEST_PRICING ? 1 : 2999, siblingDiscount: 0.05 },
+  grow: { name: "Grow", price: TEST_PRICING ? 2 : 5999, siblingDiscount: 0.1 },
+  flourish: { name: "Flourish", price: TEST_PRICING ? 3 : 9999, siblingDiscount: 0.2 },
+};
+
+const planTotal = (plan, qty) => plan.price + (qty - 1) * plan.price * (1 - plan.siblingDiscount);
+
+// Single-admin usage, same approach as the client-side nextMembershipId in
+// admin/memberships/page.tsx — a Firestore counter/transaction isn't warranted.
+async function nextMembershipId(db) {
+  const snap = await db.collection("membershipOrders").get();
+  let highest = 0;
+  snap.forEach((d) => {
+    const id = d.data().membershipId;
+    if (typeof id === "string" && id.startsWith(MEMBERSHIP_ID_PREFIX)) {
+      const n = parseInt(id.slice(MEMBERSHIP_ID_PREFIX.length), 10);
+      if (Number.isFinite(n) && n > highest) highest = n;
+    }
+  });
+  return `${MEMBERSHIP_ID_PREFIX}${String(highest + 1).padStart(4, "0")}`;
+}
+
+function validityRange(startMs, endMs) {
+  const start = new Date(startMs);
+  const end = new Date(endMs);
+  const d = (x) => x.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  const sameYear = start.getFullYear() === end.getFullYear();
+  return sameYear
+    ? `${d(start)} – ${d(end)} ${end.getFullYear()}`
+    : `${d(start)} ${start.getFullYear()} – ${d(end)} ${end.getFullYear()}`;
+}
+
+// Marks a pending order paid & approved, assigns a membership ID, and queues
+// the parent confirmation + admin notification emails. Called from both the
+// client-verify callable and the webhook below — idempotent (checks
+// status === "approved" first) since either path can fire for the same order.
+async function approvePaidOrder(db, orderId) {
+  const ref = db.collection("membershipOrders").doc(orderId);
+  const snap = await ref.get();
+  if (!snap.exists) return;
+  const order = snap.data();
+  if (order.status === "approved") return;
+
+  const nowMs = Date.now();
+  const expiresAtMs = nowMs + MEMBERSHIP_DAYS * 86400000;
+  const membershipId = order.membershipId || (await nextMembershipId(db));
+
+  await ref.update({
+    status: "approved",
+    approvedAt: admin.firestore.FieldValue.serverTimestamp(),
+    expiresAt: admin.firestore.Timestamp.fromMillis(expiresAtMs),
+    membershipId,
+  });
+
+  const validity = validityRange(nowMs, expiresAtMs);
+  const emailOrder = {
+    parentName: order.parentName,
+    childName: order.childName,
+    email: order.email,
+    items: order.items,
+    totalMonthly: order.totalMonthly,
+    membershipId,
+    validity,
+  };
+
+  await db.collection("mail").add({
+    to: order.email,
+    message: {
+      subject: MEMBERSHIP_EMAIL_SUBJECT,
+      text: buildMembershipEmailText(emailOrder),
+      html: buildMembershipEmailHtml(emailOrder),
+    },
+    orderId,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  const inr = (n) => `₹${Math.round(n || 0).toLocaleString("en-IN")}`;
+  await db.collection("mail").add({
+    to: "kirti@vetaas.in",
+    message: {
+      subject: `✅ Payment received — ${order.parentName || "Unknown"} (${inr(order.totalMonthly)}/month)`,
+      text:
+        `A membership order was paid and auto-approved via Razorpay:\n\n` +
+        `Membership ID: ${membershipId}\n` +
+        `Parent: ${order.parentName || "-"}\n` +
+        `Child: ${order.childName || "-"}\n` +
+        `Plan: ${(order.items || []).map((i) => `${i.plan} × ${i.qty}`).join(", ")}\n` +
+        `Total: ${inr(order.totalMonthly)}/month\n` +
+        `Validity: ${validity}\n\n` +
+        `No action needed — the confirmation email was sent automatically.\n` +
+        `https://www.vetaas.in/admin/memberships`,
+    },
+    type: "payment-confirmed",
+    orderId,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+}
+
+exports.createMembershipOrder = onCall(
+  { region: "us-central1", secrets: [razorpayKeySecret] },
+  async (request) => {
+    // The site signs every visitor in anonymously (see src/lib/firebase.ts), so
+    // requiring auth costs real users nothing but stops anonymous scripts from
+    // spam-creating orders against the Razorpay account.
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Please reload the page and try again.");
+    }
+
+    const data = request.data || {};
+    const items = Array.isArray(data.items) ? data.items : [];
+    if (items.length === 0) throw new HttpsError("invalid-argument", "Cart is empty.");
+    if (!data.parentName || !data.childName || !data.email || !data.phone || !data.attendees) {
+      throw new HttpsError("invalid-argument", "Missing required fields.");
+    }
+    if (!/.+@.+\..+/.test(data.email)) {
+      throw new HttpsError("invalid-argument", "Invalid email.");
+    }
+
+    const orderItems = [];
+    let totalMonthly = 0;
+    for (const raw of items) {
+      const plan = PLAN_PRICES[raw.planId];
+      const qty = Math.max(1, Math.min(20, parseInt(raw.qty, 10) || 0));
+      if (!plan) throw new HttpsError("invalid-argument", "Invalid cart item.");
+      const monthly = Math.round(planTotal(plan, qty));
+      orderItems.push({ plan: plan.name, pricePerMonth: plan.price, qty, monthly });
+      totalMonthly += monthly;
+    }
+    totalMonthly = Math.round(totalMonthly);
+    if (totalMonthly <= 0) throw new HttpsError("invalid-argument", "Invalid total.");
+
+    const db = admin.firestore();
+    const orderRef = db.collection("membershipOrders").doc();
+
+    const razorpay = new Razorpay({
+      key_id: razorpayKeyId.value(),
+      key_secret: razorpayKeySecret.value(),
+    });
+    const rzpOrder = await razorpay.orders.create({
+      amount: totalMonthly * 100, // paise
+      currency: "INR",
+      receipt: orderRef.id,
+      notes: { parentName: String(data.parentName), childName: String(data.childName) },
+    });
+
+    await orderRef.set({
+      items: orderItems,
+      totalMonthly,
+      parentName: String(data.parentName).trim(),
+      childName: String(data.childName).trim(),
+      childAge: String(data.childAge || "").trim(),
+      attendees: String(data.attendees),
+      email: String(data.email).trim(),
+      phone: String(data.phone).trim(),
+      razorpayOrderId: rzpOrder.id,
+      status: "pending",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return {
+      firestoreOrderId: orderRef.id,
+      razorpayOrderId: rzpOrder.id,
+      amount: rzpOrder.amount,
+      currency: rzpOrder.currency,
+      keyId: razorpayKeyId.value(),
+    };
+  }
+);
+
+exports.verifyMembershipPayment = onCall(
+  { region: "us-central1", secrets: [razorpayKeySecret] },
+  async (request) => {
+    const { firestoreOrderId, razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      request.data || {};
+    if (!firestoreOrderId || !razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      throw new HttpsError("invalid-argument", "Missing payment details.");
+    }
+
+    const expected = crypto
+      .createHmac("sha256", razorpayKeySecret.value())
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
+    if (expected !== razorpay_signature) {
+      throw new HttpsError("permission-denied", "Payment signature mismatch.");
+    }
+
+    const db = admin.firestore();
+    const snap = await db.collection("membershipOrders").doc(firestoreOrderId).get();
+    if (!snap.exists || snap.data().razorpayOrderId !== razorpay_order_id) {
+      throw new HttpsError("not-found", "Order not found.");
+    }
+
+    await approvePaidOrder(db, firestoreOrderId);
+    return { ok: true };
+  }
+);
+
+// Authoritative payment confirmation — Razorpay calls this directly, so it
+// fires even if the parent closes the tab right after paying (before the
+// callable above would run). approvePaidOrder() is idempotent, so whichever
+// of the two paths arrives first does the work; the other is a no-op.
+exports.razorpayWebhook = onRequest(
+  { region: "us-central1", secrets: [razorpayWebhookSecret] },
+  async (req, res) => {
+    const signature = req.headers["x-razorpay-signature"];
+    const expected = crypto
+      .createHmac("sha256", razorpayWebhookSecret.value())
+      .update(req.rawBody)
+      .digest("hex");
+    if (!signature || signature !== expected) {
+      res.status(400).send("Invalid signature");
+      return;
+    }
+
+    const event = req.body || {};
+    if (event.event === "payment.captured") {
+      const payment = event.payload && event.payload.payment && event.payload.payment.entity;
+      const razorpayOrderId = payment && payment.order_id;
+      if (razorpayOrderId) {
+        const db = admin.firestore();
+        const snap = await db
+          .collection("membershipOrders")
+          .where("razorpayOrderId", "==", razorpayOrderId)
+          .limit(1)
+          .get();
+        if (!snap.empty) {
+          await approvePaidOrder(db, snap.docs[0].id);
+        }
+      }
+    }
+    res.status(200).send("ok");
   }
 );

@@ -3,20 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import QRCode from "qrcode";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
-import { signInAnonymously } from "firebase/auth";
-import { auth, db, storage } from "@/lib/firebase";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "@/lib/firebase";
 import {
-  ArrowRight,
   Check,
   CheckCircle2,
+  CreditCard,
   Loader2,
   Mail,
   MessageCircle,
   Minus,
-  Paperclip,
   Plus,
   ShoppingCart,
   Trash2,
@@ -27,11 +23,12 @@ const WHATSAPP_NUMBER = "918951004160";
 const CONTACT_EMAIL = "kirti@vetaas.in";
 const CART_STORAGE_KEY = "vetaas-membership-cart";
 
-// Payment screenshots go to this WhatsApp number (not the general enquiry line).
-const PAYMENT_WHATSAPP_NUMBER = "919108906009";
-
-// Verified against the Google Pay QR shared by the owner — don't edit by hand.
-const UPI: { id: string; payeeName: string } | null = { id: "ktkirti6@oksbi", payeeName: "Vetaas" };
+// ⚠️⚠️ TEST PRICING — shows ₹1/₹2/₹3 instead of the real prices so live-mode
+// payments can be verified cheaply. MUST be set back to false before this page
+// is exposed to real customers. The server has its own copy of this flag in
+// functions/index.js — BOTH must be flipped, or checkout will fail with a
+// price mismatch between what's shown and what's charged.
+const TEST_PRICING = true;
 
 type Plan = {
   id: string;
@@ -51,7 +48,7 @@ const PLANS: Plan[] = [
     id: "curious",
     name: "Curious",
     tagline: "Discover and explore the Vetaas experience.",
-    price: 2999,
+    price: TEST_PRICING ? 1 : 2999,
 
     siblingDiscount: 0.05,
     accent: "#e7faf6",
@@ -72,7 +69,7 @@ const PLANS: Plan[] = [
     id: "grow",
     name: "Grow",
     tagline: "Build consistent rhythm and deeper engagement.",
-    price: 5999,
+    price: TEST_PRICING ? 2 : 5999,
 
     siblingDiscount: 0.1,
     accent: "#fff0f2",
@@ -93,7 +90,7 @@ const PLANS: Plan[] = [
     id: "flourish",
     name: "Flourish",
     tagline: "For families who want to be deeply immersed in the Vetaas community.",
-    price: 9999,
+    price: TEST_PRICING ? 3 : 9999,
 
     siblingDiscount: 0.2,
     accent: "#eaf3ff",
@@ -128,6 +125,66 @@ const formatINR = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 // Additional memberships of the same plan get the sibling discount
 const planTotal = (plan: Plan, qty: number) =>
   plan.price + (qty - 1) * plan.price * (1 - plan.siblingDiscount);
+
+// Loads the Razorpay Checkout script once and reuses it across opens.
+let razorpayScriptPromise: Promise<void> | null = null;
+function loadRazorpayScript(): Promise<void> {
+  if (typeof window === "undefined") return Promise.reject(new Error("No window"));
+  if ((window as unknown as { Razorpay?: unknown }).Razorpay) return Promise.resolve();
+  if (!razorpayScriptPromise) {
+    razorpayScriptPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("Failed to load Razorpay checkout"));
+      document.body.appendChild(script);
+    });
+  }
+  return razorpayScriptPromise;
+}
+
+interface RazorpaySuccessResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  order_id: string;
+  name: string;
+  description: string;
+  prefill: { name: string; email: string; contact: string };
+  theme: { color: string };
+  handler: (response: RazorpaySuccessResponse) => void;
+  modal: { ondismiss: () => void };
+}
+interface RazorpayFailedEvent {
+  error?: { description?: string; reason?: string };
+}
+interface RazorpayInstance {
+  open: () => void;
+  on: (event: "payment.failed", handler: (e: RazorpayFailedEvent) => void) => void;
+}
+
+const createMembershipOrder = httpsCallable<
+  {
+    items: CartItem[];
+    parentName: string;
+    childName: string;
+    childAge: string;
+    attendees: string;
+    email: string;
+    phone: string;
+  },
+  { firestoreOrderId: string; razorpayOrderId: string; amount: number; currency: string; keyId: string }
+>(functions, "createMembershipOrder");
+
+const verifyMembershipPayment = httpsCallable<
+  RazorpaySuccessResponse & { firestoreOrderId: string },
+  { ok: boolean }
+>(functions, "verifyMembershipPayment");
 
 export default function MembershipSection() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -184,6 +241,24 @@ export default function MembershipSection() {
     [cart]
   );
 
+  // Contact form
+  const [form, setForm] = useState({
+    parentName: "",
+    childName: "",
+    childAge: "",
+    attendees: "",
+    email: "",
+    phone: "",
+  });
+  const [paying, setPaying] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
+
+  const setField =
+    (key: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+      setForm((f) => ({ ...f, [key]: e.target.value }));
+
   const orderMessage = useMemo(() => {
     const lines = cart
       .map((i) => {
@@ -193,96 +268,73 @@ export default function MembershipSection() {
       })
       .filter(Boolean);
     return [
-      UPI
-        ? "Hi Vetaas! I've purchased a membership and completed the UPI payment:"
-        : "Hi Vetaas! I'd like to purchase a membership:",
+      "Hi Vetaas! I'd like to purchase a membership:",
       ...lines,
       `Total: ${formatINR(total)}/month`,
-      UPI
-        ? "I'm sharing the payment screenshot and details here."
-        : "Please share the payment details.",
+      "Having trouble checking out online — can you help?",
     ].join("\n");
   }, [cart, total]);
 
-  const upiUri =
-    UPI && total > 0
-      ? `upi://pay?pa=${UPI.id}&pn=${encodeURIComponent(UPI.payeeName)}&am=${Math.round(total)}&cu=INR&tn=${encodeURIComponent("Vetaas Membership")}`
-      : null;
-
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [upiCopied, setUpiCopied] = useState(false);
-  useEffect(() => {
-    if (!upiUri) {
-      setQrDataUrl(null);
-      return;
-    }
-    QRCode.toDataURL(upiUri, { width: 240, margin: 1 })
-      .then(setQrDataUrl)
-      .catch(() => setQrDataUrl(null));
-  }, [upiUri]);
-
-  // Order submission form
-  const [form, setForm] = useState({
-    parentName: "",
-    childName: "",
-    childAge: "",
-    attendees: "",
-    email: "",
-    phone: "",
-  });
-  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const setField =
-    (key: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-      setForm((f) => ({ ...f, [key]: e.target.value }));
-
-  const submitOrder = async (e: React.FormEvent) => {
+  const payNow = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!screenshotFile) {
-      setSubmitError("Please attach your payment screenshot.");
-      return;
-    }
-    setSubmitting(true);
-    setSubmitError(null);
+    setPaying(true);
+    setPayError(null);
     try {
-      // Ensure some auth exists for the rules check, without replacing an
-      // existing session (e.g. the admin trying the flow while logged in)
-      if (!auth.currentUser) {
-        try { await signInAnonymously(auth); } catch {}
-      }
-      const path = `membership-screenshots/${Date.now()}-${screenshotFile.name.replace(/[^\w.-]/g, "_")}`;
-      const fileRef = storageRef(storage, path);
-      await uploadBytes(fileRef, screenshotFile);
-      const screenshotUrl = await getDownloadURL(fileRef);
-      await addDoc(collection(db, "membershipOrders"), {
-        items: cart.map((i) => {
-          const plan = PLANS.find((p) => p.id === i.planId)!;
-          return { plan: plan.name, pricePerMonth: plan.price, qty: i.qty, monthly: Math.round(planTotal(plan, i.qty)) };
-        }),
-        totalMonthly: Math.round(total),
+      await loadRazorpayScript();
+      const { data: order } = await createMembershipOrder({
+        items: cart,
         parentName: form.parentName.trim(),
         childName: form.childName.trim(),
         childAge: form.childAge.trim(),
         attendees: form.attendees,
         email: form.email.trim(),
         phone: form.phone.trim(),
-        screenshotUrl,
-        upiId: UPI?.id ?? null,
-        status: "pending",
-        createdAt: serverTimestamp(),
       });
-      setSubmitted(true);
-      setCart([]);
+
+      const Razorpay = (window as unknown as { Razorpay: new (options: RazorpayOptions) => RazorpayInstance })
+        .Razorpay;
+      const rzp = new Razorpay({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        order_id: order.razorpayOrderId,
+        name: "Vetaas Education Foundation",
+        description: "The Nest — Membership",
+        prefill: { name: form.parentName.trim(), email: form.email.trim(), contact: form.phone.trim() },
+        theme: { color: "#7C3AED" },
+        handler: (response) => {
+          (async () => {
+            try {
+              await verifyMembershipPayment({ firestoreOrderId: order.firestoreOrderId, ...response });
+              setSubmitted(true);
+              setCart([]);
+            } catch {
+              setPayError(
+                "Payment succeeded but we couldn't confirm it automatically. WhatsApp us the payment ID and we'll sort it out right away."
+              );
+            } finally {
+              setPaying(false);
+            }
+          })();
+        },
+        modal: { ondismiss: () => setPaying(false) },
+      });
+
+      // Razorpay closes its modal on a failed payment without calling `handler`,
+      // so without this the visitor is left staring at the form with no
+      // explanation — even though their bank may have debited them.
+      rzp.on("payment.failed", (event) => {
+        const reason = event?.error?.description;
+        setPayError(
+          `Payment didn't go through${reason ? ` — ${reason}` : ""}. If money was debited it will be refunded automatically within 5–7 days. You can try again, or reach us on WhatsApp.`
+        );
+        setPaying(false);
+      });
+
+      rzp.open();
     } catch {
-      setSubmitError(
-        "Something went wrong while submitting. Please try again, or send the screenshot on WhatsApp instead."
-      );
-    } finally {
-      setSubmitting(false);
+      setPayError("Something went wrong starting checkout. Please try again, or reach us on WhatsApp.");
+      setPaying(false);
     }
   };
 
@@ -466,10 +518,10 @@ NEST MEMBERSHIP GUIDE
                 {submitted && (
                   <div className="text-center mt-12 px-4">
                     <CheckCircle2 size={48} className="text-[#00cdba] mx-auto mb-4" />
-                    <p className="font-extrabold text-[#111827] text-lg mb-2">Order received!</p>
+                    <p className="font-extrabold text-[#111827] text-lg mb-2">Payment successful!</p>
                     <p className="text-gray-500 font-medium text-sm leading-relaxed">
-                      We&apos;ve got your payment details. We&apos;ll verify the payment and email
-                      your membership confirmation within 24 hours.
+                      Your membership is confirmed. We&apos;ve emailed your membership ID and details —
+                      check your inbox.
                     </p>
                   </div>
                 )}
@@ -534,7 +586,7 @@ NEST MEMBERSHIP GUIDE
                 })}
               </div>
 
-              {cart.length > 0 && (
+              {cart.length > 0 && !submitted && (
                 <div className="p-6 border-t border-gray-100 space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-gray-600">Total</span>
@@ -543,174 +595,103 @@ NEST MEMBERSHIP GUIDE
                     </span>
                   </div>
 
-                  {upiUri ? (
-                    <>
-                      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-center">
-                        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">
-                          Step 1 · Pay {formatINR(total)} via UPI
-                        </p>
-                        {/* Desktop: scan the QR with a phone */}
-                        <div className="hidden md:block">
-                          {qrDataUrl && (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img
-                              src={qrDataUrl}
-                              alt={`UPI payment QR code for ${formatINR(total)}`}
-                              className="mx-auto w-44 h-44 rounded-lg bg-white p-2 border border-gray-200"
-                            />
-                          )}
-                          <p className="text-xs text-gray-500 font-medium mt-2">
-                            Scan with PhonePe, Google Pay, or any UPI app
-                          </p>
-                        </div>
-                        {/* Mobile: open the UPI app directly — you can't scan your own screen */}
-                        <a
-                          href={upiUri}
-                          className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#7c3aed] text-white font-bold text-sm rounded-full hover:brightness-110 transition-all md:hidden"
-                        >
-                          Open UPI app to pay
-                          <ArrowRight size={16} />
-                        </a>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            navigator.clipboard?.writeText(UPI!.id);
-                            setUpiCopied(true);
-                            setTimeout(() => setUpiCopied(false), 2000);
-                          }}
-                          className="mt-3 mx-auto flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#7C3AED] transition-colors cursor-pointer"
-                        >
-                          {upiCopied ? (
-                            <>
-                              <Check size={13} className="text-[#00cdba]" /> UPI ID copied!
-                            </>
-                          ) : (
-                            <>or pay to UPI ID: <span className="font-extrabold text-gray-700">{UPI!.id}</span> (tap to copy)</>
-                          )}
-                        </button>
-                      </div>
-                      <form onSubmit={submitOrder} className="rounded-2xl border border-gray-200 bg-gray-50 p-4 space-y-3">
-                        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 text-center">
-                          Step 2 · Submit your payment details
-                        </p>
-                        <input
-                          required
-                          value={form.parentName}
-                          onChange={setField("parentName")}
-                          placeholder="Parent's full name"
-                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                        />
-                        <div className="flex gap-3">
-                          <input
-                            required
-                            value={form.childName}
-                            onChange={setField("childName")}
-                            placeholder="Child's name"
-                            className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                          />
-                          <input
-                            required
-                            type="number"
-                            min={1}
-                            max={18}
-                            value={form.childAge}
-                            onChange={setField("childAge")}
-                            placeholder="Age"
-                            className="w-24 shrink-0 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                          />
-                        </div>
-                        <select
-                          required
-                          value={form.attendees}
-                          onChange={setField("attendees")}
-                          className={`w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED] cursor-pointer ${
-                            form.attendees ? "text-gray-900" : "text-gray-400"
-                          }`}
-                        >
-                          <option value="" disabled>
-                            Who will attend the sessions?
-                          </option>
-                          <option value="Child">Child</option>
-                          <option value="Parent">Parent</option>
-                          <option value="Child and Parent">Child and Parent</option>
-                        </select>
-                        <input
-                          required
-                          type="email"
-                          value={form.email}
-                          onChange={setField("email")}
-                          placeholder="Email (membership confirmation goes here)"
-                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                        />
-                        <input
-                          required
-                          type="tel"
-                          value={form.phone}
-                          onChange={setField("phone")}
-                          placeholder="Phone number"
-                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                        />
-                        <label className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-gray-300 bg-white text-sm font-medium text-gray-600 cursor-pointer hover:border-[#7C3AED] transition-colors">
-                          <Paperclip size={15} className="shrink-0" />
-                          <span className="truncate">
-                            {screenshotFile ? screenshotFile.name : "Attach payment screenshot"}
-                          </span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => setScreenshotFile(e.target.files?.[0] ?? null)}
-                          />
-                        </label>
-                        {submitError && (
-                          <p className="text-xs text-red-500 font-semibold text-center">{submitError}</p>
-                        )}
-                        <button
-                          type="submit"
-                          disabled={submitting}
-                          className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#7C3AED] text-white font-bold text-sm rounded-full hover:bg-[#6D28D9] hover:scale-[1.02] transition-all shadow-md disabled:opacity-60 disabled:hover:scale-100 cursor-pointer"
-                        >
-                          {submitting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
-                          {submitting ? "Submitting…" : "Submit for verification"}
-                        </button>
-                        <a
-                          href={`https://wa.me/${PAYMENT_WHATSAPP_NUMBER}?text=${encodeURIComponent(orderMessage)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block text-center text-xs font-bold text-gray-500 hover:text-[#25D366] transition-colors"
-                        >
-                          <MessageCircle size={13} className="inline mr-1 -mt-0.5" />
-                          Prefer WhatsApp? Send the screenshot to us there instead
-                        </a>
-                      </form>
-                      <p className="text-xs text-gray-400 font-medium text-center leading-relaxed">
-                        We&apos;ll verify your payment and email your membership confirmation within 24 hours.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <a
-                        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderMessage)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] text-white font-bold text-sm rounded-full hover:brightness-95 hover:scale-[1.02] transition-all shadow-md"
-                      >
-                        <MessageCircle size={18} />
-                        Checkout on WhatsApp
-                        <ArrowRight size={16} />
-                      </a>
-                      <a
-                        href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Vetaas Membership Purchase")}&body=${encodeURIComponent(orderMessage)}`}
-                        className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-gray-300 text-gray-800 font-bold text-sm rounded-full hover:bg-gray-50 transition-all"
-                      >
-                        <Mail size={18} />
-                        Checkout via Email
-                      </a>
-                      <p className="text-xs text-gray-400 font-medium text-center leading-relaxed">
-                        We&apos;ll confirm availability and share payment details to complete your membership.
-                      </p>
-                    </>
-                  )}
+                  <form onSubmit={payNow} className="rounded-2xl border border-gray-200 bg-gray-50 p-4 space-y-3">
+                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500 text-center">
+                      Your details
+                    </p>
+                    <input
+                      required
+                      value={form.parentName}
+                      onChange={setField("parentName")}
+                      placeholder="Parent's full name"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
+                    />
+                    <div className="flex gap-3">
+                      <input
+                        required
+                        value={form.childName}
+                        onChange={setField("childName")}
+                        placeholder="Child's name"
+                        className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
+                      />
+                      <input
+                        required
+                        type="number"
+                        min={1}
+                        max={18}
+                        value={form.childAge}
+                        onChange={setField("childAge")}
+                        placeholder="Age"
+                        className="w-24 shrink-0 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
+                      />
+                    </div>
+                    <select
+                      required
+                      value={form.attendees}
+                      onChange={setField("attendees")}
+                      className={`w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED] cursor-pointer ${
+                        form.attendees ? "text-gray-900" : "text-gray-400"
+                      }`}
+                    >
+                      <option value="" disabled>
+                        Who will attend the sessions?
+                      </option>
+                      <option value="Child">Child</option>
+                      <option value="Parent">Parent</option>
+                      <option value="Child and Parent">Child and Parent</option>
+                    </select>
+                    <input
+                      required
+                      type="email"
+                      value={form.email}
+                      onChange={setField("email")}
+                      placeholder="Email (membership confirmation goes here)"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
+                    />
+                    <input
+                      required
+                      type="tel"
+                      value={form.phone}
+                      onChange={setField("phone")}
+                      placeholder="Phone number"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
+                    />
+                    {payError && (
+                      <p className="text-xs text-red-500 font-semibold text-center">{payError}</p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={paying}
+                      className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#7C3AED] text-white font-bold text-sm rounded-full hover:bg-[#6D28D9] hover:scale-[1.02] transition-all shadow-md disabled:opacity-60 disabled:hover:scale-100 cursor-pointer"
+                    >
+                      {paying ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
+                      {paying ? "Opening secure checkout…" : `Pay ${formatINR(total)} now`}
+                    </button>
+                    <p className="text-xs text-gray-400 font-medium text-center leading-relaxed">
+                      Secure checkout via Razorpay — card, UPI, netbanking &amp; more. Your membership
+                      is confirmed instantly.
+                    </p>
+                  </form>
+
+                  <div className="flex items-center justify-center gap-4 text-xs font-bold text-gray-400">
+                    <a
+                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderMessage)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 hover:text-[#25D366] transition-colors"
+                    >
+                      <MessageCircle size={13} />
+                      Trouble paying? WhatsApp us
+                    </a>
+                    <span className="text-gray-200">|</span>
+                    <a
+                      href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Vetaas Membership Purchase")}&body=${encodeURIComponent(orderMessage)}`}
+                      className="inline-flex items-center gap-1.5 hover:text-[#7C3AED] transition-colors"
+                    >
+                      <Mail size={13} />
+                      Email us
+                    </a>
+                  </div>
                 </div>
               )}
               </div>
