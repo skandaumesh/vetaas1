@@ -86,6 +86,7 @@ export const viewport = {
 };
 
 const SITE_URL = "https://www.vetaas.in";
+const GA_MEASUREMENT_ID = "G-1JKRXKWR09";
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -156,9 +157,25 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
         <Script
-          src="https://ozlabsprototype1.vercel.app/api/v1/track/script?key=d0a677c9-0c0e-4005-9876-3e091add411d" 
-          strategy="afterInteractive" 
+          src="https://ozlabsprototype1.vercel.app/api/v1/track/script?key=d0a677c9-0c0e-4005-9876-3e091add411d"
+          strategy="afterInteractive"
         />
+
+        {/* Google Analytics 4. The measurement ID was already in the Firebase
+            config but nothing ever loaded gtag, so no data was being collected.
+            Enhanced measurement handles client-side route changes. */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
         <Header />
         <main className="flex-1">
           {children}
