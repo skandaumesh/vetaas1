@@ -15,23 +15,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Membership orders: a visitor may only file a new, well-formed pending
-    // order; only an admin can read or manage them
+    // Membership orders: created only by the createMembershipOrder Cloud
+    // Function (Admin SDK, bypasses these rules) so the charged amount is
+    // always computed server-side. No client write path at all.
     match /membershipOrders/{orderId} {
-      allow create: if request.auth != null
-        && request.resource.data.status == 'pending'
-        && request.resource.data.parentName is string
-        && request.resource.data.parentName.size() > 0
-        && request.resource.data.parentName.size() < 200
-        && request.resource.data.childName is string
-        && request.resource.data.childName.size() < 200
-        && request.resource.data.email is string
-        && request.resource.data.email.matches('.+@.+[.].+')
-        && request.resource.data.phone is string
-        && request.resource.data.phone.size() < 20
-        && request.resource.data.totalMonthly is number
-        && request.resource.data.items is list;
-      allow read, update, delete: if isAdmin();
+      allow read, write: if isAdmin();
     }
 
     // Quiz submissions: a visitor may only file a new, well-formed result;
@@ -60,6 +48,26 @@ service cloud.firestore {
     match /mail/{mailId} {
       allow create: if isAdmin();
       allow read, update, delete: if false;
+    }
+
+    // Forms: the public fill page needs to read a form's definition to render
+    // it; only an admin can create/edit/delete forms.
+    match /forms/{formId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Form responses: anyone may file a new, well-formed response to a form;
+    // only an admin can read them back.
+    match /formResponses/{responseId} {
+      allow create: if request.auth != null
+        && request.resource.data.formId is string
+        && request.resource.data.formId.size() < 60
+        && request.resource.data.formTitle is string
+        && request.resource.data.formTitle.size() < 200
+        && request.resource.data.answers is list
+        && request.resource.data.answers.size() <= 50;
+      allow read, update, delete: if isAdmin();
     }
 
     // Everything else is locked

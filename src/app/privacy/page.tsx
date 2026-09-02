@@ -48,7 +48,41 @@ export default function PrivacyPolicyPage() {
                 We only share information with your consent, to comply with laws, to provide you with services, to protect your rights, or to fulfill business obligations. We do not sell your personal data to third parties.
               </p>
 
-              <h2 className="text-2xl font-bold font-headline text-[#111827] mt-8 mb-4">5. Contact Us</h2>
+              <h2 className="text-2xl font-bold font-headline text-[#111827] mt-8 mb-4">5. Cookies &amp; Analytics</h2>
+              <p>
+                We use Google Analytics to understand how visitors find and use our website. It sets cookies in your browser and collects information such as the pages you visit, how long you stay, your approximate location (city level), and the website or search engine that referred you. This is collected in aggregate and is not used to identify you personally.
+              </p>
+              <p>
+                We use this only to improve the website and our programs. We do not use it for advertising, and we do not sell or share this data with third parties beyond Google&apos;s processing of it as our analytics provider. You can read how Google handles this data in{" "}
+                <a
+                  href="https://policies.google.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#7C3AED] font-semibold hover:underline"
+                >
+                  Google&apos;s Privacy Policy
+                </a>
+                .
+              </p>
+              <p>
+                If you would prefer not to be included, you can block cookies in your browser settings, or install{" "}
+                <a
+                  href="https://tools.google.com/dlpage/gaoptout"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#7C3AED] font-semibold hover:underline"
+                >
+                  Google&apos;s official opt-out add-on
+                </a>
+                . The website works exactly the same either way.
+              </p>
+
+              <h2 className="text-2xl font-bold font-headline text-[#111827] mt-8 mb-4">6. Payments</h2>
+              <p>
+                Membership payments are processed securely by Razorpay. Your card, UPI, and banking details are handled entirely by Razorpay and are never seen or stored by us. We retain only your name, contact details, and a record of the order.
+              </p>
+
+              <h2 className="text-2xl font-bold font-headline text-[#111827] mt-8 mb-4">7. Contact Us</h2>
               <p>
                 If you have questions or comments about this notice, you may email us at kirti@vetaas.in.
               </p>

@@ -87,12 +87,12 @@ body {
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 2.25rem;
-  border-radius: 9999px;
+  border-radius: 0.625rem;
   background-color: var(--color-gold);
   color: var(--color-dark);
   font-weight: 700;
   font-size: 1.1rem;
-  border: 2px solid var(--color-dark);
+  border: none;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   position: relative;
@@ -109,12 +109,12 @@ body {
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 2.25rem;
-  border-radius: 9999px;
+  border-radius: 0.625rem;
   background-color: var(--color-blue);
   color: white;
   font-weight: 700;
   font-size: 1.1rem;
-  border: 2px solid var(--color-blue);
+  border: none;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
 }
@@ -129,7 +129,7 @@ body {
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 2.25rem;
-  border-radius: 9999px;
+  border-radius: 0.625rem;
   background-color: transparent;
   color: var(--color-dark);
   font-weight: 600;
@@ -142,6 +142,66 @@ body {
   background-color: var(--color-dark);
   color: white;
   transform: translateY(-2px);
+}
+
+/* ── Admin: glassmorphism system ──
+   Frosted panels need something behind them to refract, so the shell paints a
+   soft colour wash and every panel is translucent + blurred over it. */
+.admin-shell {
+  background-color: #f6f7fb;
+  background-image:
+    radial-gradient(900px 520px at 8% -8%, rgba(124, 58, 237, 0.14), transparent 62%),
+    radial-gradient(760px 460px at 96% 2%, rgba(0, 205, 186, 0.13), transparent 58%),
+    radial-gradient(760px 520px at 48% 108%, rgba(255, 92, 122, 0.10), transparent 58%);
+  background-attachment: fixed;
+}
+
+/* Border is a hairline slate rather than white: a white edge on a near-white
+   page is invisible, which makes the panel read as no card at all. The inset
+   highlight keeps the lit-glass-edge look. */
+.glass-card {
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 10px 30px rgba(15, 23, 42, 0.07);
+}
+
+/* Slightly more opaque — for surfaces holding dense text, where too much
+   transparency hurts legibility */
+.glass-solid {
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 10px 30px rgba(15, 23, 42, 0.07);
+}
+
+.glass-input {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+.glass-input:focus {
+  outline: none;
+  border-color: rgba(124, 58, 237, 0.5);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+/* Safari/Firefox without backdrop-filter would render these near-transparent */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-card,
+  .glass-solid,
+  .glass-input {
+    background-color: rgba(255, 255, 255, 0.95);
+  }
 }
 
 /* ── Card System ── */

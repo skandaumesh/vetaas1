@@ -673,3 +673,277 @@ exports.razorpayWebhook = onRequest(
     res.status(200).send("ok");
   }
 );
+
+// ---------------------------------------------------------------------------
+// Analytics: reads the site's GA4 property through the Data API and hands a
+// small, pre-aggregated summary to the admin dashboard.
+//
+// Auth uses the function's own service account (Application Default
+// Credentials) — no key file is stored anywhere. That account must be granted
+// Viewer on the GA4 property; see GA4_PROPERTY_ID below.
+// ---------------------------------------------------------------------------
+
+const { BetaAnalyticsDataClient } = require("@google-analytics/data");
+
+// Numeric GA4 property id (NOT the G-XXXXXXX measurement id).
+// GA4 Admin -> Property Settings -> Property ID.
+const ga4PropertyId = defineString("GA4_PROPERTY_ID");
+
+let analyticsClient;
+function getAnalyticsClient() {
+  if (!analyticsClient) analyticsClient = new BetaAnalyticsDataClient();
+  return analyticsClient;
+}
+
+const ADMIN_EMAILS = ["kirti.vetaas@gmail.com"];
+
+function assertAdmin(request) {
+  const email = request.auth && request.auth.token && request.auth.token.email;
+  if (!email || !ADMIN_EMAILS.includes(email.toLowerCase())) {
+    throw new HttpsError("permission-denied", "Admins only.");
+  }
+}
+
+exports.getSiteAnalytics = onCall(
+  { region: "us-central1", timeoutSeconds: 60 },
+  async (request) => {
+    assertAdmin(request);
+
+    const propertyId = ga4PropertyId.value();
+    if (!propertyId) {
+      throw new HttpsError(
+        "failed-precondition",
+        "GA4_PROPERTY_ID is not configured yet."
+      );
+    }
+
+    const days = Math.min(365, Math.max(1, parseInt(request.data?.days, 10) || 28));
+    const property = `properties/${propertyId}`;
+    const dateRanges = [{ startDate: `${days}daysAgo`, endDate: "today" }];
+    const client = getAnalyticsClient();
+
+    try {
+      const [totals, timeseries, pages, sources, countries, cities] = await Promise.all([
+        // Headline numbers
+        client.runReport({
+          property,
+          dateRanges,
+          metrics: [
+            { name: "activeUsers" },
+            { name: "sessions" },
+            { name: "screenPageViews" },
+            { name: "averageSessionDuration" },
+          ],
+        }),
+        // Visitors per day, for the chart
+        client.runReport({
+          property,
+          dateRanges,
+          dimensions: [{ name: "date" }],
+          metrics: [{ name: "activeUsers" }],
+          orderBys: [{ dimension: { dimensionName: "date" } }],
+        }),
+        // Most-viewed pages. /admin is filtered out here too, not just at
+        // collection time, so views recorded before that fix don't skew this.
+        client.runReport({
+          property,
+          dateRanges,
+          dimensions: [{ name: "pagePath" }],
+          metrics: [{ name: "screenPageViews" }],
+          dimensionFilter: {
+            notExpression: {
+              filter: {
+                fieldName: "pagePath",
+                stringFilter: { matchType: "BEGINS_WITH", value: "/admin" },
+              },
+            },
+          },
+          orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+          limit: 10,
+        }),
+        // Where visitors came from
+        client.runReport({
+          property,
+          dateRanges,
+          dimensions: [{ name: "sessionDefaultChannelGroup" }],
+          metrics: [{ name: "sessions" }],
+          orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+          limit: 8,
+        }),
+        // Countries
+        client.runReport({
+          property,
+          dateRanges,
+          dimensions: [{ name: "country" }, { name: "countryId" }],
+          metrics: [{ name: "activeUsers" }],
+          orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
+          limit: 8,
+        }),
+        // Cities — more useful than country for a Bangalore-based studio
+        client.runReport({
+          property,
+          dateRanges,
+          dimensions: [{ name: "city" }],
+          metrics: [{ name: "activeUsers" }],
+          orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
+          limit: 8,
+        }),
+      ]);
+
+      const row = totals[0].rows?.[0];
+      const num = (i) => Number(row?.metricValues?.[i]?.value ?? 0);
+
+      return {
+        totals: {
+          users: num(0),
+          sessions: num(1),
+          pageViews: num(2),
+          avgSessionSeconds: Math.round(num(3)),
+        },
+        // "20260828" -> "2026-08-28"
+        timeseries: (timeseries[0].rows ?? []).map((r) => {
+          const d = r.dimensionValues[0].value;
+          return {
+            date: `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`,
+            users: Number(r.metricValues[0].value ?? 0),
+          };
+        }),
+        pages: (pages[0].rows ?? []).map((r) => ({
+          path: r.dimensionValues[0].value,
+          views: Number(r.metricValues[0].value ?? 0),
+        })),
+        sources: (sources[0].rows ?? []).map((r) => ({
+          channel: r.dimensionValues[0].value,
+          sessions: Number(r.metricValues[0].value ?? 0),
+        })),
+        countries: (countries[0].rows ?? []).map((r) => ({
+          country: r.dimensionValues[0].value,
+          // ISO code, so the dashboard can show a flag
+          code: r.dimensionValues[1].value,
+          users: Number(r.metricValues[0].value ?? 0),
+        })),
+        cities: (cities[0].rows ?? []).map((r) => ({
+          city: r.dimensionValues[0].value,
+          users: Number(r.metricValues[0].value ?? 0),
+        })),
+        days,
+      };
+    } catch (err) {
+      console.error("GA4 query failed:", err);
+      // Surfaced verbatim in the dashboard — usually a permissions or
+      // property-id problem, and the message says which.
+      throw new HttpsError("internal", String(err && err.message ? err.message : err));
+    }
+  }
+);
+
+
+// ---------------------------------------------------------------------------
+// Event poster images: move base64 data URLs out of Firestore into Cloud
+// Storage, so visitors fetch cached CDN files instead of downloading every
+// poster as document data.
+//
+// URLs use Firebase's download-token format rather than storage.googleapis.com
+// — this bucket doesn't serve objects publicly via object ACLs, so the plain
+// GCS URL renders as a broken image.
+//
+// Safe to re-run: it also repairs documents left holding an unusable
+// storage.googleapis.com URL from the first version of this migration.
+// ---------------------------------------------------------------------------
+
+function downloadUrlFor(bucket, file, token) {
+  return (
+    `https://firebasestorage.googleapis.com/v0/b/${bucket.name}` +
+    `/o/${encodeURIComponent(file.name)}?alt=media&token=${token}`
+  );
+}
+
+async function publishAndUrl(bucket, file, contentType) {
+  const token = crypto.randomUUID();
+  await file.setMetadata({
+    contentType,
+    // Posters are immutable once uploaded — let browsers and the CDN keep them.
+    cacheControl: "public, max-age=31536000, immutable",
+    metadata: { firebaseStorageDownloadTokens: token },
+  });
+  return downloadUrlFor(bucket, file, token);
+}
+
+exports.migrateEventImages = onCall(
+  { region: "us-central1", timeoutSeconds: 540, memory: "512MiB" },
+  async (request) => {
+    assertAdmin(request);
+
+    const db = admin.firestore();
+    const bucket = admin.storage().bucket();
+    const snap = await db.collection("events").get();
+
+    let migrated = 0;
+    let repaired = 0;
+    let skipped = 0;
+    let bytesFreed = 0;
+    const failures = [];
+
+    for (const docSnap of snap.docs) {
+      const image = docSnap.data().image;
+      if (typeof image !== "string" || !image) {
+        skipped++;
+        continue;
+      }
+
+      try {
+        // Case 1: still embedded as base64 — upload it.
+        if (image.startsWith("data:")) {
+          const match = image.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+          if (!match) {
+            failures.push({ id: docSnap.id, error: "Unrecognised data URL" });
+            continue;
+          }
+          const contentType = match[1];
+          const buffer = Buffer.from(match[2], "base64");
+          const ext = contentType.split("/")[1].replace("jpeg", "jpg");
+          const file = bucket.file(`eventImages/${docSnap.id}.${ext}`);
+
+          await file.save(buffer, { contentType, resumable: false });
+          const url = await publishAndUrl(bucket, file, contentType);
+          await docSnap.ref.update({ image: url });
+
+          migrated++;
+          bytesFreed += image.length;
+          continue;
+        }
+
+        // Case 2: already uploaded, but pointing at a URL this bucket won't
+        // serve. The file is there — just mint a working URL for it.
+        if (image.includes("storage.googleapis.com")) {
+          const [files] = await bucket.getFiles({ prefix: `eventImages/${docSnap.id}.` });
+          if (files.length === 0) {
+            failures.push({ id: docSnap.id, error: "Uploaded file not found" });
+            continue;
+          }
+          const file = files[0];
+          const [meta] = await file.getMetadata();
+          const url = await publishAndUrl(bucket, file, meta.contentType || "image/jpeg");
+          await docSnap.ref.update({ image: url });
+          repaired++;
+          continue;
+        }
+
+        skipped++;
+      } catch (err) {
+        failures.push({
+          id: docSnap.id,
+          error: String(err && err.message ? err.message : err),
+        });
+      }
+    }
+
+    return {
+      migrated,
+      repaired,
+      skipped,
+      failures,
+      approxKbFreed: Math.round(bytesFreed / 1024),
+    };
+  }
+);
