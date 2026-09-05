@@ -28,6 +28,7 @@ const partners: Partner[] = [
   { name: "Delhi Public School, Bangalore South", logo: "/collab/trimmed/dps.png" },
   { name: "GRAT Lab", logo: "/collab/trimmed/grat.png" },
   { name: "Samāgata Foundation", logo: "/collab/trimmed/samagata.png" },
+  { name: "Crafty", logo: "/collab/trimmed/crafty.png" },
   { name: "Gubbachi Learning Community", logo: "/collab/trimmed/gubbacchi.png" },
   { name: "Brainy Stars", logo: "/collab/trimmed/brainystars.png" },
   { name: "iGenius", logo: "/collab/trimmed/igenius.png" },
@@ -53,7 +54,7 @@ function PartnerTile({ partner, index }: { partner: Partner; index: number }) {
             width={280}
             height={140}
             sizes="256px"
-            className="h-24 w-full object-contain transition duration-300 group-hover:scale-[1.04]"
+            className="h-24 w-full object-contain rounded-lg transition duration-300 group-hover:scale-[1.04]"
           />
         ) : (
           <div className="flex items-center gap-3">
