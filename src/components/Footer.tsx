@@ -4,14 +4,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Mail, Phone, ArrowUpRight, MapPin } from "lucide-react";
+import WaveDivider from "@/components/decor/WaveDivider";
 
 export default function Footer() {
   const pathname = usePathname();
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/forms/")) return null;
 
   return (
-    <footer className="bg-[#e5e5e5] text-[#111827] relative overflow-hidden" style={{ fontFamily: 'var(--font-poppins), sans-serif' }}>
-
+    <footer className="bg-[#e5e5e5] text-[#111827] relative" style={{ fontFamily: 'var(--font-poppins), sans-serif' }}>
+      <WaveDivider variant="curve" color="#e5e5e5" flip />
 
       <div className="max-w-7xl mx-auto px-5 md:px-8 pt-20 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 mb-16">

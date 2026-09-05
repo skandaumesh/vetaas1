@@ -6,11 +6,22 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { Calendar, ClipboardList, ExternalLink, LogOut, Send, Users } from "lucide-react";
+import {
+  BarChart3,
+  Calendar,
+  ClipboardList,
+  ExternalLink,
+  FileText,
+  LogOut,
+  Send,
+  Users,
+} from "lucide-react";
 
 const NAV = [
+  { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/memberships", label: "Memberships", icon: Users },
   { href: "/admin/quizzes", label: "Quizzes", icon: ClipboardList },
+  { href: "/admin/forms", label: "Forms", icon: FileText },
   { href: "/admin/broadcast", label: "Broadcast", icon: Send },
   { href: "/admin/events", label: "Events", icon: Calendar },
 ];
@@ -34,8 +45,8 @@ export default function AdminSidebar() {
         href={href}
         className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
           active
-            ? "bg-gray-100 text-[#111827]"
-            : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+            ? "bg-white/70 text-[#111827] shadow-sm"
+            : "text-gray-500 hover:bg-white/50 hover:text-gray-800"
         }`}
       >
         <Icon size={17} className={active ? "text-[#7C3AED]" : ""} />
@@ -47,7 +58,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 h-full w-60 flex-col bg-white border-r border-gray-200 z-40">
+      <aside className="hidden md:flex fixed left-0 top-0 h-full w-60 flex-col bg-white/55 backdrop-blur-xl border-r border-white/70 z-40">
         <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-100">
           <Image src="/icon.png" alt="Vetaas" width={36} height={36} className="rounded-lg" />
           <div>
@@ -63,10 +74,23 @@ export default function AdminSidebar() {
           {links}
         </nav>
 
-        <div className="px-3 py-4 border-t border-gray-100 space-y-1">
+        <div className="px-3 py-4 border-t border-slate-200/70 space-y-1">
+          {user && (
+            <div className="flex items-center gap-2.5 px-3 py-2.5 mb-1 rounded-xl bg-white/50">
+              <span className="w-8 h-8 shrink-0 rounded-full bg-[#7C3AED] text-white text-xs font-semibold flex items-center justify-center uppercase">
+                {(user.email ?? "?").charAt(0)}
+              </span>
+              <div className="min-w-0">
+                <p className="text-[13px] font-medium text-slate-800 truncate" title={user.email ?? undefined}>
+                  {user.email}
+                </p>
+                <p className="text-[11px] text-slate-400">Administrator</p>
+              </div>
+            </div>
+          )}
           <Link
             href="/"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:bg-white/50 hover:text-gray-800 transition-colors"
           >
             <ExternalLink size={16} />
             View website
@@ -75,7 +99,6 @@ export default function AdminSidebar() {
             <button
               onClick={() => signOut(auth)}
               className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer"
-              title={user.email ?? undefined}
             >
               <LogOut size={16} />
               <span className="truncate text-left">Sign out</span>
@@ -85,7 +108,7 @@ export default function AdminSidebar() {
       </aside>
 
       {/* Mobile top bar */}
-      <div className="md:hidden sticky top-0 z-40 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-2">
+      <div className="md:hidden sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-white/70 px-4 py-3 flex items-center gap-2">
         <Image src="/icon.png" alt="Vetaas" width={28} height={28} className="rounded-md" />
         <div className="flex gap-1 flex-1 justify-center">
           {NAV.map(({ href, label }) => (

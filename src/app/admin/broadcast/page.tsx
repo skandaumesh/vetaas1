@@ -151,17 +151,17 @@ export default function AdminBroadcastPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8 md:py-10 px-4 md:px-10">
+    <main className="min-h-screen py-8 md:py-10 px-4 md:px-10">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#111827]">Broadcast</h1>
-          <p className="text-sm text-gray-500 font-medium">
+          <h1 className="text-3xl md:text-[2.15rem] font-semibold tracking-[-0.02em] text-slate-900">Broadcast <span className="text-slate-300">email</span></h1>
+          <p className="text-sm text-slate-400">
             Send one personalised email to all your contacts. Each person gets their own name.
           </p>
         </div>
 
         {sentCount !== null ? (
-          <div className="bg-white rounded-3xl border border-gray-200 p-10 text-center">
+          <div className="glass-card rounded-3xl p-10 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-green-100 mb-5">
               <CheckCircle2 className="w-8 h-8 text-[#16a34a]" />
             </div>
@@ -185,8 +185,8 @@ export default function AdminBroadcastPage() {
             {/* Compose */}
             <div className="lg:col-span-3 space-y-5">
               {/* Audience */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-5">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Audience</p>
+              <div className="glass-card rounded-2xl p-5">
+                <p className="text-[13px] font-medium text-slate-400 uppercase tracking-wide mb-3">Audience</p>
                 <div className="space-y-2.5">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" checked={useMembers} onChange={(e) => setUseMembers(e.target.checked)} className="w-4 h-4 accent-[#7C3AED]" />
@@ -200,7 +200,7 @@ export default function AdminBroadcastPage() {
                   </label>
                 </div>
                 <div className="mt-4">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Add more (optional)</label>
+                  <label className="text-[13px] font-medium text-slate-400 uppercase tracking-wide">Add more (optional)</label>
                   <textarea
                     value={manual}
                     onChange={(e) => setManual(e.target.value)}
@@ -212,9 +212,9 @@ export default function AdminBroadcastPage() {
               </div>
 
               {/* Message */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-4">
+              <div className="glass-card rounded-2xl p-5 space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Subject</label>
+                  <label className="text-[13px] font-medium text-slate-400 uppercase tracking-wide">Subject</label>
                   <input
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
@@ -223,7 +223,7 @@ export default function AdminBroadcastPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wide">Message</label>
+                  <label className="text-[13px] font-medium text-slate-400 uppercase tracking-wide">Message</label>
                   <textarea
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
@@ -239,7 +239,7 @@ export default function AdminBroadcastPage() {
 
             {/* Preview + send */}
             <div className="lg:col-span-2 space-y-5">
-              <div className="bg-white rounded-2xl border border-gray-200 p-5">
+              <div className="glass-card rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Users size={15} className="text-[#7C3AED]" />
                   <span className="text-sm font-bold text-[#111827]">{recipients.length} recipient{recipients.length === 1 ? "" : "s"}</span>
@@ -261,10 +261,10 @@ export default function AdminBroadcastPage() {
               </div>
 
               {/* Live preview */}
-              <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+              <div className="glass-card rounded-2xl overflow-hidden">
                 <div className="px-4 py-2.5 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
                   <Mail size={14} className="text-gray-400" />
-                  <span className="text-xs font-bold text-gray-500">Preview — as {preview.name || "there"}</span>
+                  <span className="text-[13px] font-medium text-slate-400">Preview — as {preview.name || "there"}</span>
                 </div>
                 <div className="p-4">
                   <p className="text-xs text-gray-400 mb-2">
@@ -293,7 +293,7 @@ export default function AdminBroadcastPage() {
                   </button>
                   <button
                     onClick={() => setConfirm(false)}
-                    className="px-5 py-3.5 bg-white border border-gray-200 text-gray-500 rounded-full text-sm font-bold hover:bg-gray-100 transition-all cursor-pointer"
+                    className="px-5 py-3.5 bg-white/60 border border-white/70 text-gray-500 rounded-full text-sm font-bold hover:bg-gray-100 transition-all cursor-pointer"
                   >
                     Cancel
                   </button>

@@ -26,7 +26,7 @@ export default function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full bg-white/60 backdrop-blur-md shadow-sm border-b border-white/20"
+      className="w-full bg-white shadow-sm border-b border-gray-100"
     >
       <div className="w-full max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 h-14 md:h-16 flex items-center justify-between">
 
@@ -49,7 +49,7 @@ export default function Navbar() {
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
               if (item.label === "Services") {
-                const isServicesActive = pathname === "/services" || pathname === "/parents" || pathname === "/children" || pathname === "/teachers";
+                const isServicesActive = pathname === "/services" || pathname === "/parents" || pathname === "/children" || pathname === "/teachers" || pathname === "/club";
                 return (
                   <div key={item.href} className="relative group py-2">
                     <Link href="/services" className={`flex items-center gap-1 text-base lg:text-[1.1rem] font-semibold transition-colors cursor-pointer ${
@@ -72,6 +72,9 @@ export default function Navbar() {
                       </Link>
                       <Link href="/parents" className="block text-center px-5 py-2.5 text-sm font-semibold text-gray-800 hover:text-[#FF5C7A] hover:bg-gray-50 transition-colors">
                         SEL for Parents
+                      </Link>
+                      <Link href="/club" className="block text-center px-5 py-2.5 text-sm font-semibold text-gray-800 hover:text-[#FF5C7A] hover:bg-gray-50 transition-colors">
+                        Clubs
                       </Link>
                     </div>
                   </div>
@@ -143,7 +146,7 @@ export default function Navbar() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
-                  <div className={`pl-6 flex flex-col gap-2 overflow-hidden transition-all duration-300 ${isMobileServicesOpen ? 'max-h-56 mt-1 mb-2' : 'max-h-0'}`}>
+                  <div className={`pl-6 flex flex-col gap-2 overflow-hidden transition-all duration-300 ${isMobileServicesOpen ? 'max-h-80 mt-1 mb-2' : 'max-h-0'}`}>
                     <Link
                       href="/services"
                       className="text-base font-semibold py-2 px-4 rounded-lg text-gray-700 hover:bg-gray-50"
@@ -171,6 +174,13 @@ export default function Navbar() {
                       onClick={() => setIsOpen(false)}
                     >
                       SEL for Parents
+                    </Link>
+                    <Link
+                      href="/club"
+                      className="text-base font-semibold py-2 px-4 rounded-lg text-gray-700 hover:bg-gray-50"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Clubs
                     </Link>
                   </div>
                 </div>

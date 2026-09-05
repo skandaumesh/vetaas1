@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import WaveDivider from "@/components/decor/WaveDivider";
 
 export default function WhySELSection() {
   const pillars = [
@@ -58,61 +59,10 @@ export default function WhySELSection() {
   ];
 
   return (
-    <section 
-      className="pt-10 pb-12 lg:pt-12 lg:pb-16 bg-gradient-to-b from-[#faf9f6] to-[#ecf7f4] relative overflow-hidden z-10"
+    <section
+      className="pt-10 pb-24 lg:pt-12 lg:pb-32 bg-[#EAFBF9] relative overflow-hidden z-10"
       style={{ fontFamily: 'var(--font-poppins), sans-serif' }}
     >
-      {/* Background Decor — Layered Premium */}
-      <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#00CDBA]/5 blur-[120px] md:animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute bottom-[10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-[#FFC107]/5 blur-[130px] md:animate-pulse-slow pointer-events-none z-0" />
-
-      {/* Morphing organic blob — top right */}
-      <div className="absolute top-[5%] right-[5%] w-[280px] h-[280px] bg-gradient-to-br from-[#00CDBA]/8 to-[#268bff]/6 md:animate-morph pointer-events-none z-0 blur-[60px]" />
-      {/* Morphing organic blob — bottom left */}
-      <div className="absolute bottom-[8%] left-[3%] w-[320px] h-[320px] bg-gradient-to-tr from-[#FFC107]/8 to-[#ffc107]/6 md:animate-morph pointer-events-none z-0 blur-[70px]" style={{ animationDelay: '-4s' }} />
-
-      {/* Drifting geometric ring accent — top left */}
-      <div className="absolute top-[12%] left-[8%] w-[120px] h-[120px] rounded-full border-2 border-[#00CDBA]/10 md:animate-drift pointer-events-none z-0" />
-      {/* Drifting geometric ring accent — bottom right */}
-      <div className="absolute bottom-[15%] right-[10%] w-[90px] h-[90px] rounded-full border-2 border-[#FFC107]/12 md:animate-drift-reverse pointer-events-none z-0" />
-      {/* Small orbiting dot */}
-      <div className="absolute top-[30%] right-[20%] w-[10px] h-[10px] rounded-full bg-[#268bff]/15 md:animate-orbit pointer-events-none z-0" />
-
-      {/* Layered SVG journey lines */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <svg width="100%" height="100%" viewBox="0 0 1440 900" preserveAspectRatio="none" fill="none" className="w-full h-full">
-          {/* Primary curve */}
-          <path 
-            d="M-50,300 C300,100 600,450 900,200 C1200,50 1350,380 1500,250" 
-            stroke="#FFC107" 
-            strokeWidth="3" 
-            strokeLinecap="round" 
-            opacity="0.08"
-          />
-          {/* Secondary offset curve */}
-          <path 
-            d="M-50,380 C350,180 650,520 950,280 C1250,100 1400,450 1550,320" 
-            stroke="#00CDBA" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            opacity="0.06"
-          />
-          {/* Thin accent curve */}
-          <path 
-            d="M-50,500 C200,350 500,600 800,400 C1100,250 1300,500 1500,420" 
-            stroke="#268bff" 
-            strokeWidth="1.5" 
-            strokeLinecap="round" 
-            strokeDasharray="12 8"
-            opacity="0.06"
-          />
-          {/* Decorative circles */}
-          <circle cx="200" cy="150" r="60" stroke="#00CDBA" strokeWidth="1" opacity="0.05" />
-          <circle cx="1200" cy="700" r="80" stroke="#FFC107" strokeWidth="1" opacity="0.05" />
-          <circle cx="700" cy="100" r="35" stroke="#ffc107" strokeWidth="1.5" opacity="0.06" />
-        </svg>
-      </div>
-
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 relative z-10">
         
         {/* Original Header */}
@@ -123,10 +73,10 @@ export default function WhySELSection() {
           transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto mb-16"
         >
-          <div className="inline-flex items-center justify-center bg-[#268bff] text-white px-4 py-1.5 rounded-full mb-4 shadow-sm rotate-1">
-            <span className="text-xs font-semibold uppercase tracking-wider">Why Social Emotional Learning?</span>
-          </div>
-          
+          <span className="block text-[#268bff] text-xs font-black uppercase tracking-[0.25em] mb-4">
+            Why Social Emotional Learning?
+          </span>
+
           <h2 className="text-3xl md:text-4xl lg:text-5xl text-[#111827] font-bold font-headline tracking-tight leading-[1.2] mb-5">
             Education isn't just academics.<br />
             <span className="inline-block bg-[#00CDBA] text-white px-3 py-0.5 rounded-xl -rotate-1 mt-2 shadow-sm font-semibold">It's about the whole child.</span>
@@ -207,6 +157,8 @@ export default function WhySELSection() {
           ))}
         </div>
       </div>
+
+      <WaveDivider color="#FFFFFF" />
     </section>
   );
 }

@@ -2,8 +2,8 @@ import React from "react";
 import { MapPin } from "lucide-react";
 
 export const metadata = {
-  title: "Find Us",
-  description: "Find Vetaas Education Foundation's physical location in Bangalore, India. Visit us or get directions.",
+  title: "Visit Us in J. P. Nagar, Bengaluru",
+  description: "The Nest by Vetaas is on Kanakapura Main Road, J. P. Nagar, Bengaluru 560078 — open 11 AM to 6 PM. Directions, map and contact details for our SEL studio.",
   alternates: { canonical: "/find-us" },
   openGraph: {
     title: "Find Us | Vetaas Education Foundation",

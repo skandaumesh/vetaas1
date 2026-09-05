@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
+import { httpsCallable } from "firebase/functions";
+import { db, storage, functions } from "@/lib/firebase";
 import { useAdminAuth } from "@/components/admin/AdminGate";
 import {
   CheckCircle2,
@@ -61,6 +63,51 @@ export default function AdminEventsPage() {
 
   // Event form modal
   const [formOpen, setFormOpen] = useState(false);
+
+  // One-off: move legacy base64 posters out of Firestore into Cloud Storage.
+  // The button disappears once no event still holds an embedded image.
+  const [migrating, setMigrating] = useState(false);
+  // Base64 images still to move, plus any left on a storage.googleapis.com URL
+  // that this bucket won't serve (broken by the first migration attempt).
+  const legacyImageCount = events.filter(
+    (e: any) =>
+      typeof e.image === "string" &&
+      (e.image.startsWith("data:") || e.image.includes("storage.googleapis.com"))
+  ).length;
+
+  const migrateImages = async () => {
+    setMigrating(true);
+    try {
+      const fn = httpsCallable<
+        Record<string, never>,
+        {
+          migrated: number;
+          repaired: number;
+          skipped: number;
+          approxKbFreed: number;
+          failures: { id: string; error: string }[];
+        }
+      >(functions, "migrateEventImages");
+      const { data } = await fn({});
+      const parts = [];
+      if (data.migrated) parts.push(`moved ${data.migrated}`);
+      if (data.repaired) parts.push(`fixed ${data.repaired}`);
+      showToast(
+        (parts.length ? `Images: ${parts.join(", ")}.` : "Nothing to do.") +
+          (data.failures.length ? ` ${data.failures.length} failed.` : ""),
+        data.failures.length ? "error" : "success"
+      );
+      if (data.failures.length) console.error("Image migration failures:", data.failures);
+      await fetchEvents();
+    } catch (err) {
+      showToast(
+        `Migration failed: ${err instanceof Error ? err.message : "unknown error"}`,
+        "error"
+      );
+    } finally {
+      setMigrating(false);
+    }
+  };
 
   // Fetch events once the admin is signed in
   useEffect(() => {
@@ -124,49 +171,52 @@ export default function AdminEventsPage() {
       let imageUrl = "";
 
       if (imageFile) {
-        // Since Firebase Storage is blocked, we will compress the image and convert it to Base64 
-        // to store it directly in Firestore (limit is 1MB per document).
-        imageUrl = await new Promise<string>((resolve, reject) => {
+        // Resize/compress in the browser, then store the file in Cloud Storage
+        // and keep only its URL in Firestore. Previously the image was embedded
+        // as base64 in the document, which meant every visitor to /events
+        // downloaded every poster as document data instead of cached CDN files.
+        const blob = await new Promise<Blob>((resolve, reject) => {
           const reader = new FileReader();
           reader.readAsDataURL(imageFile);
           reader.onload = (event) => {
             const img = new window.Image();
             img.src = event.target?.result as string;
             img.onload = () => {
-              const canvas = document.createElement("canvas");
-              const MAX_WIDTH = 800;
-              const MAX_HEIGHT = 800;
-              let width = img.width;
-              let height = img.height;
-
+              const MAX = 1200;
+              let { width, height } = img;
               if (width > height) {
-                if (width > MAX_WIDTH) {
-                  height *= MAX_WIDTH / width;
-                  width = MAX_WIDTH;
+                if (width > MAX) {
+                  height *= MAX / width;
+                  width = MAX;
                 }
-              } else {
-                if (height > MAX_HEIGHT) {
-                  width *= MAX_HEIGHT / height;
-                  height = MAX_HEIGHT;
-                }
+              } else if (height > MAX) {
+                width *= MAX / height;
+                height = MAX;
               }
 
+              const canvas = document.createElement("canvas");
               canvas.width = width;
               canvas.height = height;
               const ctx = canvas.getContext("2d");
-              if (ctx) {
-                ctx.drawImage(img, 0, 0, width, height);
-                // Compress to 70% quality JPEG to ensure it fits well under Firestore's 1MB limit
-                const base64Url = canvas.toDataURL("image/jpeg", 0.7);
-                resolve(base64Url);
-              } else {
-                resolve(event.target?.result as string);
-              }
+              if (!ctx) return reject(new Error("Canvas unavailable"));
+              ctx.drawImage(img, 0, 0, width, height);
+              canvas.toBlob(
+                (b) => (b ? resolve(b) : reject(new Error("Could not encode image"))),
+                "image/jpeg",
+                0.82
+              );
             };
             img.onerror = (err) => reject(err);
           };
           reader.onerror = (err) => reject(err);
         });
+
+        const fileRef = storageRef(
+          storage,
+          `eventImages/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`
+        );
+        await uploadBytes(fileRef, blob, { contentType: "image/jpeg" });
+        imageUrl = await getDownloadURL(fileRef);
       } else if (formData.manualImageUrl) {
         imageUrl = formData.manualImageUrl;
       }
@@ -371,7 +421,7 @@ export default function AdminEventsPage() {
     return (
       <div
         key={event.id}
-        className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-gray-300 transition-all duration-300 relative overflow-hidden flex flex-col gap-4 group"
+        className="glass-card rounded-2xl p-5 hover:border-gray-300 transition-all duration-300 relative overflow-hidden flex flex-col gap-4 group"
       >
         <div className="flex gap-4 items-start">
           {event.image ? (
@@ -437,7 +487,7 @@ export default function AdminEventsPage() {
                 </div>
                 <button
                   onClick={() => setEditingHighlightsId(event.id)}
-                  className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-white border border-gray-200 hover:bg-gray-100 text-gray-600 rounded-lg transition cursor-pointer shrink-0"
+                  className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 bg-white/60 border border-white/70 hover:bg-white/80 text-gray-600 rounded-lg transition cursor-pointer shrink-0"
                 >
                   <Edit2 size={10} /> Edit
                 </button>
@@ -509,7 +559,7 @@ export default function AdminEventsPage() {
 
   // Authenticated Admin Panel
   return (
-    <div className="min-h-screen bg-gray-50 py-8 md:py-10 px-4 md:px-10 relative">
+    <div className="min-h-screen py-8 md:py-10 px-4 md:px-10 relative">
 
       {/* Toast Notification Layer */}
       <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
@@ -597,14 +647,63 @@ export default function AdminEventsPage() {
         )}
       </AnimatePresence>
 
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-[1400px] mx-auto">
 
-        {/* Admin Dashboard Subheader */}
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#111827]">Events Dashboard</h1>
-          <p className="text-sm text-gray-500 font-medium mt-1">
-            Signed in as <span className="font-semibold text-gray-700">{user?.email}</span>
-          </p>
+        {/* Header */}
+        <header className="flex flex-wrap items-end justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl md:text-[2.15rem] font-semibold tracking-[-0.02em] text-slate-900">
+              Events <span className="text-slate-300">dashboard</span>
+            </h1>
+            <p className="text-sm text-slate-400 mt-1">
+              Create and manage everything shown on the public events page.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {legacyImageCount > 0 && (
+              <button
+                onClick={migrateImages}
+                disabled={migrating}
+                title="Move poster images out of the database into Cloud Storage"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/70 border border-amber-200 text-amber-700 rounded-lg text-[13px] font-medium hover:bg-amber-50 transition-colors disabled:opacity-60 cursor-pointer"
+              >
+                {migrating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <ImageIcon className="w-4 h-4" />
+                )}
+                {migrating ? "Moving…" : `Optimise ${legacyImageCount} image${legacyImageCount === 1 ? "" : "s"}`}
+              </button>
+            )}
+            <button
+              onClick={openNewForm}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-700 text-white rounded-lg text-[13px] font-medium transition-colors cursor-pointer"
+            >
+              <PlusCircle className="w-4 h-4" />
+              Add event
+            </button>
+          </div>
+        </header>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-px bg-slate-200 border border-slate-200 rounded-xl overflow-hidden mb-8">
+          {[
+            { label: "Total events", value: String(events.length), sub: "all time" },
+            {
+              label: "Upcoming",
+              value: String(upcomingEvents.length),
+              sub: upcomingEvents.length > 0 ? "scheduled ahead" : "nothing scheduled",
+            },
+            { label: "Completed", value: String(completedEvents.length), sub: "already held" },
+          ].map((card) => (
+            <div key={card.label} className="bg-white px-5 py-5">
+              <p className="text-[13px] font-medium text-slate-400 mb-3">{card.label}</p>
+              <p className="text-[2.5rem] font-semibold tabular-nums tracking-[-0.03em] leading-none mb-2 text-slate-900">
+                {card.value}
+              </p>
+              <p className="text-xs text-slate-300">{card.sub}</p>
+            </div>
+          ))}
         </div>
 
         {/* Event Form Modal */}
@@ -765,7 +864,7 @@ export default function AdminEventsPage() {
                       onChange={handleImageChange}
                       className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#00CDBA]/10 file:text-[#00CDBA] hover:file:bg-[#00CDBA]/20 cursor-pointer"
                     />
-                    <p className="text-[10px] text-gray-400 font-medium mt-2">Images compress dynamically and store instantly.</p>
+                    <p className="text-[10px] text-slate-300 mt-2">Images compress dynamically and store instantly.</p>
                   </div>
                 </div>
                 
@@ -824,26 +923,13 @@ export default function AdminEventsPage() {
 
         {/* List Section */}
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-extrabold text-[#111827] flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-[#7C3AED]" /> Manage Events
-            </h2>
-            <button
-              onClick={openNewForm}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-full text-sm font-bold transition-colors cursor-pointer"
-            >
-              <PlusCircle className="w-4 h-4" />
-              Add Event
-            </button>
-          </div>
-            
             {loading ? (
-              <div className="flex items-center gap-2 text-gray-500 font-body py-8">
+              <div className="flex items-center gap-2 text-sm text-slate-400 py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-[#7C3AED]" />
                 <span className="font-semibold">Loading events list...</span>
               </div>
             ) : events.length === 0 ? (
-              <p className="text-gray-500 font-body py-8 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+              <p className="text-sm text-slate-400 py-10 text-center bg-white/50 rounded-2xl border border-dashed border-gray-300">
                 No events yet. Click &quot;Add Event&quot; to create your first one.
               </p>
             ) : (
@@ -852,13 +938,13 @@ export default function AdminEventsPage() {
                 <section>
                   <div className="flex items-center gap-2 mb-4">
                     <span className="w-2 h-2 rounded-full bg-green-500" />
-                    <h3 className="text-sm font-extrabold uppercase tracking-wider text-gray-500">
+                    <h3 className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                       Upcoming
                     </h3>
-                    <span className="text-xs font-bold text-gray-400">{upcomingEvents.length}</span>
+                    <span className="text-xs text-slate-400 tabular-nums">{upcomingEvents.length}</span>
                   </div>
                   {upcomingEvents.length === 0 ? (
-                    <p className="text-gray-400 font-body py-6 text-center bg-white rounded-2xl border border-dashed border-gray-200 text-sm">
+                    <p className="text-sm text-slate-400 py-8 text-center bg-white/50 rounded-2xl border border-dashed border-gray-200 text-sm">
                       No upcoming events. Click &quot;Add Event&quot; to schedule one.
                     </p>
                   ) : (
@@ -873,10 +959,10 @@ export default function AdminEventsPage() {
                   <section>
                     <div className="flex items-center gap-2 mb-4">
                       <span className="w-2 h-2 rounded-full bg-gray-400" />
-                      <h3 className="text-sm font-extrabold uppercase tracking-wider text-gray-500">
+                      <h3 className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
                         Completed
                       </h3>
-                      <span className="text-xs font-bold text-gray-400">{completedEvents.length}</span>
+                      <span className="text-xs text-slate-400 tabular-nums">{completedEvents.length}</span>
                     </div>
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 font-body items-start">
                       {completedEvents.map(renderCard)}

@@ -156,6 +156,18 @@ body {
   background-attachment: fixed;
 }
 
+/* Public form and event pages. Same ambient wash as the admin shell, but on
+   the warm cream the marketing site uses rather than the cool admin grey, so
+   the glass panels still read as part of the main site. */
+.form-shell {
+  background-color: #faf9f6;
+  background-image:
+    radial-gradient(900px 540px at 6% -10%, rgba(124, 58, 237, 0.16), transparent 60%),
+    radial-gradient(780px 480px at 98% 4%, rgba(0, 205, 186, 0.14), transparent 58%),
+    radial-gradient(820px 560px at 52% 110%, rgba(255, 92, 122, 0.12), transparent 60%);
+  background-attachment: fixed;
+}
+
 /* Border is a hairline slate rather than white: a white edge on a near-white
    page is invisible, which makes the panel read as no card at all. The inset
    highlight keeps the lit-glass-edge look. */
@@ -294,6 +306,13 @@ body {
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+/* The partner strip loops indefinitely, so honour a reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
 }
 
 

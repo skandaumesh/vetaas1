@@ -667,6 +667,16 @@ exports.razorpayWebhook = onRequest(
           .get();
         if (!snap.empty) {
           await approvePaidOrder(db, snap.docs[0].id);
+        } else {
+          // Not a membership — it may be a paid event registration.
+          const reg = await db
+            .collection("formResponses")
+            .where("razorpayOrderId", "==", razorpayOrderId)
+            .limit(1)
+            .get();
+          if (!reg.empty) {
+            await markRegistrationPaid(db, reg.docs[0].id, payment.id);
+          }
         }
       }
     }
@@ -723,7 +733,7 @@ exports.getSiteAnalytics = onCall(
     const client = getAnalyticsClient();
 
     try {
-      const [totals, timeseries, pages, sources, countries, cities] = await Promise.all([
+      const [totals, timeseries, pages, sources, countries, cities, hours] = await Promise.all([
         // Headline numbers
         client.runReport({
           property,
@@ -749,7 +759,11 @@ exports.getSiteAnalytics = onCall(
           property,
           dateRanges,
           dimensions: [{ name: "pagePath" }],
-          metrics: [{ name: "screenPageViews" }],
+          metrics: [
+            { name: "screenPageViews" },
+            { name: "userEngagementDuration" },
+            { name: "activeUsers" },
+          ],
           dimensionFilter: {
             notExpression: {
               filter: {
@@ -788,6 +802,17 @@ exports.getSiteAnalytics = onCall(
           orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
           limit: 8,
         }),
+        // Hour of day, aggregated across the whole range, so the dashboard can
+        // show when the site is actually busy. "hour" is 00-23 in the GA4
+        // property's own timezone (IST here), not UTC.
+        client.runReport({
+          property,
+          dateRanges,
+          dimensions: [{ name: "hour" }],
+          metrics: [{ name: "sessions" }],
+          orderBys: [{ dimension: { dimensionName: "hour" } }],
+          limit: 24,
+        }),
       ]);
 
       const row = totals[0].rows?.[0];
@@ -808,10 +833,17 @@ exports.getSiteAnalytics = onCall(
             users: Number(r.metricValues[0].value ?? 0),
           };
         }),
-        pages: (pages[0].rows ?? []).map((r) => ({
-          path: r.dimensionValues[0].value,
-          views: Number(r.metricValues[0].value ?? 0),
-        })),
+        pages: (pages[0].rows ?? []).map((r) => {
+          const engagementSeconds = Number(r.metricValues[1].value ?? 0);
+          const users = Number(r.metricValues[2].value ?? 0);
+          return {
+            path: r.dimensionValues[0].value,
+            views: Number(r.metricValues[0].value ?? 0),
+            // Matches GA4's "average engagement time per active user": total
+            // time engaged on the page divided by the people who saw it.
+            avgSeconds: users ? Math.round(engagementSeconds / users) : 0,
+          };
+        }),
         sources: (sources[0].rows ?? []).map((r) => ({
           channel: r.dimensionValues[0].value,
           sessions: Number(r.metricValues[0].value ?? 0),
@@ -825,6 +857,11 @@ exports.getSiteAnalytics = onCall(
         cities: (cities[0].rows ?? []).map((r) => ({
           city: r.dimensionValues[0].value,
           users: Number(r.metricValues[0].value ?? 0),
+        })),
+        // Sparse: GA4 omits hours with no traffic, so the client fills 0-23.
+        hours: (hours[0].rows ?? []).map((r) => ({
+          hour: Number(r.dimensionValues[0].value),
+          sessions: Number(r.metricValues[0].value ?? 0),
         })),
         days,
       };
@@ -945,5 +982,201 @@ exports.migrateEventImages = onCall(
       failures,
       approxKbFreed: Math.round(bytesFreed / 1024),
     };
+  }
+);
+
+// ---------------------------------------------------------------------------
+// Public membership status lookup.
+//
+// membershipOrders is admin-only in the security rules, so members can't read
+// their own record directly — this is the one narrow, server-controlled way in.
+//
+// Both the membership ID and the matching email are required. IDs run
+// sequentially (VET-0001, VET-0002...), so an ID on its own would let anyone
+// walk the whole member list. Only a minimal set of fields is returned.
+// ---------------------------------------------------------------------------
+
+exports.checkMembership = onCall(
+  { region: "us-central1" },
+  async (request) => {
+    const membershipId = String(request.data?.membershipId ?? "").trim().toUpperCase();
+    const email = String(request.data?.email ?? "").trim().toLowerCase();
+
+    if (!membershipId || !email) {
+      throw new HttpsError("invalid-argument", "Membership ID and email are both required.");
+    }
+
+    const db = admin.firestore();
+    const snap = await db
+      .collection("membershipOrders")
+      .where("membershipId", "==", membershipId)
+      .limit(1)
+      .get();
+
+    // Same response whether the ID doesn't exist or the email doesn't match,
+    // so this can't be used to discover which IDs are real.
+    const notFound = { found: false };
+    if (snap.empty) return notFound;
+
+    const order = snap.docs[0].data();
+    if (String(order.email ?? "").trim().toLowerCase() !== email) return notFound;
+    if (order.status !== "approved") return notFound;
+
+    const expiresAtMs = order.expiresAt ? order.expiresAt.toMillis() : null;
+    const daysLeft =
+      expiresAtMs === null ? null : Math.ceil((expiresAtMs - Date.now()) / 86400000);
+
+    return {
+      found: true,
+      membershipId,
+      // First name only — enough to confirm it's the right record without
+      // handing back the full details we hold.
+      childName: String(order.childName ?? "").split(" ")[0],
+      plan: (order.items ?? []).map((i) => `${i.plan}${i.qty > 1 ? ` x${i.qty}` : ""}`).join(", "),
+      expiresAt: expiresAtMs,
+      daysLeft,
+      active: daysLeft !== null && daysLeft >= 0,
+    };
+  }
+);
+
+
+// ---------------------------------------------------------------------------
+// Paid event registrations.
+//
+// Some forms are free and some charge a per-event amount the admin sets in the
+// builder. The price is read from the form document server-side, so the
+// browser can never dictate what a registration costs. Free forms don't come
+// through here at all — they write straight to Firestore under the rules.
+// ---------------------------------------------------------------------------
+
+// Idempotent: both the browser's verify call and the webhook can land, and
+// whichever arrives second must be a no-op.
+async function markRegistrationPaid(db, responseId, paymentId) {
+  const ref = db.collection("formResponses").doc(responseId);
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) return;
+    if (snap.data().paymentStatus === "paid") return;
+    tx.update(ref, {
+      paymentStatus: "paid",
+      razorpayPaymentId: paymentId || null,
+      paidAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  });
+}
+
+exports.createEventRegistration = onCall(
+  { region: "us-central1", secrets: [razorpayKeySecret] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Please reload the page and try again.");
+    }
+
+    const data = request.data || {};
+    const formId = String(data.formId || "").trim();
+    if (!formId) throw new HttpsError("invalid-argument", "Missing form.");
+
+    const db = admin.firestore();
+    const formSnap = await db.collection("forms").doc(formId).get();
+    if (!formSnap.exists) throw new HttpsError("not-found", "This form doesn't exist.");
+
+    const form = formSnap.data();
+    if (form.status === "closed") {
+      throw new HttpsError("failed-precondition", "This form is no longer accepting responses.");
+    }
+
+    // The amount comes from Firestore, never from the request.
+    const price = Math.round(Number(form.price) || 0);
+    if (price <= 0) {
+      throw new HttpsError("failed-precondition", "This form is free — no payment needed.");
+    }
+    if (price > 500000) {
+      throw new HttpsError("failed-precondition", "Ticket price is out of range.");
+    }
+
+    // Rebuild the answers from the form definition so the stored labels always
+    // match the real questions, whatever the client sent.
+    const submitted = data.answers && typeof data.answers === "object" ? data.answers : {};
+    const fields = Array.isArray(form.fields) ? form.fields : [];
+    const answers = fields.map((field) => {
+      const raw = submitted[field.id];
+      const value = Array.isArray(raw)
+        ? raw.map((v) => String(v).slice(0, 500)).slice(0, 50)
+        : String(raw ?? "").slice(0, 5000);
+      return { fieldId: field.id, label: String(field.label || ""), value };
+    });
+
+    const missing = fields.find((field) => {
+      if (!field.required) return false;
+      const value = answers.find((a) => a.fieldId === field.id).value;
+      return Array.isArray(value) ? value.length === 0 : value.trim().length === 0;
+    });
+    if (missing) {
+      throw new HttpsError("invalid-argument", "Please answer all required questions.");
+    }
+
+    const responseRef = db.collection("formResponses").doc();
+    const razorpay = new Razorpay({
+      key_id: razorpayKeyId.value(),
+      key_secret: razorpayKeySecret.value(),
+    });
+    const rzpOrder = await razorpay.orders.create({
+      amount: price * 100, // paise
+      currency: "INR",
+      receipt: responseRef.id,
+      notes: { formId, formTitle: String(form.title || "").slice(0, 100) },
+    });
+
+    await responseRef.set({
+      formId,
+      formTitle: String(form.title || ""),
+      answers,
+      amount: price,
+      paymentStatus: "pending",
+      razorpayOrderId: rzpOrder.id,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return {
+      responseId: responseRef.id,
+      razorpayOrderId: rzpOrder.id,
+      amount: rzpOrder.amount,
+      currency: rzpOrder.currency,
+      keyId: razorpayKeyId.value(),
+    };
+  }
+);
+
+exports.verifyEventPayment = onCall(
+  { region: "us-central1", secrets: [razorpayKeySecret] },
+  async (request) => {
+    const data = request.data || {};
+    const responseId = String(data.responseId || "");
+    const orderId = String(data.razorpay_order_id || "");
+    const paymentId = String(data.razorpay_payment_id || "");
+    const signature = String(data.razorpay_signature || "");
+    if (!responseId || !orderId || !paymentId || !signature) {
+      throw new HttpsError("invalid-argument", "Missing payment details.");
+    }
+
+    const expected = crypto
+      .createHmac("sha256", razorpayKeySecret.value())
+      .update(`${orderId}|${paymentId}`)
+      .digest("hex");
+    if (expected !== signature) {
+      throw new HttpsError("permission-denied", "Payment could not be verified.");
+    }
+
+    const db = admin.firestore();
+    const snap = await db.collection("formResponses").doc(responseId).get();
+    if (!snap.exists) throw new HttpsError("not-found", "Registration not found.");
+    // The signature proves the order was paid; this proves it's *this* order.
+    if (snap.data().razorpayOrderId !== orderId) {
+      throw new HttpsError("permission-denied", "Payment does not match this registration.");
+    }
+
+    await markRegistrationPaid(db, responseId, paymentId);
+    return { ok: true };
   }
 );

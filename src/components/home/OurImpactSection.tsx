@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { BookOpen, Users, Smile } from "lucide-react";
+import WaveDivider from "@/components/decor/WaveDivider";
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -37,7 +38,7 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
 const stats = [
   {
     id: 1,
-    number: 50,
+    number: 370,
     suffix: "+",
     label: "Teachers",
     icon: BookOpen,
@@ -45,7 +46,7 @@ const stats = [
   },
   {
     id: 2,
-    number: 50,
+    number: 48,
     suffix: "+",
     label: "Parents",
     icon: Users,
@@ -53,7 +54,7 @@ const stats = [
   },
   {
     id: 3,
-    number: 300,
+    number: 400,
     suffix: "+",
     label: "Children",
     icon: Smile,
@@ -63,58 +64,7 @@ const stats = [
 
 export default function OurImpactSection() {
   return (
-    <section className="relative w-full pt-8 pb-12 lg:pt-12 lg:pb-16 bg-gradient-to-b from-[#fafaf7] to-[#f0f6fa] overflow-hidden z-10">
-      
-
-
-      {/* Morphing organic blobs */}
-      <div className="absolute top-[10%] right-[5%] w-[300px] h-[300px] bg-gradient-to-br from-[#00CDBA]/6 to-[#268bff]/5 md:animate-morph pointer-events-none z-0 blur-[65px]" />
-      <div className="absolute bottom-[5%] left-[8%] w-[280px] h-[280px] bg-gradient-to-tr from-[#FF5C7A]/6 to-[#FFC107]/5 md:animate-morph pointer-events-none z-0 blur-[60px]" style={{ animationDelay: '-5s' }} />
-      <div className="absolute top-[40%] left-[50%] w-[200px] h-[200px] bg-gradient-to-br from-[#FFC107]/5 to-[#ffc107]/4 md:animate-morph pointer-events-none z-0 blur-[50px]" style={{ animationDelay: '-9s' }} />
-
-      {/* Drifting geometric rings */}
-      <div className="absolute top-[15%] right-[12%] w-[110px] h-[110px] rounded-full border-2 border-[#00CDBA]/8 md:animate-drift pointer-events-none z-0" />
-      <div className="absolute bottom-[18%] left-[15%] w-[80px] h-[80px] rounded-full border-2 border-[#FF5C7A]/10 md:animate-drift-reverse pointer-events-none z-0" />
-      <div className="absolute top-[60%] right-[5%] w-[60px] h-[60px] rounded-full border border-[#268bff]/8 md:animate-drift pointer-events-none z-0" style={{ animationDelay: '-10s' }} />
-      {/* Orbiting dots */}
-      <div className="absolute top-[20%] left-[30%] w-[10px] h-[10px] rounded-full bg-[#00CDBA]/12 md:animate-orbit pointer-events-none z-0" />
-      <div className="absolute bottom-[30%] right-[25%] w-[7px] h-[7px] rounded-full bg-[#FFC107]/15 md:animate-orbit pointer-events-none z-0" style={{ animationDelay: '-15s' }} />
-
-      {/* Layered SVG journey lines */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <svg width="100%" height="100%" viewBox="0 0 1440 600" preserveAspectRatio="none" fill="none" className="w-full h-full">
-          {/* Primary teal curve */}
-          <path 
-            d="M-50,150 C300,350 600,50 1000,400 C1200,550 1350,200 1500,250" 
-            stroke="#00CDBA" 
-            strokeWidth="3" 
-            strokeLinecap="round" 
-            opacity="0.07"
-          />
-          {/* Secondary coral curve */}
-          <path 
-            d="M-50,250 C350,450 650,100 1050,350 C1250,480 1400,250 1550,300" 
-            stroke="#FF5C7A" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            opacity="0.05"
-          />
-          {/* Dashed gold accent */}
-          <path 
-            d="M-50,450 C200,300 500,550 800,350 C1100,200 1300,450 1500,380" 
-            stroke="#FFC107" 
-            strokeWidth="1.5" 
-            strokeLinecap="round" 
-            strokeDasharray="8 6"
-            opacity="0.06"
-          />
-          {/* Decorative circles */}
-          <circle cx="250" cy="120" r="50" stroke="#00CDBA" strokeWidth="1" opacity="0.04" />
-          <circle cx="1100" cy="480" r="65" stroke="#FF5C7A" strokeWidth="1" opacity="0.04" />
-          <circle cx="600" cy="80" r="30" stroke="#FFC107" strokeWidth="1.5" opacity="0.05" />
-        </svg>
-      </div>
-
+    <section className="relative w-full pt-8 pb-24 lg:pt-12 lg:pb-32 bg-white overflow-hidden z-10">
       <div className="w-full max-w-[1100px] mx-auto px-6 md:px-12 relative z-10">
         
         {/* Section Header */}
@@ -146,7 +96,7 @@ export default function OurImpactSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="bg-white border border-gray-200 rounded-3xl lg:rounded-full py-4 px-6 sm:px-8 w-full flex items-center justify-center gap-4 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1 group"
+              className="bg-white border border-gray-200 rounded-2xl py-4 px-6 sm:px-8 w-full flex items-center justify-center gap-4 shadow-sm hover:shadow-md transition-shadow duration-300 flex-1 group"
               style={{ fontFamily: 'var(--font-poppins), sans-serif' }}
             >
               {/* Icon */}
@@ -168,6 +118,8 @@ export default function OurImpactSection() {
         </div>
 
       </div>
+
+      <WaveDivider color="#F7EAC6" />
     </section>
   );
 }

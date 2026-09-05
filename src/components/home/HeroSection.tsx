@@ -1,13 +1,13 @@
 "use client";
- 
+
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { Star, ArrowRight, Blocks, GraduationCap, HeartHandshake, Sparkles } from "lucide-react";
- 
+
 export default function HeroSection() {
   return (
-    <section 
+    <section
       className="relative w-full min-h-screen flex flex-col lg:flex-row bg-[#faf9f6] overflow-hidden z-30 pt-[var(--header-height)]"
     >
       {/* Global SVG Definitions for Clip Paths */}
@@ -20,7 +20,7 @@ export default function HeroSection() {
       </svg>
 
       {/* Left Column: Content Pane (Uses Left side of finalhero.png for exact background decor & doodles) */}
-      <div 
+      <div
         className="w-full lg:w-[55%] flex flex-col justify-center px-6 sm:px-12 md:px-20 lg:pl-28 lg:pr-12 xl:pl-36 xl:pr-16 pt-16 pb-16 lg:py-0 relative z-10"
         style={{ fontFamily: 'var(--font-poppins), sans-serif' }}
       >
@@ -61,17 +61,17 @@ export default function HeroSection() {
         {/* Large Navy Blue Bottom Wave */}
         <div className="hidden lg:block absolute bottom-0 left-0 w-full h-[90px] sm:h-[110px] lg:h-[130px] pointer-events-none -z-10">
           <svg viewBox="0 0 600 120" preserveAspectRatio="none" className="w-full h-full text-[#7C3AED]">
-            <path 
-              d="M 0,90 C 80,110 160,115 220,105 C 300,90 400,60 480,70 C 520,75 560,95 600,90 L 600,120 L 0,120 Z" 
-              fill="currentColor" 
+            <path
+              d="M 0,90 C 80,110 160,115 220,105 C 300,90 400,60 480,70 C 520,75 560,95 600,90 L 600,120 L 0,120 Z"
+              fill="currentColor"
             />
           </svg>
         </div>
 
         {/* --- Content Column --- */}
-        <motion.div 
-          initial={{ opacity: 0, x: -30 }} 
-          animate={{ opacity: 1, x: 0 }} 
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="flex flex-col items-start text-left relative z-10 max-w-xl lg:max-w-lg xl:max-w-xl mx-auto lg:mx-0"
         >
@@ -157,11 +157,11 @@ export default function HeroSection() {
       {/* Right Column: Image Pane with Dynamic Wavy Divider */}
       <div className="w-full lg:w-[45%] h-[420px] sm:h-[520px] lg:h-auto relative z-10 overflow-hidden">
         {/* Child Photo cropped from landingpage.png (Shifted to object-[62%_20%] on mobile to display face and drawing fully) */}
-        <Image 
-          src="/landingpage.png" 
-          alt="Nurturing Hope and Life" 
-          fill 
-          className="object-cover object-[15%_20%] lg:object-[15%_0%]" 
+        <Image
+          src="/landingpage.png"
+          alt="Nurturing Hope and Life"
+          fill
+          className="object-cover object-[15%_20%] lg:object-[15%_0%]"
           priority
         />
 
@@ -181,15 +181,15 @@ export default function HeroSection() {
         </div>
 
         {/* Blue Wave Continuation (Fixed 130px height at bottom, clipped to the left of the gold line) */}
-        <div 
+        <div
           className="hidden lg:block absolute top-0 left-0 h-full w-[120px] -translate-x-[1px] z-30 pointer-events-none"
           style={{ clipPath: 'url(#divider-left-clip)' }}
         >
           <div className="absolute bottom-0 left-0 w-full h-[130px]">
             <svg viewBox="0 0 120 120" preserveAspectRatio="none" className="w-full h-full text-[#7C3AED]">
-              <path 
-                d="M 0,90 C 20,85 70,105 120,120 L 120,120 L 0,120 Z" 
-                fill="currentColor" 
+              <path
+                d="M 0,90 C 20,85 70,105 120,120 L 120,120 L 0,120 Z"
+                fill="currentColor"
               />
             </svg>
           </div>

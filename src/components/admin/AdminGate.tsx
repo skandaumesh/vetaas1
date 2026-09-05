@@ -56,7 +56,7 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
 
   if (authLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50">
+      <main className="min-h-screen admin-shell flex items-center justify-center">
         <Loader2 className="animate-spin text-[#7C3AED]" size={32} />
       </main>
     );
@@ -64,10 +64,10 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
+      <main className="min-h-screen admin-shell flex items-center justify-center px-6">
         <form
           onSubmit={handleLogin}
-          className="bg-white rounded-3xl shadow-sm border border-gray-200 p-8 w-full max-w-sm space-y-4"
+          className="glass-solid rounded-3xl p-8 w-full max-w-sm space-y-4"
         >
           <div className="text-center mb-2">
             <Image

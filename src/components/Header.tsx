@@ -7,7 +7,7 @@ import Navbar from "./Navbar";
 
 export default function Header() {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith("/admin");
+  const hideChrome = pathname?.startsWith("/admin") || pathname?.startsWith("/forms/");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function Header() {
     };
   }, []);
 
-  if (isAdmin) return null;
+  if (hideChrome) return null;
 
   return (
     <div ref={ref} className="fixed top-0 inset-x-0 z-50">

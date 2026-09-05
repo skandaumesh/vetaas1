@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 import Script from "next/script";
 
@@ -27,11 +28,25 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    default: "Vetaas Education Foundation | Social Emotional Learning",
+    default: "Social Emotional Learning (SEL) in Bengaluru | Vetaas Education Foundation",
     template: "%s | Vetaas Education Foundation",
   },
-  description: "Vetaas partners with parents, teachers, and schools to nurture Social Emotional Learning (SEL) in early childhood across Bangalore, India. Discover our resources, curriculum, and community initiatives.",
-  keywords: ["Social Emotional Learning", "SEL", "Early Childhood Education", "Vetaas Education Foundation", "Bangalore", "Child Development", "Parenting", "Teacher Training"],
+  description:
+    "Social Emotional Learning (SEL) programs for children, parents and teachers in Bengaluru. Vetaas runs workshops, parent-child sessions and school partnerships from The Nest, our studio in J. P. Nagar.",
+  keywords: [
+    "SEL Bengaluru",
+    "SEL Bangalore",
+    "Social Emotional Learning Bengaluru",
+    "Social Emotional Learning Bangalore",
+    "SEL classes for children Bangalore",
+    "SEL workshops for teachers",
+    "parenting workshops Bengaluru",
+    "early childhood education Bangalore",
+    "child development JP Nagar",
+    "SEL curriculum for schools",
+    "Vetaas Education Foundation",
+    "The Nest by Vetaas",
+  ],
   authors: [{ name: "Vetaas Education Foundation" }],
   creator: "Vetaas Education Foundation",
   publisher: "Vetaas Education Foundation",
@@ -92,24 +107,59 @@ const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": ["Organization", "EducationalOrganization", "NGO"],
+      // LocalBusiness matters for "…near me" / "…in Bengaluru" searches — it's
+      // what lets Google associate the site with a physical place.
+      "@type": ["LocalBusiness", "EducationalOrganization", "NGO"],
       "@id": `${SITE_URL}/#organization`,
       name: "Vetaas Education Foundation",
-      alternateName: "Vetaas — The Tree of Hope",
+      alternateName: ["Vetaas — The Tree of Hope", "The Nest by Vetaas"],
       url: SITE_URL,
       logo: `${SITE_URL}/logo.webp`,
+      image: `${SITE_URL}/logo.webp`,
       description:
-        "Vetaas partners with parents, teachers, and schools to nurture Social Emotional Learning (SEL) in early childhood across Bangalore, India.",
-      areaServed: {
-        "@type": "City",
-        name: "Bangalore",
-      },
+        "Vetaas Education Foundation runs Social Emotional Learning (SEL) programs, workshops and parent-child sessions for early childhood in Bengaluru — working with parents, teachers and schools from our studio, The Nest, in J. P. Nagar.",
+      telephone: "+91-89510-04160",
+      email: "kirti@vetaas.in",
+      priceRange: "₹₹",
+      areaServed: [
+        { "@type": "City", name: "Bengaluru" },
+        { "@type": "City", name: "Bangalore" },
+      ],
       address: {
         "@type": "PostalAddress",
-        addressLocality: "Bangalore",
+        name: "The Nest by Vetaas",
+        streetAddress:
+          "Dhanalakshmi Building, D21, Kanakapura Main Road, opposite Total Energies petrol station, Shakambari Nagar, 1st Phase, J. P. Nagar",
+        addressLocality: "Bengaluru",
         addressRegion: "Karnataka",
+        postalCode: "560078",
         addressCountry: "IN",
       },
+      hasMap: "https://maps.app.goo.gl/eMUJokfKE8opyhhz5",
+      openingHoursSpecification: [
+        {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ],
+          opens: "11:00",
+          closes: "18:00",
+        },
+      ],
+      knowsAbout: [
+        "Social Emotional Learning",
+        "SEL curriculum",
+        "Early childhood education",
+        "Parent workshops",
+        "Teacher training",
+        "Child development",
+      ],
       sameAs: [
         "https://www.instagram.com/vetaaseducation/",
         "https://www.linkedin.com/company/vetaas/",
@@ -161,21 +211,10 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
-        {/* Google Analytics 4. The measurement ID was already in the Firebase
-            config but nothing ever loaded gtag, so no data was being collected.
-            Enhanced measurement handles client-side route changes. */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="ga4-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}');
-          `}
-        </Script>
+        {/* Google Analytics 4 — sends page views manually so /admin is excluded
+            (see GoogleAnalytics.tsx). Otherwise the team's own dashboard
+            browsing shows up as visitor traffic. */}
+        <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
         <Header />
         <main className="flex-1">
           {children}

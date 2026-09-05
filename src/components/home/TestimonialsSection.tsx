@@ -89,61 +89,10 @@ export default function TestimonialsSection() {
   const MAX_LENGTH = 130;
 
   return (
-    <section 
-      className="pt-12 pb-8 lg:pt-16 lg:pb-12 bg-gradient-to-b from-[#ecf7f4] to-[#fafaf7] overflow-hidden relative z-20"
+    <section
+      className="pt-12 pb-20 lg:pt-16 lg:pb-28 bg-white overflow-hidden relative z-20"
       style={{ fontFamily: 'var(--font-poppins), sans-serif' }}
     >
-      {/* Background Decor — Layered Premium */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-[#FF5C7A]/4 blur-[100px] md:animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute top-[-5%] left-[-8%] w-[400px] h-[400px] rounded-full bg-[#268bff]/4 blur-[110px] md:animate-pulse-slow pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[350px] h-[350px] rounded-full bg-[#00CDBA]/4 blur-[100px] md:animate-pulse-slow pointer-events-none z-0" />
- 
-      {/* Morphing organic blobs */}
-      <div className="absolute top-[15%] right-[8%] w-[220px] h-[220px] bg-gradient-to-br from-[#FF5C7A]/6 to-[#FFC107]/5 md:animate-morph pointer-events-none z-0 blur-[50px]" />
-      <div className="absolute bottom-[10%] left-[5%] w-[260px] h-[260px] bg-gradient-to-tr from-[#268bff]/6 to-[#00CDBA]/5 md:animate-morph pointer-events-none z-0 blur-[55px]" style={{ animationDelay: '-6s' }} />
- 
-      {/* Drifting geometric rings */}
-      <div className="absolute top-[8%] left-[12%] w-[100px] h-[100px] rounded-full border-2 border-[#FF5C7A]/8 md:animate-drift pointer-events-none z-0" />
-      <div className="absolute bottom-[20%] right-[15%] w-[70px] h-[70px] rounded-full border-2 border-[#00CDBA]/10 md:animate-drift-reverse pointer-events-none z-0" />
-      <div className="absolute top-[50%] left-[3%] w-[50px] h-[50px] rounded-full border border-[#FFC107]/12 md:animate-drift pointer-events-none z-0" style={{ animationDelay: '-8s' }} />
-      {/* Orbiting dot */}
-      <div className="absolute top-[25%] left-[25%] w-[8px] h-[8px] rounded-full bg-[#FF5C7A]/12 md:animate-orbit pointer-events-none z-0" />
-      
-      {/* Layered SVG journey lines */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <svg width="100%" height="100%" viewBox="0 0 1440 600" preserveAspectRatio="none" fill="none" className="w-full h-full">
-          {/* Primary coral curve */}
-          <path 
-            d="M-50,250 C300,450 600,100 1000,350 C1200,450 1350,250 1500,300" 
-            stroke="#FF5C7A" 
-            strokeWidth="3" 
-            strokeLinecap="round" 
-            opacity="0.07"
-          />
-          {/* Secondary teal curve */}
-          <path 
-            d="M-50,180 C250,380 550,50 950,300 C1150,400 1300,180 1500,230" 
-            stroke="#00CDBA" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            opacity="0.05"
-          />
-          {/* Dashed accent */}
-          <path 
-            d="M-50,400 C200,300 500,500 800,320 C1100,180 1350,400 1500,350" 
-            stroke="#FFC107" 
-            strokeWidth="1.5" 
-            strokeLinecap="round" 
-            strokeDasharray="10 6"
-            opacity="0.06"
-          />
-          {/* Decorative SVG circles */}
-          <circle cx="150" cy="100" r="45" stroke="#FF5C7A" strokeWidth="1" opacity="0.04" />
-          <circle cx="1300" cy="450" r="55" stroke="#268bff" strokeWidth="1" opacity="0.04" />
-          <circle cx="800" cy="50" r="25" stroke="#00CDBA" strokeWidth="1.5" opacity="0.05" />
-        </svg>
-      </div>
- 
       <div className="max-w-[1400px] mx-auto px-6 mb-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -151,9 +100,9 @@ export default function TestimonialsSection() {
           viewport={{ once: true }}
           className="text-center"
         >
-          <div className="inline-flex items-center justify-center bg-[#FF5C7A] text-white px-5 py-2 rounded-full mb-4 shadow-sm rotate-1">
-            <span className="text-sm font-semibold uppercase tracking-wider">Testimonials</span>
-          </div>
+          <span className="block text-[#FF5C7A] text-xs font-black uppercase tracking-[0.25em] mb-4">
+            Testimonials
+          </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl text-[#111827] font-bold font-headline tracking-tight leading-[1.2]">
             Voices from <span className="inline-block bg-[#00CDBA] text-white px-5 py-1 rounded-[1.5rem] shadow-sm rotate-2">Our Village</span>
           </h2>

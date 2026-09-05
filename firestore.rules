@@ -57,8 +57,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Form responses: anyone may file a new, well-formed response to a form;
-    // only an admin can read them back.
+    // Form responses: anyone may file a new, well-formed response to a FREE
+    // form; only an admin can read them back.
+    //
+    // Paid registrations never come through here — the createEventRegistration
+    // Cloud Function writes them with the Admin SDK, which bypasses these
+    // rules, so the charged amount is always the one stored on the form. Two
+    // guards keep that airtight: the form being written to must be free, and
+    // the payment fields may not appear in a client-written document (so a
+    // free response can't be forged to look paid).
     match /formResponses/{responseId} {
       allow create: if request.auth != null
         && request.resource.data.formId is string
@@ -66,7 +73,13 @@ service cloud.firestore {
         && request.resource.data.formTitle is string
         && request.resource.data.formTitle.size() < 200
         && request.resource.data.answers is list
-        && request.resource.data.answers.size() <= 50;
+        && request.resource.data.answers.size() <= 50
+        && !('paymentStatus' in request.resource.data)
+        && !('amount' in request.resource.data)
+        && !('razorpayOrderId' in request.resource.data)
+        && !('razorpayPaymentId' in request.resource.data)
+        && get(/databases/$(database)/documents/forms/$(request.resource.data.formId))
+             .data.get('price', 0) == 0;
       allow read, update, delete: if isAdmin();
     }
 
