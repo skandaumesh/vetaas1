@@ -1,9 +1,32 @@
 type WaveDividerProps = {
-  variant?: "curve" | "zigzag";
+  variant?: "curve" | "waves";
   color: string;
   flip?: boolean;
   className?: string;
 };
+
+/**
+ * A run of even, rounded waves across the full width — the same repeating
+ * rhythm a zigzag gives, but every peak and trough is a quadratic curve, so
+ * there are no sharp corners anywhere along the seam.
+ *
+ * Each segment is a half-period bump and they alternate direction, which keeps
+ * the curve continuous where one segment hands over to the next.
+ */
+const WAVES_PATH = (() => {
+  const width = 1440;
+  const segments = 22;
+  const step = width / segments;
+  const amplitude = 32;
+  const midline = 50;
+
+  let d = `M 0,${midline}`;
+  for (let i = 0; i < segments; i++) {
+    const lift = i % 2 === 0 ? -amplitude : amplitude;
+    d += ` q ${step / 2},${lift} ${step},0`;
+  }
+  return `${d} L ${width},100 L 0,100 Z`;
+})();
 
 /**
  * Full-width SVG seam used to transition between two flat-color sections
@@ -28,17 +51,14 @@ export default function WaveDivider({
         preserveAspectRatio="none"
         className="w-full h-full"
       >
-        {variant === "curve" ? (
-          <path
-            d="M0,55 C420,-15 1020,125 1440,45 L1440,100 L0,100 Z"
-            fill={color}
-          />
-        ) : (
-          <path
-            d="M0,100 L0,55 L80,25 L160,65 L240,25 L320,65 L400,25 L480,65 L560,25 L640,65 L720,25 L800,65 L880,25 L960,65 L1040,25 L1120,65 L1200,25 L1280,65 L1360,25 L1440,55 L1440,100 Z"
-            fill={color}
-          />
-        )}
+        <path
+          d={
+            variant === "curve"
+              ? "M0,55 C420,-15 1020,125 1440,45 L1440,100 L0,100 Z"
+              : WAVES_PATH
+          }
+          fill={color}
+        />
       </svg>
     </div>
   );

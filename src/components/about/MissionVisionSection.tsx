@@ -101,7 +101,7 @@ export default function MissionVisionSection() {
 
       </div>
 
-      <WaveDivider variant="zigzag" color="#EAFBF9" />
+      <WaveDivider variant="waves" color="#D3F2EC" />
     </section>
   );
 }

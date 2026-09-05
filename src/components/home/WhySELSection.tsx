@@ -60,7 +60,7 @@ export default function WhySELSection() {
 
   return (
     <section
-      className="pt-10 pb-24 lg:pt-12 lg:pb-32 bg-[#EAFBF9] relative overflow-hidden z-10"
+      className="pt-10 pb-24 lg:pt-12 lg:pb-32 bg-[#D3F2EC] relative overflow-hidden z-10"
       style={{ fontFamily: 'var(--font-poppins), sans-serif' }}
     >
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 relative z-10">
