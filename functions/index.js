@@ -1360,6 +1360,52 @@ async function fallbackLinks(attachments) {
   return links;
 }
 
+function buildDownloadsHtml({ name, attachments, links, tooBig }) {
+  const rows = tooBig
+    ? links
+        .map(
+          (l) =>
+            '<tr><td style="padding:7px 0;font-size:14px;color:#374151;">' +
+            l.name +
+            ' &mdash; <a href="' + l.url + '" style="color:#7C3AED;font-weight:bold;text-decoration:none;">Download</a>' +
+            '</td></tr>'
+        )
+        .join("")
+    : attachments
+        .map(
+          (a) =>
+            '<tr><td style="padding:7px 0;font-size:14px;color:#374151;">' +
+            '<span style="color:#00CDBA;font-weight:bold;">&#10003;</span> ' + a.name +
+            '</td></tr>'
+        )
+        .join("");
+
+  const note = tooBig
+    ? "These files were too large to attach, so they're linked above. Please save them to your device &mdash; the links are time-limited."
+    : "Your files are attached to this email. Save them to your device so you always have them.";
+
+  return (
+    '<div style="margin:0;padding:24px 12px;background:#faf9f6;font-family:Segoe UI,Helvetica,Arial,sans-serif;">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #eee;">' +
+        '<tr><td style="padding:32px 32px 8px;text-align:center;">' +
+          '<img src="https://www.vetaas.in/icon.png" width="72" height="72" alt="Vetaas" style="border-radius:50%;display:block;margin:0 auto 14px;background:#ffffff;" />' +
+          '<p style="margin:0;font-size:20px;font-weight:bold;color:#111827;">Your downloads</p>' +
+        '</td></tr>' +
+        '<tr><td style="padding:16px 32px 0;">' +
+          '<p style="margin:0 0 14px;font-size:15px;color:#374151;">Hi ' + (name || "there") + ',</p>' +
+          '<p style="margin:0 0 16px;font-size:15px;color:#374151;">Thank you for your order.</p>' +
+          '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;">' + rows + '</table>' +
+          '<p style="margin:0 0 24px;font-size:13px;color:#6b7280;line-height:1.6;">' + note + '</p>' +
+        '</td></tr>' +
+        '<tr><td style="padding:18px 32px 28px;border-top:1px solid #f1f1f1;text-align:center;">' +
+          '<p style="margin:0;font-size:13px;color:#9ca3af;">Vetaas Education Foundation</p>' +
+          '<a href="https://www.vetaas.in" style="font-size:13px;color:#9ca3af;text-decoration:none;">www.vetaas.in</a>' +
+        '</td></tr>' +
+      '</table>' +
+    '</div>'
+  );
+}
+
 /**
  * Idempotent, like the membership and event-registration paths: the browser's
  * verify call and the webhook can both land, and whichever is second does
@@ -1413,6 +1459,7 @@ async function fulfilCartOrder(db, orderId, paymentId) {
               "\n\nPlease save the files to your device — these links are time-limited."
             : " attached to this email:\n\n" + listed) +
           "\n\nWarm regards,\nVetaas Education Foundation\nwww.vetaas.in",
+        html: buildDownloadsHtml({ name: claimed.name, attachments, links, tooBig }),
       },
       // Fetched from Storage by sendMail; PDF bytes can't live on this document.
       storageAttachments: tooBig
