@@ -167,6 +167,55 @@ const structuredData = {
       ],
     },
     {
+      // Answer engines quote FAQ entries almost verbatim, so these are written
+      // as direct answers to the questions people actually ask, each naming
+      // the place and the subject rather than assuming context.
+      "@type": "FAQPage",
+      "@id": `${SITE_URL}/#faq`,
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "What is Social Emotional Learning (SEL)?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Social Emotional Learning (SEL) is how children learn to understand their feelings, build relationships, and handle everyday situations with confidence. Vetaas Education Foundation brings SEL research into classrooms and homes in Bengaluru through stories, art, movement and play.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Where is Vetaas Education Foundation located?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Vetaas Education Foundation runs its studio, The Nest, at Dhanalakshmi Building, D21, Kanakapura Main Road, opposite the Total Energies petrol station, Shakambari Nagar, 1st Phase, J. P. Nagar, Bengaluru 560078. It is open every day from 11:00 to 18:00.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Who are Vetaas SEL programmes for?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Vetaas works with three groups in Bengaluru: children in early childhood, parents who want to support their child's emotional growth, and teachers and schools adopting SEL in the classroom. Sessions run at The Nest in J. P. Nagar and in partner schools.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "How can I join a Vetaas workshop or become a member?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Upcoming workshops are listed at vetaas.in/events and can be booked online. Monthly memberships to The Nest are available at vetaas.in/services, and the team can be reached on +91 89510 04160 or kirti@vetaas.in.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Does Vetaas offer SEL training for schools and teachers?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Yes. Vetaas Education Foundation provides SEL curriculum support, teacher training and classroom integration toolkits for schools in Bengaluru, and collaborates with partner schools across the city.",
+          },
+        },
+      ],
+    },
+    {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
       url: SITE_URL,
