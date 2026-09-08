@@ -9,8 +9,37 @@ service firebase.storage {
         && request.auth.token.email in ['kirti.vetaas@gmail.com'];
     }
 
-    // Payment screenshots: a signed-in visitor may upload an image under 5 MB;
-    // only an admin can read them back
+    // Paid downloads. Never readable through these rules — after payment a
+    // Cloud Function mints a signed (or tokenised) link with the Admin SDK,
+    // which bypasses rules. A catch-all public read would have made every
+    // worksheet downloadable by anyone who guessed the path.
+    match /products/{file=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Event posters and form cover images are public content. They're served
+    // through download-token URLs, so this read rule only matters for the SDK
+    // calls that mint those URLs.
+    match /eventImages/{file=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /formLogos/{file=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Form "image upload" answers: a visitor filling out a public form may
+    // upload an image under 8 MB. The uploader needs read to fetch its
+    // download URL; only an admin sees them in the responses view.
+    match /formUploads/{formId}/{file} {
+      allow create: if request.auth != null
+        && request.resource.size < 8 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow read: if request.auth != null;
+    }
+
+    // Legacy payment screenshots from before Razorpay.
     match /membership-screenshots/{file} {
       allow create: if request.auth != null
         && request.resource.size < 5 * 1024 * 1024
@@ -18,19 +47,10 @@ service firebase.storage {
       allow read: if isAdmin();
     }
 
-    // Form "image upload" answers: a visitor filling out a public form may
-    // upload an image under 8 MB; only an admin can read them back
-    match /formUploads/{formId}/{file} {
-      allow create: if request.auth != null
-        && request.resource.size < 8 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
-      allow read: if isAdmin();
-    }
-
-    // Event images and other assets: public read, admin-only write
+    // Anything else is admin-only, so a new bucket path is private by default
+    // rather than world-readable.
     match /{allPaths=**} {
-      allow read: if true;
-      allow write: if isAdmin();
+      allow read, write: if isAdmin();
     }
   }
 }

@@ -12,6 +12,9 @@ type Partner = {
    * back to a numbered placeholder mark.
    */
   logo?: string;
+  /** True pixel size of the file, so each tile can size itself to its logo. */
+  w?: number;
+  h?: number;
   /**
    * Optional size multiplier. Very wide wordmarks hit the tile's width limit
    * long before its height, so they end up shorter than the squarer marks
@@ -29,16 +32,16 @@ type Partner = {
  * duplicates whatever is here to make the loop seamless.
  */
 const partners: Partner[] = [
-  { name: "Ekya Schools", logo: "/collab/trimmed/ekya.png" },
-  { name: "Kahaani Box", logo: "/collab/trimmed/kahaani.png" },
-  { name: "Delhi Public School, Bangalore South", logo: "/collab/trimmed/dps.png" },
-  { name: "GRAT Lab", logo: "/collab/trimmed/grat-v2.png" },
-  { name: "Samāgata Foundation", logo: "/collab/trimmed/samagata-v2.png" },
-  { name: "Crafty", logo: "/collab/trimmed/crafty.png" },
-  { name: "Gubbachi Learning Community", logo: "/collab/trimmed/gubbacchi.png" },
-  { name: "Brainy Stars", logo: "/collab/trimmed/brainystars-v2.png" },
-  { name: "iGenius", logo: "/collab/trimmed/igenius-v2.png" },
-  { name: "10Labs", logo: "/collab/trimmed/onezerolabs-v2.png", scale: 1.3 },
+  { name: "Ekya Schools", logo: "/collab/trimmed/ekya.png", w: 900, h: 89 },
+  { name: "Kahaani Box", logo: "/collab/trimmed/kahaani.png", w: 276, h: 400 },
+  { name: "Delhi Public School, Bangalore South", logo: "/collab/trimmed/dps.png", w: 714, h: 400 },
+  { name: "GRAT Lab", logo: "/collab/trimmed/grat-v2.png", w: 326, h: 400 },
+  { name: "Samāgata Foundation", logo: "/collab/trimmed/samagata-v2.png", w: 538, h: 168 },
+  { name: "Crafty", logo: "/collab/trimmed/crafty.png", w: 400, h: 400 },
+  { name: "Gubbachi Learning Community", logo: "/collab/trimmed/gubbacchi.png", w: 197, h: 120 },
+  { name: "Brainy Stars", logo: "/collab/trimmed/brainystars-v2.png", w: 270, h: 121 },
+  { name: "iGenius", logo: "/collab/trimmed/igenius-v3.png", w: 900, h: 231 },
+  { name: "10Labs", logo: "/collab/trimmed/onezerolabs-v2.png", w: 832, h: 94, scale: 1.3 },
 ];
 
 const accents = ["#7C3AED", "#00CDBA", "#FF5C7A", "#268bff"];
@@ -47,27 +50,27 @@ function PartnerTile({ partner, index }: { partner: Partner; index: number }) {
   const accent = accents[index % accents.length];
 
   return (
-    <li className="shrink-0 px-2.5 sm:px-3">
+    <li className="shrink-0 px-10 sm:px-14">
       {/* No card behind the logo — the marks sit straight on the band, so the
           white backgrounds baked into several of the source files have been
           knocked out to transparent. */}
-      <div className="group h-32 w-60 sm:w-64 px-7 flex items-center justify-center transition-transform duration-300 hover:-translate-y-0.5">
+      {/* The tile hugs its logo instead of being a fixed width: a portrait mark
+          like Kahaani Box is only ~66px wide at full height, so a 256px tile
+          left a dead gap either side of it. Real file dimensions on each entry
+          let the browser derive the true width from the height. */}
+      <div className="group h-32 flex items-center justify-center transition-transform duration-300 hover:-translate-y-0.5">
         {partner.logo ? (
-          /* Every logo gets the same fixed box and object-contain letterboxes
-             inside it, so each one grows to fill whichever axis it runs out of
-             first. A max-height alone is only a ceiling — small source files
-             like iGenius (67x92) would sit at their own size and read tiny. */
           <span
-            className="flex w-full items-center justify-center"
+            className="flex items-center justify-center"
             style={partner.scale ? { transform: `scale(${partner.scale})` } : undefined}
           >
             <Image
               src={partner.logo}
               alt={partner.name}
-              width={280}
-              height={140}
-              sizes="256px"
-              className="h-24 w-full object-contain rounded-lg transition duration-300 group-hover:scale-[1.04]"
+              width={partner.w ?? 280}
+              height={partner.h ?? 140}
+              sizes="280px"
+              className="h-24 w-auto max-w-[230px] object-contain rounded-lg transition duration-300 group-hover:scale-[1.04]"
             />
           </span>
         ) : (

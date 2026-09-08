@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { CartProvider } from "@/lib/cart";
 
 import Script from "next/script";
 
@@ -215,12 +216,14 @@ export default function RootLayout({
             (see GoogleAnalytics.tsx). Otherwise the team's own dashboard
             browsing shows up as visitor traffic. */}
         <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
-        <Header />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
-        <ScrollToTop />
+        <CartProvider>
+          <Header />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+          <ScrollToTop />
+        </CartProvider>
       </body>
     </html>
   );

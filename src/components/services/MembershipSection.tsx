@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useCart } from "@/lib/cart";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { httpsCallable } from "firebase/functions";
@@ -187,6 +189,10 @@ const verifyMembershipPayment = httpsCallable<
 >(functions, "verifyMembershipPayment");
 
 export default function MembershipSection() {
+  // Plans feed the site-wide cart; checkout happens on /cart alongside any
+  // worksheets or card decks in the same order.
+  const { add: addToSharedCart } = useCart();
+  const [added, setAdded] = useState<string | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -207,15 +213,17 @@ export default function MembershipSection() {
   }, [cart, hydrated]);
 
   const addToCart = (planId: string) => {
-    setSubmitted(false);
-    setCart((prev) => {
-      const existing = prev.find((i) => i.planId === planId);
-      if (existing) {
-        return prev.map((i) => (i.planId === planId ? { ...i, qty: i.qty + 1 } : i));
-      }
-      return [...prev, { planId, qty: 1 }];
+    const plan = PLANS.find((p) => p.id === planId);
+    if (!plan) return;
+    addToSharedCart({
+      id: plan.id,
+      kind: "membership",
+      name: `${plan.name} membership`,
+      price: plan.price,
+      siblingDiscount: plan.siblingDiscount,
     });
-    setDrawerOpen(true);
+    setAdded(plan.id);
+    window.setTimeout(() => setAdded((cur) => (cur === plan.id ? null : cur)), 2200);
   };
 
   const changeQty = (planId: string, delta: number) => {
@@ -430,8 +438,16 @@ NEST MEMBERSHIP GUIDE
               className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 font-bold text-sm rounded-full hover:brightness-105 hover:scale-[1.02] transition-all shadow-md cursor-pointer"
             >
               <ShoppingCart size={16} />
-              Choose {plan.name}
+              {added === plan.id ? "Added to cart" : `Choose ${plan.name}`}
             </button>
+            {added === plan.id && (
+              <Link
+                href="/cart"
+                className="mt-2 block text-center text-[13px] font-bold text-[#7C3AED] hover:underline"
+              >
+                View cart &rarr;
+              </Link>
+            )}
           </motion.div>
         ))}
       </div>
@@ -456,252 +472,6 @@ NEST MEMBERSHIP GUIDE
         </ul>
       </motion.div>
 
-      {/* Cart UI is portaled to <body>: the page wraps this section in a
-          stacking context (relative z-10) that would trap fixed elements
-          below the navbar (z-50) and event banner (z-[60]) */}
-      {hydrated &&
-        createPortal(
-          <>
-      {/* Floating cart button */}
-      <AnimatePresence>
-        {itemCount > 0 && !drawerOpen && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={() => setDrawerOpen(true)}
-            className="fixed bottom-24 right-8 z-40 inline-flex items-center gap-2.5 px-6 py-3.5 bg-[#7C3AED] text-white font-bold text-sm rounded-full shadow-xl hover:bg-[#6D28D9] hover:scale-105 transition-all cursor-pointer"
-          >
-            <ShoppingCart size={18} />
-            Cart
-            <span className="bg-white text-[#7C3AED] rounded-full w-6 h-6 flex items-center justify-center text-xs font-extrabold">
-              {itemCount}
-            </span>
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* Cart drawer */}
-      <AnimatePresence>
-        {drawerOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setDrawerOpen(false)}
-              className="fixed inset-0 bg-black/40 z-[70]"
-            />
-            <motion.aside
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[80] shadow-2xl flex flex-col"
-            >
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <h3 className="text-lg font-extrabold text-[#111827] flex items-center gap-2">
-                  <ShoppingCart size={20} className="text-[#7C3AED]" />
-                  Your Cart
-                </h3>
-                <button
-                  onClick={() => setDrawerOpen(false)}
-                  className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
-                  aria-label="Close cart"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="flex-grow overflow-y-auto">
-              <div className="p-6 space-y-4">
-                {submitted && (
-                  <div className="text-center mt-12 px-4">
-                    <CheckCircle2 size={48} className="text-[#00cdba] mx-auto mb-4" />
-                    <p className="font-extrabold text-[#111827] text-lg mb-2">Payment successful!</p>
-                    <p className="text-gray-500 font-medium text-sm leading-relaxed">
-                      Your membership is confirmed. We&apos;ve emailed your membership ID and details —
-                      check your inbox.
-                    </p>
-                  </div>
-                )}
-                {cart.length === 0 && !submitted && (
-                  <p className="text-gray-500 font-medium text-sm text-center mt-12">
-                    Your cart is empty. Choose a membership plan to get started.
-                  </p>
-                )}
-                {cart.map((item) => {
-                  const plan = PLANS.find((p) => p.id === item.planId);
-                  if (!plan) return null;
-                  return (
-                    <div
-                      key={item.planId}
-                      className="rounded-2xl border border-gray-200 p-4"
-                      style={{ backgroundColor: plan.accent }}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <p className="font-extrabold text-[#111827]">{plan.name} Membership</p>
-                          <p className="text-sm text-gray-600 font-medium">
-                            {formatINR(plan.price)}/month
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => removeItem(item.planId)}
-                          className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-                          aria-label={`Remove ${plan.name}`}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 bg-white rounded-full px-2 py-1">
-                          <button
-                            onClick={() => changeQty(item.planId, -1)}
-                            className="w-6 h-6 rounded-full hover:bg-gray-100 flex items-center justify-center cursor-pointer"
-                            aria-label="Decrease quantity"
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <span className="font-bold text-sm w-4 text-center">{item.qty}</span>
-                          <button
-                            onClick={() => changeQty(item.planId, 1)}
-                            className="w-6 h-6 rounded-full hover:bg-gray-100 flex items-center justify-center cursor-pointer"
-                            aria-label="Increase quantity"
-                          >
-                            <Plus size={14} />
-                          </button>
-                        </div>
-                        <p className="font-extrabold text-[#111827] text-sm">
-                          {formatINR(planTotal(plan, item.qty))}/mo
-                        </p>
-                      </div>
-                      {item.qty > 1 && plan.siblingDiscount > 0 && (
-                        <p className="text-xs text-gray-600 font-semibold mt-2">
-                          Includes {plan.siblingDiscount * 100}% sibling discount on additional memberships.
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {cart.length > 0 && !submitted && (
-                <div className="p-6 border-t border-gray-100 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-600">Total</span>
-                    <span className="text-2xl font-extrabold text-[#111827]">
-                      {formatINR(total)}<span className="text-sm text-gray-500 font-semibold">/month</span>
-                    </span>
-                  </div>
-
-                  <form onSubmit={payNow} className="rounded-2xl border border-gray-200 bg-gray-50 p-4 space-y-3">
-                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500 text-center">
-                      Your details
-                    </p>
-                    <input
-                      required
-                      value={form.parentName}
-                      onChange={setField("parentName")}
-                      placeholder="Parent's full name"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                    />
-                    <div className="flex gap-3">
-                      <input
-                        required
-                        value={form.childName}
-                        onChange={setField("childName")}
-                        placeholder="Child's name"
-                        className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                      />
-                      <input
-                        required
-                        type="number"
-                        min={1}
-                        max={18}
-                        value={form.childAge}
-                        onChange={setField("childAge")}
-                        placeholder="Age"
-                        className="w-24 shrink-0 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                      />
-                    </div>
-                    <select
-                      required
-                      value={form.attendees}
-                      onChange={setField("attendees")}
-                      className={`w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED] cursor-pointer ${
-                        form.attendees ? "text-gray-900" : "text-gray-400"
-                      }`}
-                    >
-                      <option value="" disabled>
-                        Who will attend the sessions?
-                      </option>
-                      <option value="Child">Child</option>
-                      <option value="Parent">Parent</option>
-                      <option value="Child and Parent">Child and Parent</option>
-                    </select>
-                    <input
-                      required
-                      type="email"
-                      value={form.email}
-                      onChange={setField("email")}
-                      placeholder="Email (membership confirmation goes here)"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                    />
-                    <input
-                      required
-                      type="tel"
-                      value={form.phone}
-                      onChange={setField("phone")}
-                      placeholder="Phone number"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:border-[#7C3AED]"
-                    />
-                    {payError && (
-                      <p className="text-xs text-red-500 font-semibold text-center">{payError}</p>
-                    )}
-                    <button
-                      type="submit"
-                      disabled={paying}
-                      className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#7C3AED] text-white font-bold text-sm rounded-full hover:bg-[#6D28D9] hover:scale-[1.02] transition-all shadow-md disabled:opacity-60 disabled:hover:scale-100 cursor-pointer"
-                    >
-                      {paying ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
-                      {paying ? "Opening secure checkout…" : `Pay ${formatINR(total)} now`}
-                    </button>
-                    <p className="text-xs text-gray-400 font-medium text-center leading-relaxed">
-                      Secure checkout via Razorpay — card, UPI, netbanking &amp; more. Your membership
-                      is confirmed instantly.
-                    </p>
-                  </form>
-
-                  <div className="flex items-center justify-center gap-4 text-xs font-bold text-gray-400">
-                    <a
-                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderMessage)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 hover:text-[#25D366] transition-colors"
-                    >
-                      <MessageCircle size={13} />
-                      Trouble paying? WhatsApp us
-                    </a>
-                    <span className="text-gray-200">|</span>
-                    <a
-                      href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Vetaas Membership Purchase")}&body=${encodeURIComponent(orderMessage)}`}
-                      className="inline-flex items-center gap-1.5 hover:text-[#7C3AED] transition-colors"
-                    >
-                      <Mail size={13} />
-                      Email us
-                    </a>
-                  </div>
-                </div>
-              )}
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-          </>,
-          document.body
-        )}
     </section>
   );
 }

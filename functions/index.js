@@ -663,6 +663,18 @@ exports.razorpayWebhook = onRequest(
       const razorpayOrderId = payment && payment.order_id;
       if (razorpayOrderId) {
         const db = admin.firestore();
+        const cart = await db
+          .collection("orders")
+          .where("razorpayOrderId", "==", razorpayOrderId)
+          .limit(1)
+          .get();
+        if (!cart.empty) {
+          // A cart order fulfils its own membership line, so return
+          // before the membershipOrders lookup below claims it too.
+          await fulfilCartOrder(db, cart.docs[0].id, payment.id);
+          res.status(200).send("ok");
+          return;
+        }
         const snap = await db
           .collection("membershipOrders")
           .where("razorpayOrderId", "==", razorpayOrderId)
@@ -1180,6 +1192,356 @@ exports.verifyEventPayment = onCall(
     }
 
     await markRegistrationPaid(db, responseId, paymentId);
+    return { ok: true };
+  }
+);
+
+
+// ---------------------------------------------------------------------------
+// Unified cart: membership plans, paid downloads and free worksheets in one
+// order and one payment.
+//
+// Prices live here, never in the browser — the client sends ids and quantities
+// and the amount is recomputed from this catalog before the Razorpay order is
+// created.
+//
+// Free worksheets are public files, so they're delivered as plain links. Paid
+// downloads must NOT sit in /public or the link could be guessed without
+// paying; they're kept in Cloud Storage and delivered as short-lived signed
+// URLs generated after payment clears.
+// ---------------------------------------------------------------------------
+
+const DOWNLOAD_LINK_HOURS = 72;
+
+const DIGITAL_PRODUCTS = {
+  "conversation-7day": {
+    name: "7 Days of Conversation Cards",
+    price: 99,
+    // Upload the deck here before selling it — see fulfilment below, which
+    // reports a missing file rather than emailing a broken link.
+    storagePaths: ["products/conversation-cards-days-1-7.pdf"],
+  },
+  "worksheet-kindness-journal": {
+    name: "My Kindness Journal",
+    price: 49,
+    storagePaths: ["products/worksheets/kindness-journal.pdf"],
+  },
+  "worksheet-seasons-diary": {
+    name: "Seasons' Diary",
+    price: 49,
+    storagePaths: ["products/worksheets/seasons-diary.pdf"],
+  },
+  "worksheet-garden-seasons": {
+    name: "My Garden & Seasons Colouring",
+    price: 49,
+    storagePaths: ["products/worksheets/seasons-diary-2.pdf"],
+  },
+  "worksheet-animals-match": {
+    name: "Match Animals with Their Food",
+    price: 49,
+    storagePaths: ["products/worksheets/animals-match.pdf"],
+  },
+};
+
+/**
+ * Rebuilds the cart from the catalog. Anything the client sends that isn't a
+ * known id is rejected outright rather than silently dropped, so a tampered
+ * cart fails loudly instead of checking out at the wrong price.
+ */
+function priceCart(rawItems) {
+  const membership = [];
+  const digital = [];
+  let total = 0;
+
+  for (const raw of rawItems) {
+    const qty = Math.max(1, Math.min(20, parseInt(raw.qty, 10) || 1));
+
+    if (raw.kind === "membership") {
+      const plan = PLAN_PRICES[raw.id];
+      if (!plan) throw new HttpsError("invalid-argument", `Unknown plan: ${raw.id}`);
+      const monthly = Math.round(planTotal(plan, qty));
+      membership.push({ plan: plan.name, planId: raw.id, pricePerMonth: plan.price, qty, monthly });
+      total += monthly;
+      continue;
+    }
+
+    if (raw.kind === "product") {
+      const product = DIGITAL_PRODUCTS[raw.id];
+      if (!product) throw new HttpsError("invalid-argument", `Unknown product: ${raw.id}`);
+      // Downloads are per-household, so quantity never multiplies the price.
+      const line = Math.round(product.price);
+      digital.push({ id: raw.id, name: product.name, price: line });
+      total += line;
+      continue;
+    }
+
+    throw new HttpsError("invalid-argument", "Unknown cart item.");
+  }
+
+  if (membership.length === 0 && digital.length === 0) {
+    throw new HttpsError("invalid-argument", "Cart is empty.");
+  }
+  return { membership, digital, total: Math.round(total) };
+}
+
+async function downloadLinksFor(digital) {
+  const bucket = admin.storage().bucket();
+  const expires = Date.now() + DOWNLOAD_LINK_HOURS * 3600000;
+  const links = [];
+
+  for (const item of digital) {
+    const product = DIGITAL_PRODUCTS[item.id];
+    if (!product) continue;
+
+    for (const path of product.publicPaths ?? []) {
+      links.push({ name: product.name, url: `https://www.vetaas.in${path}` });
+    }
+
+    for (const path of product.storagePaths ?? []) {
+      const file = bucket.file(path);
+      const [exists] = await file.exists();
+      if (!exists) {
+        // Better a flagged order than an email full of dead links.
+        console.error(`Missing product file for ${item.id}: ${path}`);
+        links.push({ name: product.name, url: null, missing: path });
+        continue;
+      }
+      // Signed URLs expire, which is what we want for paid files — but they
+      // need the service account to be allowed to sign blobs. If that isn't
+      // granted, fall back to a Firebase download token so the customer still
+      // gets their file; the token is unguessable, it just doesn't expire.
+      let url;
+      try {
+        [url] = await file.getSignedUrl({ action: "read", expires });
+      } catch (err) {
+        console.error("Signed URL failed, falling back to a download token:", err.message);
+        const token = crypto.randomUUID();
+        const [meta] = await file.getMetadata();
+        await file.setMetadata({
+          metadata: { ...(meta.metadata || {}), firebaseStorageDownloadTokens: token },
+        });
+        url = downloadUrlFor(bucket, file, token);
+      }
+      links.push({ name: product.name, url });
+    }
+  }
+  return links;
+}
+
+/**
+ * Idempotent, like the membership and event-registration paths: the browser's
+ * verify call and the webhook can both land, and whichever is second does
+ * nothing.
+ */
+async function fulfilCartOrder(db, orderId, paymentId) {
+  const ref = db.collection("orders").doc(orderId);
+  const claimed = await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) return null;
+    const order = snap.data();
+    if (order.status === "paid") return null;
+    tx.update(ref, {
+      status: "paid",
+      razorpayPaymentId: paymentId || null,
+      paidAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    return order;
+  });
+  if (!claimed) return;
+
+  // Membership is issued through the existing, proven path so admin listing,
+  // membership IDs, expiry and the welcome email all behave identically.
+  if (claimed.membershipOrderId) {
+    await approvePaidOrder(db, claimed.membershipOrderId);
+  }
+
+  const digital = claimed.digital ?? [];
+  if (digital.length === 0) return;
+
+  const links = await downloadLinksFor(digital);
+  const missing = links.filter((l) => !l.url);
+  const usable = links.filter((l) => l.url);
+
+  if (usable.length > 0) {
+    await db.collection("mail").add({
+      to: claimed.email,
+      message: {
+        subject: "Your Vetaas downloads",
+        text:
+          `Hi ${claimed.name || "there"},\n\n` +
+          `Thank you! Here are your downloads:\n\n` +
+          usable.map((l) => `${l.name}\n${l.url}`).join("\n\n") +
+          `\n\nPlease save the files to your device — paid download links are ` +
+          `time-limited. If a link stops working, reply to this email and we'll send a fresh one.\n\n` +
+          `Warm regards,\nVetaas Education Foundation\nwww.vetaas.in`,
+      },
+      orderId,
+      type: "downloads",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+
+  if (missing.length > 0) {
+    await db.collection("mail").add({
+      to: "kirti@vetaas.in",
+      message: {
+        subject: `⚠️ Paid order ${orderId} has missing files`,
+        text:
+          `An order was paid but these files aren't in Cloud Storage yet:\n\n` +
+          missing.map((l) => `${l.name} — expected at ${l.missing}`).join("\n") +
+          `\n\nThe customer (${claimed.email}) has not received them. Upload the ` +
+          `files and email them manually.`,
+      },
+      orderId,
+      type: "fulfilment-error",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+}
+
+exports.createCartOrder = onCall(
+  { region: "us-central1", secrets: [razorpayKeySecret] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Please reload the page and try again.");
+    }
+
+    const data = request.data || {};
+    const items = Array.isArray(data.items) ? data.items : [];
+    if (items.length === 0) throw new HttpsError("invalid-argument", "Cart is empty.");
+
+    const name = String(data.name || "").trim();
+    const email = String(data.email || "").trim();
+    const phone = String(data.phone || "").trim();
+    if (!name || !email) throw new HttpsError("invalid-argument", "Name and email are required.");
+    if (!/.+@.+\..+/.test(email)) throw new HttpsError("invalid-argument", "Invalid email.");
+
+    const { membership, digital, total } = priceCart(items);
+
+    // Membership needs the child's details for the welcome email and the
+    // admin list, so require them only when a plan is actually in the cart.
+    const childName = String(data.childName || "").trim();
+    if (membership.length > 0 && (!childName || !phone)) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Child's name and phone number are required for a membership."
+      );
+    }
+
+    const db = admin.firestore();
+    const orderRef = db.collection("orders").doc();
+
+    let membershipOrderId = null;
+    if (membership.length > 0) {
+      const membershipRef = db.collection("membershipOrders").doc();
+      membershipOrderId = membershipRef.id;
+      await membershipRef.set({
+        items: membership.map(({ plan, pricePerMonth, qty, monthly }) => ({
+          plan,
+          pricePerMonth,
+          qty,
+          monthly,
+        })),
+        totalMonthly: membership.reduce((sum, m) => sum + m.monthly, 0),
+        parentName: name,
+        childName,
+        childAge: String(data.childAge || "").trim(),
+        attendees: String(data.attendees || membership.reduce((n, m) => n + m.qty, 0)),
+        email,
+        phone,
+        status: "pending",
+        cartOrderId: orderRef.id,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+
+    // A cart of only free worksheets skips Razorpay entirely.
+    if (total <= 0) {
+      await orderRef.set({
+        name,
+        email,
+        phone,
+        membership,
+        digital,
+        total: 0,
+        membershipOrderId,
+        status: "pending",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      await fulfilCartOrder(db, orderRef.id, null);
+      return { orderId: orderRef.id, free: true, amount: 0 };
+    }
+
+    const razorpay = new Razorpay({
+      key_id: razorpayKeyId.value(),
+      key_secret: razorpayKeySecret.value(),
+    });
+    const rzpOrder = await razorpay.orders.create({
+      amount: total * 100, // paise
+      currency: "INR",
+      receipt: orderRef.id,
+      notes: { name, email },
+    });
+
+    await orderRef.set({
+      name,
+      email,
+      phone,
+      membership,
+      digital,
+      total,
+      membershipOrderId,
+      razorpayOrderId: rzpOrder.id,
+      status: "pending",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    if (membershipOrderId) {
+      await db
+        .collection("membershipOrders")
+        .doc(membershipOrderId)
+        .update({ razorpayOrderId: rzpOrder.id });
+    }
+
+    return {
+      orderId: orderRef.id,
+      free: false,
+      razorpayOrderId: rzpOrder.id,
+      amount: rzpOrder.amount,
+      currency: rzpOrder.currency,
+      keyId: razorpayKeyId.value(),
+    };
+  }
+);
+
+exports.verifyCartPayment = onCall(
+  { region: "us-central1", secrets: [razorpayKeySecret] },
+  async (request) => {
+    const data = request.data || {};
+    const orderId = String(data.orderId || "");
+    const rzpOrderId = String(data.razorpay_order_id || "");
+    const paymentId = String(data.razorpay_payment_id || "");
+    const signature = String(data.razorpay_signature || "");
+    if (!orderId || !rzpOrderId || !paymentId || !signature) {
+      throw new HttpsError("invalid-argument", "Missing payment details.");
+    }
+
+    const expected = crypto
+      .createHmac("sha256", razorpayKeySecret.value())
+      .update(`${rzpOrderId}|${paymentId}`)
+      .digest("hex");
+    if (expected !== signature) {
+      throw new HttpsError("permission-denied", "Payment could not be verified.");
+    }
+
+    const db = admin.firestore();
+    const snap = await db.collection("orders").doc(orderId).get();
+    if (!snap.exists) throw new HttpsError("not-found", "Order not found.");
+    if (snap.data().razorpayOrderId !== rzpOrderId) {
+      throw new HttpsError("permission-denied", "Payment does not match this order.");
+    }
+
+    await fulfilCartOrder(db, orderId, paymentId);
     return { ok: true };
   }
 );

@@ -29,23 +29,7 @@ const QUIZZES = [
 
 export default function QuizzesSection() {
   return (
-    <section className="max-w-6xl mx-auto px-6 pt-[calc(var(--header-height)+2.5rem)] pb-24">
-      {/* Heading */}
-      <div className="max-w-3xl mb-14">
-        <span className="inline-block py-1.5 px-5 rounded-full bg-white border border-gray-200 text-[#7C3AED] font-bold text-[10px] tracking-[0.2em] uppercase shadow-sm mb-5">
-          Self-Assessments
-        </span>
-        <h1 className="text-3xl sm:text-4xl lg:text-[2.6rem] font-extrabold text-[#111827] leading-[1.15] tracking-tight">
-          Not sure where to start? Take one of our{" "}
-          <span className="text-[#7C3AED]">self-assessments.</span>
-        </h1>
-        <p className="text-gray-500 font-medium text-base md:text-lg mt-5 leading-relaxed">
-          Short, reflective tools for parents and children — a simple way to notice
-          where you are and discover gentle next steps.
-        </p>
-      </div>
-
-      {/* Quiz cards */}
+    <section className="max-w-6xl mx-auto px-6 pb-24">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         {QUIZZES.map((quiz, i) => {
           const Icon = quiz.icon;
