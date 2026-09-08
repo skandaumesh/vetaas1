@@ -15,6 +15,7 @@ import {
   LogOut,
   Send,
   MoreHorizontal,
+  ShoppingBag,
   Users,
   X,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const NAV = [
   { href: "/admin/memberships", label: "Members", icon: Users, primary: true },
   { href: "/admin/events", label: "Events", icon: Calendar, primary: true },
   { href: "/admin/forms", label: "Forms", icon: FileText, primary: true },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/quizzes", label: "Quizzes", icon: ClipboardList },
   { href: "/admin/broadcast", label: "Broadcast", icon: Send },
 ];
