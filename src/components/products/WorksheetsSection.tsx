@@ -15,6 +15,8 @@ const WORKSHEETS = [
     description:
       "A simple activity for children to notice and record their own acts of kindness, with reward stickers to celebrate them.",
     id: "worksheet-kindness-journal",
+    // TEST PRICE — remove this line to go back to the standard ₹49.
+    price: 1,
     cover: "/worksheets/covers/kindness-journal.webp",
     coverW: 900,
     coverH: 636,
@@ -107,7 +109,7 @@ export default function WorksheetsSection() {
                     <Icon size={20} />
                   </span>
                   <span className="text-lg font-extrabold text-[#111827]">
-                    &#8377;{WORKSHEET_PRICE}
+                    &#8377;{sheet.price ?? WORKSHEET_PRICE}
                   </span>
                 </div>
 
@@ -128,7 +130,7 @@ export default function WorksheetsSection() {
                         id: sheet.id,
                         kind: "product",
                         name: sheet.title,
-                        price: WORKSHEET_PRICE,
+                        price: sheet.price ?? WORKSHEET_PRICE,
                       })
                     }
                     disabled={items.some((i) => i.id === sheet.id)}

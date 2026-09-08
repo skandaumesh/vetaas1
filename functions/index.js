@@ -1223,7 +1223,8 @@ const DIGITAL_PRODUCTS = {
   },
   "worksheet-kindness-journal": {
     name: "My Kindness Journal",
-    price: 49,
+    // TEST PRICE — put back to 49 once the live payment has been checked.
+    price: 1,
     storagePaths: ["products/worksheets/kindness-journal.pdf"],
   },
   "worksheet-seasons-diary": {
