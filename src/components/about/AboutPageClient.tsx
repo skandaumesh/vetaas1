@@ -99,6 +99,13 @@ export default function AboutPageClient() {
   return (
     <main className="bg-white min-h-screen font-sans text-[#1e293b] overflow-hidden pt-[calc(var(--header-height)+3rem)]">
 
+      {/* The page opens on a section heading by design, which left it with no
+          page-level H1 at all. Visually hidden so the layout is unchanged. */}
+      <h1 className="sr-only">
+        About Vetaas Education Foundation — Social Emotional Learning for early
+        childhood in Bengaluru
+      </h1>
+
       {/* ── THE FORMULA: PREMIUM REDESIGN ── */}
       <section id="formula-section" className="py-24 bg-[#fafaf9] relative overflow-hidden rounded-[3.5rem] mx-4 md:mx-8 border border-gray-100 shadow-[inset_0_0_80px_rgba(0,0,0,0.01)]">
 

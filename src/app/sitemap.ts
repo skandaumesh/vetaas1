@@ -16,6 +16,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/find-us',
     '/contact',
     '/products',
+    '/products/sel-assessment',
+    '/products/parent-reflection',
     '/club',
     '/privacy',
     '/terms',
