@@ -3,20 +3,33 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Check, Flower2, Heart, PawPrint, Plus, Sun } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useCart } from "@/lib/cart";
 
 // Keep in step with DIGITAL_PRODUCTS in functions/index.js — that copy is
 // what actually gets charged.
 const WORKSHEET_PRICE = 49;
 
-const WORKSHEETS = [
+type Worksheet = {
+  title: string;
+  description: string;
+  id: string;
+  cover: string;
+  coverW: number;
+  coverH: number;
+  accent: string;
+  tint: string;
+  icon: LucideIcon;
+  /** Overrides WORKSHEET_PRICE for a single sheet when one is priced apart. */
+  price?: number;
+};
+
+const WORKSHEETS: Worksheet[] = [
   {
     title: "My Kindness Journal",
     description:
       "A simple activity for children to notice and record their own acts of kindness, with reward stickers to celebrate them.",
     id: "worksheet-kindness-journal",
-    // TEST PRICE — remove this line to go back to the standard ₹49.
-    price: 1,
     cover: "/worksheets/covers/kindness-journal.webp",
     coverW: 900,
     coverH: 636,
