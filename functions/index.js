@@ -1472,6 +1472,28 @@ async function fulfilCartOrder(db, orderId, paymentId) {
   }
 
   if (missing.length > 0) {
+    // Tell the customer too. Without this, someone whose whole order is a
+    // product we can't serve pays and then hears nothing at all.
+    await db.collection("mail").add({
+      to: claimed.email,
+      message: {
+        subject: "About your Vetaas order",
+        text:
+          "Hi " + (claimed.name || "there") + ",\n\n" +
+          "Thank you for your order. " +
+          missing.map((m) => m.name).join(", ") +
+          (missing.length === 1 ? " is" : " are") +
+          " being prepared and we'll email " +
+          (missing.length === 1 ? "it" : "them") +
+          " to you shortly — usually within one working day.\n\n" +
+          "Sorry for the wait, and do reply to this email if you'd like an update.\n\n" +
+          "Warm regards,\nVetaas Education Foundation\nwww.vetaas.in",
+      },
+      orderId,
+      type: "downloads-pending",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
     await db.collection("mail").add({
       to: "kirti@vetaas.in",
       message: {
