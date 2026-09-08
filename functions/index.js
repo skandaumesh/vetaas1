@@ -58,6 +58,17 @@ exports.sendMail = onDocumentCreated(
       });
     }
 
+    // Storage-backed attachments. The bytes can't live on the queue document
+    // (Firestore caps a document at 1MB), so they're fetched here instead.
+    for (const item of data.storageAttachments ?? []) {
+      try {
+        const [buf] = await admin.storage().bucket().file(item.storagePath).download();
+        attachments.push({ filename: item.filename, content: buf });
+      } catch (err) {
+        console.error(`Could not attach ${item.storagePath}:`, err.message);
+      }
+    }
+
     try {
       const info = await transporter.sendMail({
         from: `"${FROM_NAME}" <${FROM_ADDRESS}>`,
@@ -1285,46 +1296,66 @@ function priceCart(rawItems) {
   return { membership, digital, total: Math.round(total) };
 }
 
-async function downloadLinksFor(digital) {
+// Mail servers reject oversized messages, and base64 inflates a file by about
+// a third. Past this the order falls back to links rather than bouncing.
+const MAX_ATTACH_BYTES = 15 * 1024 * 1024;
+
+/**
+ * Resolves each purchased product to the file that should be attached. Returns
+ * the attachment list, anything that couldn't be found, and the total size so
+ * the caller can decide whether the message is deliverable.
+ */
+async function attachmentsFor(digital) {
   const bucket = admin.storage().bucket();
-  const expires = Date.now() + DOWNLOAD_LINK_HOURS * 3600000;
-  const links = [];
+  const attachments = [];
+  const missing = [];
+  let bytes = 0;
 
   for (const item of digital) {
     const product = DIGITAL_PRODUCTS[item.id];
     if (!product) continue;
 
-    for (const path of product.publicPaths ?? []) {
-      links.push({ name: product.name, url: `https://www.vetaas.in${path}` });
-    }
-
-    for (const path of product.storagePaths ?? []) {
-      const file = bucket.file(path);
+    for (const storagePath of product.storagePaths ?? []) {
+      const file = bucket.file(storagePath);
       const [exists] = await file.exists();
       if (!exists) {
-        // Better a flagged order than an email full of dead links.
-        console.error(`Missing product file for ${item.id}: ${path}`);
-        links.push({ name: product.name, url: null, missing: path });
+        console.error(`Missing product file for ${item.id}: ${storagePath}`);
+        missing.push({ name: product.name, path: storagePath });
         continue;
       }
-      // Signed URLs expire, which is what we want for paid files — but they
-      // need the service account to be allowed to sign blobs. If that isn't
-      // granted, fall back to a Firebase download token so the customer still
-      // gets their file; the token is unguessable, it just doesn't expire.
-      let url;
-      try {
-        [url] = await file.getSignedUrl({ action: "read", expires });
-      } catch (err) {
-        console.error("Signed URL failed, falling back to a download token:", err.message);
-        const token = crypto.randomUUID();
-        const [meta] = await file.getMetadata();
-        await file.setMetadata({
-          metadata: { ...(meta.metadata || {}), firebaseStorageDownloadTokens: token },
-        });
-        url = downloadUrlFor(bucket, file, token);
-      }
-      links.push({ name: product.name, url });
+      const [meta] = await file.getMetadata();
+      bytes += Number(meta.size) || 0;
+      attachments.push({
+        filename: storagePath.split("/").pop(),
+        storagePath,
+        name: product.name,
+      });
     }
+  }
+
+  return { attachments, missing, bytes };
+}
+
+/** Only used when the attachments would be too large to email. */
+async function fallbackLinks(attachments) {
+  const bucket = admin.storage().bucket();
+  const expires = Date.now() + DOWNLOAD_LINK_HOURS * 3600000;
+  const links = [];
+  for (const a of attachments) {
+    const file = bucket.file(a.storagePath);
+    let url;
+    try {
+      [url] = await file.getSignedUrl({ action: "read", expires });
+    } catch (err) {
+      console.error("Signed URL failed, falling back to a download token:", err.message);
+      const token = crypto.randomUUID();
+      const [meta] = await file.getMetadata();
+      await file.setMetadata({
+        metadata: { ...(meta.metadata || {}), firebaseStorageDownloadTokens: token },
+      });
+      url = downloadUrlFor(bucket, file, token);
+    }
+    links.push({ name: a.name, url });
   }
   return links;
 }
@@ -1359,23 +1390,34 @@ async function fulfilCartOrder(db, orderId, paymentId) {
   const digital = claimed.digital ?? [];
   if (digital.length === 0) return;
 
-  const links = await downloadLinksFor(digital);
-  const missing = links.filter((l) => !l.url);
-  const usable = links.filter((l) => l.url);
+  const { attachments, missing, bytes } = await attachmentsFor(digital);
 
-  if (usable.length > 0) {
+  if (attachments.length > 0) {
+    const tooBig = bytes > MAX_ATTACH_BYTES;
+    const links = tooBig ? await fallbackLinks(attachments) : [];
+    const listed = attachments.map((a) => "• " + a.name).join("\n");
+    const linked = links.map((l) => l.name + "\n" + l.url).join("\n\n");
+
     await db.collection("mail").add({
       to: claimed.email,
       message: {
         subject: "Your Vetaas downloads",
         text:
-          `Hi ${claimed.name || "there"},\n\n` +
-          `Thank you! Here are your downloads:\n\n` +
-          usable.map((l) => `${l.name}\n${l.url}`).join("\n\n") +
-          `\n\nPlease save the files to your device — paid download links are ` +
-          `time-limited. If a link stops working, reply to this email and we'll send a fresh one.\n\n` +
-          `Warm regards,\nVetaas Education Foundation\nwww.vetaas.in`,
+          "Hi " + (claimed.name || "there") + ",\n\n" +
+          "Thank you! Your " +
+          (attachments.length === 1 ? "worksheet is" : "worksheets are") +
+          (tooBig
+            ? " too large to attach, so here " +
+              (links.length === 1 ? "is the link" : "are the links") +
+              ":\n\n" + linked +
+              "\n\nPlease save the files to your device — these links are time-limited."
+            : " attached to this email:\n\n" + listed) +
+          "\n\nWarm regards,\nVetaas Education Foundation\nwww.vetaas.in",
       },
+      // Fetched from Storage by sendMail; PDF bytes can't live on this document.
+      storageAttachments: tooBig
+        ? []
+        : attachments.map(({ filename, storagePath }) => ({ filename, storagePath })),
       orderId,
       type: "downloads",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -1386,12 +1428,12 @@ async function fulfilCartOrder(db, orderId, paymentId) {
     await db.collection("mail").add({
       to: "kirti@vetaas.in",
       message: {
-        subject: `⚠️ Paid order ${orderId} has missing files`,
+        subject: "⚠️ Paid order " + orderId + " has missing files",
         text:
-          `An order was paid but these files aren't in Cloud Storage yet:\n\n` +
-          missing.map((l) => `${l.name} — expected at ${l.missing}`).join("\n") +
-          `\n\nThe customer (${claimed.email}) has not received them. Upload the ` +
-          `files and email them manually.`,
+          "An order was paid but these files aren't in Cloud Storage yet:\n\n" +
+          missing.map((m) => m.name + " — expected at " + m.path).join("\n") +
+          "\n\nThe customer (" + claimed.email + ") has not received them. " +
+          "Upload the files and email them manually.",
       },
       orderId,
       type: "fulfilment-error",
