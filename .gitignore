@@ -46,3 +46,7 @@ dev_output.log
 
 # debug/probe scripts (local only)
 /scripts/
+
+# Paid product masters — these must never be in a public repo.
+# The delivered copies live in Cloud Storage under products/.
+assets/products/
