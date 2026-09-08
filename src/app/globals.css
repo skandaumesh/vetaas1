@@ -304,6 +304,28 @@ body {
   }
 }
 
+/* Cart button reaction when something is added — a short squash-and-stretch
+   plus a ring flash, so the bag is noticed without pulling focus for long. */
+@keyframes cart-pop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.3); }
+  60% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+@keyframes cart-ring {
+  0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.45); }
+  100% { box-shadow: 0 0 0 14px rgba(124, 58, 237, 0); }
+}
+.cart-pop { animation: cart-pop 0.5s ease-out; }
+.cart-ring { animation: cart-ring 0.6s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-pop,
+  .cart-ring {
+    animation: none;
+  }
+}
+
 .animate-marquee:hover {
   animation-play-state: paused;
 }
