@@ -8,15 +8,36 @@ import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage
 import { httpsCallable } from "firebase/functions";
 import { auth, db, functions, storage } from "@/lib/firebase";
 import { loadRazorpayScript, openRazorpay } from "@/lib/razorpay";
-import type { FormDoc, FormField } from "@/lib/forms";
-import { CheckCircle2, ImageUp, Loader2, Lock, MapPin, X } from "lucide-react";
-
-type AnswerValue = string | string[];
+import {
+  FILE_UPLOAD_ACCEPT,
+  FILE_UPLOAD_MAX_BYTES,
+  GRID_FIELD_TYPES,
+  emptyAnswer,
+  fileNameFromUrl,
+  isAnswerEmpty,
+  type AnswerValue,
+  type FormDoc,
+  type FormField,
+  type GridAnswer,
+} from "@/lib/forms";
+import { CheckCircle2, FileText, ImageUp, Loader2, Lock, MapPin, Star, Upload, X } from "lucide-react";
 
 const EMAIL_RE = /.+@.+\..+/;
 
+const EXTENSION_TYPES: Record<string, string> = {
+  pdf: "application/pdf",
+  doc: "application/msword",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ppt: "application/vnd.ms-powerpoint",
+  pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  txt: "text/plain",
+  csv: "text/csv",
+};
+
 const createEventRegistration = httpsCallable<
-  { formId: string; answers: Record<string, string | string[]> },
+  { formId: string; answers: Record<string, AnswerValue> },
   {
     responseId: string;
     razorpayOrderId: string;
@@ -124,17 +145,14 @@ export default function PublicFormPage() {
     setValue(fieldId, checked ? [...current, option] : current.filter((o) => o !== option));
   };
 
-  const isEmpty = (value: AnswerValue | undefined) =>
-    !value || (Array.isArray(value) ? value.length === 0 : value.trim().length === 0);
-
   const submit = async () => {
     if (!form) return;
     const nextErrors: Record<string, boolean> = {};
     form.fields.forEach((field) => {
       const value = answers[field.id];
-      if (field.required && isEmpty(value)) {
+      if (field.required && isAnswerEmpty(field, value)) {
         nextErrors[field.id] = true;
-      } else if (field.type === "email" && !isEmpty(value) && !EMAIL_RE.test((value as string).trim())) {
+      } else if (field.type === "email" && typeof value === "string" && value.trim() && !EMAIL_RE.test(value.trim())) {
         nextErrors[field.id] = true;
       }
     });
@@ -164,7 +182,7 @@ export default function PublicFormPage() {
         answers: form.fields.map((field) => ({
           fieldId: field.id,
           label: field.label,
-          value: answers[field.id] ?? (field.type === "checkboxes" ? [] : ""),
+          value: answers[field.id] ?? emptyAnswer(field),
         })),
         createdAt: serverTimestamp(),
       });
@@ -198,8 +216,8 @@ export default function PublicFormPage() {
       await loadRazorpayScript();
       const { data: order } = await createEventRegistration({
         formId,
-        answers: form.fields.reduce<Record<string, string | string[]>>((acc, field) => {
-          acc[field.id] = answers[field.id] ?? (field.type === "checkboxes" ? [] : "");
+        answers: form.fields.reduce<Record<string, AnswerValue>>((acc, field) => {
+          acc[field.id] = answers[field.id] ?? emptyAnswer(field);
           return acc;
         }, {}),
       });
@@ -599,25 +617,38 @@ function FieldInput({
   bare?: boolean;
 }) {
   const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const uploadImage = async (file: File) => {
+  // Shared by image and file questions. The original name is kept, made safe,
+  // in the storage path so the responses view can show what was uploaded.
+  const upload = async (file: File) => {
+    setUploadError(null);
+    if (file.size > FILE_UPLOAD_MAX_BYTES) {
+      setUploadError("That file is over 10 MB. Please choose a smaller one.");
+      return;
+    }
     setUploading(true);
-    setUploadError(false);
     try {
       if (!auth.currentUser) {
         try {
           await signInAnonymously(auth);
         } catch {}
       }
-      const ext = file.name.split(".").pop() ?? "jpg";
-      const ref = storageRef(storage, `formUploads/${formId}/${field.id}-${Date.now()}.${ext}`);
-      await uploadBytes(ref, file);
-      const url = await getDownloadURL(ref);
-      onChange(url);
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+      // Some browsers leave the type blank for office files; storage rules
+      // check it, so fill it in from the extension.
+      const contentType = file.type || EXTENSION_TYPES[ext];
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "_").slice(-80) || "file";
+      const ref = storageRef(storage, `formUploads/${formId}/${field.id}-${Date.now()}-${safeName}`);
+      await uploadBytes(ref, file, contentType ? { contentType } : undefined);
+      onChange(await getDownloadURL(ref));
     } catch (err) {
-      console.error("Failed to upload image:", err);
-      setUploadError(true);
+      console.error("Failed to upload file:", err);
+      setUploadError(
+        field.type === "image_upload"
+          ? "Upload failed. Please use a PNG, JPG, GIF, WebP or HEIC image and try again."
+          : "Upload failed. Please use a PDF, Word, Excel, PowerPoint, text or image file and try again."
+      );
     } finally {
       setUploading(false);
     }
@@ -738,23 +769,227 @@ function FieldInput({
                 disabled={uploading}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) uploadImage(file);
+                  if (file) upload(file);
                   e.target.value = "";
                 }}
               />
             </label>
           )}
-          {uploadError && <p className="text-xs font-semibold text-red-500 mt-2">Upload failed — try again.</p>}
+          {uploadError && <p className="text-xs font-semibold text-red-500 mt-2">{uploadError}</p>}
         </div>
+      )}
+
+      {field.type === "file_upload" && (
+        <div>
+          {typeof value === "string" && value ? (
+            <div className="flex items-center gap-3 max-w-md rounded-lg border border-gray-200 px-3 py-2.5">
+              <FileText size={18} className="shrink-0 text-[#7C3AED]" />
+              <a
+                href={value}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-gray-800 truncate hover:underline"
+              >
+                {fileNameFromUrl(value)}
+              </a>
+              <button
+                type="button"
+                onClick={() => onChange("")}
+                aria-label="Remove file"
+                className="ml-auto text-gray-400 hover:text-red-500 cursor-pointer"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          ) : (
+            <label
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed ${
+                error ? "border-red-400" : "border-gray-300"
+              } text-sm font-semibold text-gray-600 hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors cursor-pointer`}
+            >
+              {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+              {uploading ? "Uploading…" : "Add file"}
+              <input
+                type="file"
+                accept={FILE_UPLOAD_ACCEPT}
+                className="hidden"
+                disabled={uploading}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) upload(file);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          )}
+          <p className="text-xs text-gray-400 mt-2">
+            PDF, Word, Excel, PowerPoint, text or image, up to 10 MB.
+          </p>
+          {uploadError && <p className="text-xs font-semibold text-red-500 mt-1">{uploadError}</p>}
+        </div>
+      )}
+
+      {field.type === "linear_scale" && <ScaleInput field={field} value={value} onChange={onChange} />}
+
+      {field.type === "rating" && <RatingInput field={field} value={value} onChange={onChange} />}
+
+      {GRID_FIELD_TYPES.includes(field.type) && (
+        <GridInput field={field} value={value} onChange={onChange} />
+      )}
+
+      {(field.type === "date" || field.type === "time") && (
+        <input
+          type={field.type}
+          value={typeof value === "string" ? value : ""}
+          onChange={(e) => onChange(e.target.value)}
+          className={`border ${
+            error ? "border-red-400" : "border-gray-200"
+          } rounded-lg px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:border-[#7C3AED]`}
+        />
       )}
 
       {error && (
         <p className="text-xs font-semibold text-red-500 mt-2">
           {field.type === "email" && value
             ? "Enter a valid email address."
-            : "This question is required."}
+            : GRID_FIELD_TYPES.includes(field.type)
+              ? "Please answer every row."
+              : "This question is required."}
         </p>
       )}
+    </div>
+  );
+}
+
+type InputProps = {
+  field: FormField;
+  value: AnswerValue | undefined;
+  onChange: (v: AnswerValue) => void;
+};
+
+function ScaleInput({ field, value, onChange }: InputProps) {
+  const min = field.scaleMin === 0 ? 0 : 1;
+  const max = Math.max(min + 1, field.scaleMax ?? 5);
+  const steps = Array.from({ length: max - min + 1 }, (_, i) => String(min + i));
+  return (
+    <div className="overflow-x-auto">
+      <div className="flex items-end gap-4 min-w-max py-1">
+        {field.minLabel && (
+          <span className="max-w-[7rem] pb-1 text-xs text-gray-500">{field.minLabel}</span>
+        )}
+        {steps.map((step) => (
+          <label
+            key={step}
+            className="flex flex-col items-center gap-1.5 text-sm font-medium text-gray-700 cursor-pointer"
+          >
+            <span>{step}</span>
+            <input
+              type="radio"
+              name={field.id}
+              checked={value === step}
+              onChange={() => onChange(step)}
+              className="w-4 h-4 accent-[#7C3AED] cursor-pointer"
+            />
+          </label>
+        ))}
+        {field.maxLabel && (
+          <span className="max-w-[7rem] pb-1 text-xs text-gray-500">{field.maxLabel}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RatingInput({ field, value, onChange }: InputProps) {
+  const max = field.ratingMax ?? 5;
+  const current = typeof value === "string" ? Number(value) || 0 : 0;
+  return (
+    <div className="flex items-center gap-1" role="radiogroup" aria-label={field.label || "Rating"}>
+      {Array.from({ length: max }, (_, i) => {
+        const n = i + 1;
+        const filled = current >= n;
+        return (
+          <button
+            key={n}
+            type="button"
+            role="radio"
+            aria-checked={current === n}
+            aria-label={`${n} out of ${max}`}
+            onClick={() => onChange(current === n ? "" : String(n))}
+            className="p-0.5 rounded cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7C3AED]"
+          >
+            <Star
+              size={28}
+              className={filled ? "text-amber-400" : "text-gray-300 hover:text-amber-300"}
+              fill={filled ? "currentColor" : "none"}
+            />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function GridInput({ field, value, onChange }: InputProps) {
+  const rows = field.rows ?? [];
+  const columns = field.columns ?? [];
+  const multi = field.type === "checkbox_grid";
+  const grid: GridAnswer = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+
+  const setCell = (row: string, column: string, checked: boolean) => {
+    const next: GridAnswer = { ...grid };
+    if (multi) {
+      const current = Array.isArray(next[row]) ? (next[row] as string[]) : [];
+      next[row] = checked ? [...current, column] : current.filter((c) => c !== column);
+    } else {
+      next[row] = column;
+    }
+    onChange(next);
+  };
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-sm">
+        <thead>
+          <tr>
+            <th className="p-2" />
+            {columns.map((column) => (
+              <th
+                key={column}
+                scope="col"
+                className="p-2 text-center text-xs font-semibold text-gray-500 whitespace-nowrap"
+              >
+                {column}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row} className="border-t border-gray-100">
+              <th scope="row" className="p-2 pr-4 text-left font-medium text-gray-700">
+                {row}
+              </th>
+              {columns.map((column) => {
+                const cell = grid[row];
+                const on = multi ? Array.isArray(cell) && cell.includes(column) : cell === column;
+                return (
+                  <td key={column} className="p-2 text-center">
+                    <input
+                      type={multi ? "checkbox" : "radio"}
+                      name={`${field.id}-${row}`}
+                      checked={on}
+                      onChange={(e) => setCell(row, column, e.target.checked)}
+                      aria-label={`${row}: ${column}`}
+                      className="w-4 h-4 accent-[#7C3AED] cursor-pointer"
+                    />
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

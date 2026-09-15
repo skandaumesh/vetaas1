@@ -14,12 +14,19 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAdminAuth } from "@/components/admin/AdminGate";
-import type { FormDoc, FormResponseDoc } from "@/lib/forms";
+import {
+  fileNameFromUrl,
+  formatAnswer,
+  type FormDoc,
+  type FormResponseDoc,
+  type GridAnswer,
+} from "@/lib/forms";
 import {
   ArrowLeft,
   ChevronDown,
   Clock,
   Download,
+  FileText,
   Inbox,
   Loader2,
   Trash2,
@@ -96,7 +103,7 @@ export default function FormResponsesPage() {
       const cells = form.fields.map((field) => {
         const answer = r.answers?.find((a) => a.fieldId === field.id);
         const value = answer?.value;
-        return Array.isArray(value) ? value.join("; ") : value ?? "";
+        return formatAnswer(value);
       });
       cells.push(fmtDateTime(r.createdAt));
       return cells.map((c) => csvEscape(String(c))).join(",");
@@ -211,8 +218,11 @@ export default function FormResponsesPage() {
                   {open && (
                     <div className="border-t border-gray-100 bg-white/40 px-5 py-5 space-y-3">
                       {(r.answers ?? []).map((a, i) => {
-                        const fieldType = form?.fields.find((f) => f.id === a.fieldId)?.type;
+                        const field = form?.fields.find((f) => f.id === a.fieldId);
+                        const fieldType = field?.type;
                         const isImage = fieldType === "image_upload" && typeof a.value === "string" && a.value;
+                        const isFile = fieldType === "file_upload" && typeof a.value === "string" && a.value;
+                        const isGrid = !!a.value && typeof a.value === "object" && !Array.isArray(a.value);
                         return (
                           <div key={i} className="flex flex-col sm:flex-row sm:justify-between gap-1 text-sm border-b border-gray-100 pb-2">
                             <span className="text-gray-500">{a.label}</span>
@@ -221,9 +231,37 @@ export default function FormResponsesPage() {
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={a.value as string} alt="" className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
                               </a>
+                            ) : isFile ? (
+                              <a
+                                href={a.value as string}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 font-semibold text-[#7C3AED] hover:underline break-all sm:text-right"
+                              >
+                                <FileText size={14} className="shrink-0" />
+                                {fileNameFromUrl(a.value as string)}
+                              </a>
+                            ) : isGrid ? (
+                              <dl className="space-y-0.5 sm:text-right">
+                                {Object.entries(a.value as GridAnswer).map(([row, cell]) => (
+                                  <div key={row}>
+                                    <dt className="inline text-gray-500">{row}: </dt>
+                                    <dd className="inline font-semibold text-[#111827]">
+                                      {Array.isArray(cell) ? cell.join(", ") : cell}
+                                    </dd>
+                                  </div>
+                                ))}
+                              </dl>
+                            ) : fieldType === "rating" && typeof a.value === "string" && a.value ? (
+                              <span className="font-semibold text-[#111827] sm:text-right">
+                                <span className="text-amber-400">{"★".repeat(Number(a.value) || 0)}</span>{" "}
+                                <span className="text-gray-400">
+                                  {a.value}/{field?.ratingMax ?? 5}
+                                </span>
+                              </span>
                             ) : (
                               <span className="font-semibold text-[#111827] sm:text-right">
-                                {Array.isArray(a.value) ? a.value.join(", ") : a.value || "—"}
+                                {formatAnswer(a.value) || "—"}
                               </span>
                             )}
                           </div>

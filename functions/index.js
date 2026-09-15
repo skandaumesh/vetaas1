@@ -1127,16 +1127,42 @@ exports.createEventRegistration = onCall(
     const fields = Array.isArray(form.fields) ? form.fields : [];
     const answers = fields.map((field) => {
       const raw = submitted[field.id];
-      const value = Array.isArray(raw)
-        ? raw.map((v) => String(v).slice(0, 500)).slice(0, 50)
-        : String(raw ?? "").slice(0, 5000);
+      let value;
+      if (Array.isArray(raw)) {
+        value = raw.map((v) => String(v).slice(0, 500)).slice(0, 50);
+      } else if (raw && typeof raw === "object") {
+        // Grid answer: row -> column(s). Only the form's own rows are kept, so
+        // a crafted payload can't write arbitrary keys onto the document.
+        value = {};
+        for (const row of Array.isArray(field.rows) ? field.rows : []) {
+          if (!row) continue;
+          const cell = raw[row];
+          if (Array.isArray(cell)) {
+            value[row] = cell.map((c) => String(c).slice(0, 200)).slice(0, 50);
+          } else if (cell !== undefined && cell !== null) {
+            value[row] = String(cell).slice(0, 200);
+          }
+        }
+      } else {
+        value = String(raw ?? "").slice(0, 5000);
+      }
       return { fieldId: field.id, label: String(field.label || ""), value };
     });
 
     const missing = fields.find((field) => {
       if (!field.required) return false;
       const value = answers.find((a) => a.fieldId === field.id).value;
-      return Array.isArray(value) ? value.length === 0 : value.trim().length === 0;
+      if (Array.isArray(value)) return value.length === 0;
+      if (value && typeof value === "object") {
+        // A required grid needs every row answered.
+        const rows = Array.isArray(field.rows) ? field.rows.filter(Boolean) : [];
+        return rows.some((r) => {
+          const cell = value[r];
+          if (cell === undefined) return true;
+          return Array.isArray(cell) ? cell.length === 0 : String(cell).trim().length === 0;
+        });
+      }
+      return String(value).trim().length === 0;
     });
     if (missing) {
       throw new HttpsError("invalid-argument", "Please answer all required questions.");

@@ -29,13 +29,26 @@ service firebase.storage {
       allow write: if isAdmin();
     }
 
-    // Form "image upload" answers: a visitor filling out a public form may
-    // upload an image under 8 MB. The uploader needs read to fetch its
-    // download URL; only an admin sees them in the responses view.
+    // Form upload answers: a visitor filling out a public form may upload an
+    // image or common document under 10 MB. Types are an explicit allowlist —
+    // no executables, archives or HTML, which could be served back to someone.
+    // The uploader needs read to fetch its download URL; only an admin sees
+    // them in the responses view.
     match /formUploads/{formId}/{file} {
       allow create: if request.auth != null
-        && request.resource.size < 8 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+        && request.resource.size < 10 * 1024 * 1024
+        && (request.resource.contentType.matches('image/(png|jpeg|gif|webp|heic|heif)')
+          || request.resource.contentType in [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-powerpoint',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'text/plain',
+            'text/csv'
+          ]);
       allow read: if request.auth != null;
     }
 

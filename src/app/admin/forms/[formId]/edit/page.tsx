@@ -8,10 +8,13 @@ import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage
 import { db, storage } from "@/lib/firebase";
 import { useAdminAuth } from "@/components/admin/AdminGate";
 import {
+  FIELD_TYPE_GROUPS,
   FIELD_TYPE_LABELS,
+  GRID_FIELD_TYPES,
   OPTION_FIELD_TYPES,
   emptyField,
   sanitizeField,
+  withType,
   type FieldType,
   type FormDoc,
   type FormField,
@@ -28,7 +31,8 @@ import {
   X,
 } from "lucide-react";
 
-const FIELD_TYPES = Object.keys(FIELD_TYPE_LABELS) as FieldType[];
+/** The list-shaped settings a question can have. */
+type ListKey = "options" | "rows" | "columns";
 
 export default function EditFormPage() {
   const { user } = useAdminAuth();
@@ -112,11 +116,7 @@ export default function EditFormPage() {
     setFields((prev) =>
       prev.map((f) => {
         if (f.id !== id) return f;
-        return sanitizeField({
-          ...f,
-          type,
-          options: OPTION_FIELD_TYPES.includes(type) ? f.options ?? ["Option 1"] : undefined,
-        });
+        return withType(f, type);
       })
     );
   };
@@ -133,28 +133,32 @@ export default function EditFormPage() {
     });
   };
 
-  const addOption = (fieldId: string) => {
+  // One set of helpers for options, grid rows and grid columns, since each is
+  // an editable list of labels on the field.
+  const addListItem = (fieldId: string, key: ListKey, prefix: string) => {
     setFields((prev) =>
       prev.map((f) =>
         f.id === fieldId
-          ? { ...f, options: [...(f.options ?? []), `Option ${(f.options?.length ?? 0) + 1}`] }
+          ? ({ ...f, [key]: [...(f[key] ?? []), `${prefix} ${(f[key]?.length ?? 0) + 1}`] } as FormField)
           : f
       )
     );
   };
-  const updateOption = (fieldId: string, index: number, value: string) => {
+  const updateListItem = (fieldId: string, key: ListKey, index: number, value: string) => {
     setFields((prev) =>
       prev.map((f) =>
         f.id === fieldId
-          ? { ...f, options: (f.options ?? []).map((o, i) => (i === index ? value : o)) }
+          ? ({ ...f, [key]: (f[key] ?? []).map((o, i) => (i === index ? value : o)) } as FormField)
           : f
       )
     );
   };
-  const removeOption = (fieldId: string, index: number) => {
+  const removeListItem = (fieldId: string, key: ListKey, index: number) => {
     setFields((prev) =>
       prev.map((f) =>
-        f.id === fieldId ? { ...f, options: (f.options ?? []).filter((_, i) => i !== index) } : f
+        f.id === fieldId
+          ? ({ ...f, [key]: (f[key] ?? []).filter((_, i) => i !== index) } as FormField)
+          : f
       )
     );
   };
@@ -460,10 +464,14 @@ export default function EditFormPage() {
                   onChange={(e) => setFieldType(field.id, e.target.value as FieldType)}
                   className="text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none cursor-pointer"
                 >
-                  {FIELD_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {FIELD_TYPE_LABELS[t]}
-                    </option>
+                  {FIELD_TYPE_GROUPS.map((group) => (
+                    <optgroup key={group.label} label={group.label}>
+                      {group.types.map((t) => (
+                        <option key={t} value={t}>
+                          {FIELD_TYPE_LABELS[t]}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </div>
@@ -477,11 +485,11 @@ export default function EditFormPage() {
                       </span>
                       <input
                         value={opt}
-                        onChange={(e) => updateOption(field.id, oi, e.target.value)}
+                        onChange={(e) => updateListItem(field.id, "options", oi, e.target.value)}
                         className="flex-grow text-sm text-gray-700 font-medium border-b border-transparent hover:border-gray-200 focus:border-[#7C3AED] focus:outline-none py-1"
                       />
                       <button
-                        onClick={() => removeOption(field.id, oi)}
+                        onClick={() => removeListItem(field.id, "options", oi)}
                         className="text-gray-300 hover:text-red-500 cursor-pointer"
                         aria-label="Remove option"
                       >
@@ -490,12 +498,129 @@ export default function EditFormPage() {
                     </div>
                   ))}
                   <button
-                    onClick={() => addOption(field.id)}
+                    onClick={() => addListItem(field.id, "options", "Option")}
                     className="text-xs font-bold text-[#7C3AED] hover:text-[#6D28D9] cursor-pointer"
                   >
                     + Add option
                   </button>
                 </div>
+              )}
+
+              {field.type === "linear_scale" && (
+                <div className="mb-4 pl-1 space-y-3">
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+                    <select
+                      value={field.scaleMin === 0 ? 0 : 1}
+                      onChange={(e) => updateField(field.id, { scaleMin: Number(e.target.value) })}
+                      aria-label="Scale starts at"
+                      className="border border-gray-200 rounded-lg px-2.5 py-1.5 cursor-pointer focus:outline-none"
+                    >
+                      {[0, 1].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                    <span>to</span>
+                    <select
+                      value={field.scaleMax ?? 5}
+                      onChange={(e) => updateField(field.id, { scaleMax: Number(e.target.value) })}
+                      aria-label="Scale ends at"
+                      className="border border-gray-200 rounded-lg px-2.5 py-1.5 cursor-pointer focus:outline-none"
+                    >
+                      {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <input
+                      value={field.minLabel ?? ""}
+                      onChange={(e) => updateField(field.id, { minLabel: e.target.value })}
+                      placeholder={`Label for ${field.scaleMin === 0 ? 0 : 1} (optional)`}
+                      className="text-sm text-gray-700 border-b border-gray-200 py-1.5 focus:outline-none focus:border-[#7C3AED] placeholder:text-gray-300"
+                    />
+                    <input
+                      value={field.maxLabel ?? ""}
+                      onChange={(e) => updateField(field.id, { maxLabel: e.target.value })}
+                      placeholder={`Label for ${field.scaleMax ?? 5} (optional)`}
+                      className="text-sm text-gray-700 border-b border-gray-200 py-1.5 focus:outline-none focus:border-[#7C3AED] placeholder:text-gray-300"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {field.type === "rating" && (
+                <div className="mb-4 pl-1 flex flex-wrap items-center gap-2 text-sm text-gray-600">
+                  <span>Stars</span>
+                  <select
+                    value={field.ratingMax ?? 5}
+                    onChange={(e) => updateField(field.id, { ratingMax: Number(e.target.value) })}
+                    aria-label="Number of stars"
+                    className="border border-gray-200 rounded-lg px-2.5 py-1.5 cursor-pointer focus:outline-none"
+                  >
+                    {[3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-amber-400 tracking-wider" aria-hidden>
+                    {"★".repeat(field.ratingMax ?? 5)}
+                  </span>
+                </div>
+              )}
+
+              {GRID_FIELD_TYPES.includes(field.type) && (
+                <div className="mb-4 pl-1 grid sm:grid-cols-2 gap-6">
+                  {(["rows", "columns"] as const).map((key) => (
+                    <div key={key}>
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                        {key === "rows" ? "Rows" : "Columns"}
+                      </p>
+                      <div className="space-y-2">
+                        {(field[key] ?? []).map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <span className="w-4 text-right text-xs text-gray-300">{idx + 1}.</span>
+                            <input
+                              value={item}
+                              onChange={(e) => updateListItem(field.id, key, idx, e.target.value)}
+                              className="flex-grow text-sm text-gray-700 font-medium border-b border-transparent hover:border-gray-200 focus:border-[#7C3AED] focus:outline-none py-1"
+                            />
+                            <button
+                              onClick={() => removeListItem(field.id, key, idx)}
+                              className="text-gray-300 hover:text-red-500 cursor-pointer"
+                              aria-label={key === "rows" ? "Remove row" : "Remove column"}
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          onClick={() => addListItem(field.id, key, key === "rows" ? "Row" : "Column")}
+                          className="text-xs font-bold text-[#7C3AED] hover:text-[#6D28D9] cursor-pointer"
+                        >
+                          + Add {key === "rows" ? "row" : "column"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {field.type === "file_upload" && (
+                <p className="mb-4 pl-1 text-xs text-slate-400">
+                  Respondents upload one PDF, Word, Excel, PowerPoint, text or image file, up to 10 MB.
+                </p>
+              )}
+
+              {(field.type === "date" || field.type === "time") && (
+                <p className="mb-4 pl-1 text-xs text-slate-400">
+                  Respondents pick a {field.type} using the{" "}
+                  {field.type === "date" ? "calendar" : "clock"} on their device.
+                </p>
               )}
 
               <div className="flex items-center justify-between pt-3 border-t border-gray-100">
