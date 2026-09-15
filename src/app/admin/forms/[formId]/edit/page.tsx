@@ -210,10 +210,6 @@ export default function EditFormPage() {
     );
   }
 
-  // Same rule the public page uses: a date or location makes it an event, and
-  // events show the cover as a square rather than a wide banner.
-  const coverIsSquare = !!(eventDate.trim() || location.trim());
-
   return (
     <main className="min-h-screen py-8 md:py-10 px-4 md:px-10">
       <div className="max-w-3xl mx-auto">
@@ -238,9 +234,8 @@ export default function EditFormPage() {
           </button>
         </div>
 
-        {/* Cover image. The preview is cropped to the same shape the public
-            page will use — square for events, wide banner otherwise — so what
-            you see here is what people actually get. */}
+        {/* Cover image. Always shown 1:1 — here and on the public page — so
+            what you see in the preview is what people actually get. */}
         <div className="glass-card rounded-2xl p-4 mb-4">
           <div className="flex items-start gap-4">
             <div className="shrink-0">
@@ -248,16 +243,10 @@ export default function EditFormPage() {
                 <img
                   src={logoUrl}
                   alt="Cover"
-                  className={`${
-                    coverIsSquare ? "w-28 h-28" : "w-44 h-[4.4rem]"
-                  } object-cover rounded-xl border border-gray-200`}
+                  className="w-28 h-28 aspect-square object-cover rounded-xl border border-gray-200"
                 />
               ) : (
-                <div
-                  className={`${
-                    coverIsSquare ? "w-28 h-28" : "w-44 h-[4.4rem]"
-                  } rounded-xl bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center text-gray-300`}
-                >
+                <div className="w-28 h-28 aspect-square rounded-xl bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center text-gray-300">
                   <ImageUp size={20} />
                 </div>
               )}
@@ -266,9 +255,8 @@ export default function EditFormPage() {
             <div className="flex-grow min-w-0">
               <p className="text-sm font-bold text-[#111827]">Cover image (optional)</p>
               <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
-                {coverIsSquare
-                  ? "Cropped to a square beside the title. Square images look best."
-                  : "Cropped to a wide banner across the top. Add a date or location to switch this to a square."}
+                Shown as a 1:1 square beside the title. Square images look best — others are
+                cropped from the centre.
               </p>
               <div className="flex items-center gap-2 mt-3">
                 <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors cursor-pointer">

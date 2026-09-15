@@ -57,11 +57,20 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
 
+    // True when the admin entered their password in the last 5 minutes. The
+    // admin panel re-asks for it before deleting, which refreshes auth_time.
+    function recentlySignedIn() {
+      return request.time.toMillis() - request.auth.token.auth_time * 1000 < 5 * 60 * 1000;
+    }
+
     // Forms: the public fill page needs to read a form's definition to render
-    // it; only an admin can create/edit/delete forms.
+    // it; only an admin can create or edit forms. Deleting also needs a fresh
+    // password entry, so a session left signed in on a shared device — or a
+    // delete sent from the dev console — can't remove forms without it.
     match /forms/{formId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin() && recentlySignedIn();
     }
 
     // Form responses: anyone may file a new, well-formed response to a FREE

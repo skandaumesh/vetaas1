@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAdminAuth } from "@/components/admin/AdminGate";
+import PasswordConfirmDialog from "@/components/admin/PasswordConfirmDialog";
 import type { FormDoc } from "@/lib/forms";
 import {
   BarChart3,
@@ -41,7 +42,7 @@ export default function AdminFormsPage() {
   const [responseCounts, setResponseCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<FormRow | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -92,10 +93,10 @@ export default function AdminFormsPage() {
     await updateDoc(doc(db, "forms", form.id), { status: nextStatus, updatedAt: serverTimestamp() });
   };
 
+  // Runs only after PasswordConfirmDialog has verified the admin's password.
   const remove = async (id: string) => {
     await deleteDoc(doc(db, "forms", id));
     setForms((prev) => prev.filter((f) => f.id !== id));
-    setDeleteConfirmId(null);
   };
 
   const copyLink = (id: string) => {
@@ -196,29 +197,37 @@ export default function AdminFormsPage() {
                   >
                     {copiedId === form.id ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
                   </button>
-                  {deleteConfirmId === form.id ? (
-                    <button
-                      onClick={() => remove(form.id)}
-                      className="inline-flex items-center justify-center w-8 h-8 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors cursor-pointer"
-                      aria-label="Confirm delete"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setDeleteConfirmId(form.id)}
-                      className="inline-flex items-center justify-center w-8 h-8 bg-white/60 border border-white/70 text-gray-400 rounded-full hover:text-red-500 transition-colors cursor-pointer"
-                      aria-label="Delete form"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => setDeleteTarget(form)}
+                    className="inline-flex items-center justify-center w-8 h-8 bg-white/60 border border-white/70 text-gray-400 rounded-full hover:text-red-500 transition-colors cursor-pointer"
+                    aria-label="Delete form"
+                    title="Delete form"
+                  >
+                    <Trash2 size={13} />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      <PasswordConfirmDialog
+        open={deleteTarget !== null}
+        title="Delete this form?"
+        message={
+          <>
+            <span className="font-semibold text-slate-700">
+              {deleteTarget?.title || "Untitled form"}
+            </span>{" "}
+            will be permanently deleted and its link will stop working. Enter your admin password to
+            confirm.
+          </>
+        }
+        confirmLabel="Delete form"
+        onConfirm={() => (deleteTarget ? remove(deleteTarget.id) : Promise.resolve())}
+        onClose={() => setDeleteTarget(null)}
+      />
     </main>
   );
 }
