@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin', '/admin/', '/cart', '/membership'],
+        disallow: ['/admin', '/admin/', '/cart', '/membership', '/ticket/'],
       },
       {
         userAgent: [
@@ -27,7 +27,7 @@ export default function robots(): MetadataRoute.Robots {
           'CCBot',
         ],
         allow: '/',
-        disallow: ['/admin', '/admin/', '/cart', '/membership'],
+        disallow: ['/admin', '/admin/', '/cart', '/membership', '/ticket/'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

@@ -20,7 +20,27 @@ import {
   type FormField,
   type GridAnswer,
 } from "@/lib/forms";
-import { CheckCircle2, FileText, ImageUp, Loader2, Lock, MapPin, Star, Upload, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  FileText,
+  ImageUp,
+  Loader2,
+  Lock,
+  MapPin,
+  Star,
+  Ticket,
+  Upload,
+  X,
+} from "lucide-react";
+import {
+  confirmationEnabled,
+  eventWhen,
+  isEventForm,
+  mapLink,
+  newTicketToken,
+  registrantEmail,
+} from "@/lib/tickets";
 
 const EMAIL_RE = /.+@.+\..+/;
 
@@ -39,6 +59,7 @@ const EXTENSION_TYPES: Record<string, string> = {
 const createEventRegistration = httpsCallable<
   { formId: string; answers: Record<string, AnswerValue> },
   {
+    ticketToken: string | null;
     responseId: string;
     razorpayOrderId: string;
     amount: number;
@@ -54,27 +75,13 @@ const verifyEventPayment = httpsCallable<
     razorpay_payment_id: string;
     razorpay_signature: string;
   },
-  { ok: boolean }
+  { ok: boolean; ticketToken: string | null }
 >(functions, "verifyEventPayment");
 
 const fmtPrice = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 const respondedKey = (formId: string) => `formResponded:${formId}`;
-
-// "2026-09-05" -> the pieces the date chip and heading need. Parsed as local
-// time (not UTC) so the day never shifts backwards for IST visitors.
-const dateParts = (iso: string) => {
-  const d = new Date(`${iso}T00:00:00`);
-  if (Number.isNaN(d.getTime())) return null;
-  return {
-    month: d.toLocaleDateString("en-IN", { month: "short" }).toUpperCase(),
-    day: d.getDate(),
-    full: d.toLocaleDateString("en-IN", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-    }),
-  };
-};
+// Remembers this device's ticket so "View my ticket" survives a reload.
+const ticketKey = (formId: string) => `formTicket:${formId}`;
 
 export default function PublicFormPage() {
   const params = useParams();
@@ -92,6 +99,22 @@ export default function PublicFormPage() {
   // Landing view first, questions after they click Register.
   const [registering, setRegistering] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
+  const [ticketToken, setTicketToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(ticketKey(formId));
+      if (saved) setTicketToken(saved);
+    } catch {}
+  }, [formId]);
+
+  const rememberTicket = (token: string | null) => {
+    if (!token) return;
+    setTicketToken(token);
+    try {
+      localStorage.setItem(ticketKey(formId), token);
+    } catch {}
+  };
 
   useEffect(() => {
     (async () => {
@@ -176,6 +199,9 @@ export default function PublicFormPage() {
         return;
       }
 
+      // Events get a ticket. The token is made here so the ticket link can be
+      // shown straight away; the server issues the ticket and emails it.
+      const token = isEventForm(form) ? newTicketToken() : null;
       await addDoc(collection(db, "formResponses"), {
         formId,
         formTitle: form.title,
@@ -184,9 +210,11 @@ export default function PublicFormPage() {
           label: field.label,
           value: answers[field.id] ?? emptyAnswer(field),
         })),
+        ...(token ? { ticketToken: token } : {}),
         createdAt: serverTimestamp(),
       });
       markResponded();
+      rememberTicket(token);
       setSubmitted(true);
     } catch (err) {
       console.error("Failed to submit form:", err);
@@ -232,16 +260,19 @@ export default function PublicFormPage() {
         theme: { color: "#7C3AED" },
         handler: async (response) => {
           try {
-            await verifyEventPayment({
+            const { data: verified } = await verifyEventPayment({
               responseId: order.responseId,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
             markResponded();
+            rememberTicket(verified.ticketToken ?? order.ticketToken);
             setSubmitted(true);
           } catch (err) {
             console.error("Payment verification failed:", err);
+            // The ticket still goes live once the webhook confirms payment.
+            rememberTicket(order.ticketToken);
             // The webhook still confirms it, so don't tell them it failed.
             setPayError(
               "Payment received, but confirming it took longer than expected. We'll be in touch — no need to pay again."
@@ -307,6 +338,14 @@ export default function PublicFormPage() {
           {form.title || "This form"}
         </h1>
         <p className="text-gray-500 font-medium">You&apos;ve already responded to this form.</p>
+        {ticketToken && (
+          <a
+            href={`/ticket/${ticketToken}`}
+            className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-[#7C3AED] text-white font-bold rounded-lg hover:bg-[#6D28D9] transition-colors"
+          >
+            <Ticket size={16} /> View my ticket
+          </a>
+        )}
       </div>
     );
   }
@@ -324,17 +363,48 @@ export default function PublicFormPage() {
   }
 
   if (submitted) {
+    const emailing = confirmationEnabled(form);
+    const sentTo = registrantEmail(
+      form.fields.map((f) => ({ fieldId: f.id, label: f.label, value: answers[f.id] ?? "" }))
+    );
     return shell(
       <div className="glass-card rounded-3xl p-10 text-center">
         <CheckCircle2 className="mx-auto mb-4 text-[#00CDBA]" size={40} />
-        <h1 className="text-xl font-headline font-bold text-[#111827] mb-2">Thank you!</h1>
-        <p className="text-gray-500 font-medium">Your response has been recorded.</p>
+        <h1 className="text-xl font-headline font-bold text-[#111827] mb-2">
+          {ticketToken ? "You're in!" : "Thank you!"}
+        </h1>
+        <p className="text-gray-500 font-medium">
+          {ticketToken
+            ? `You're registered for ${form.title || "this event"}.`
+            : "Your response has been recorded."}
+        </p>
+        {emailing && (sentTo || price > 0) && (
+          <p className="text-sm text-gray-500 mt-2">
+            {sentTo ? (
+              <>
+                We&apos;ve emailed {ticketToken ? "your ticket" : "a confirmation"} to{" "}
+                <span className="font-semibold text-gray-700">{sentTo}</span>.
+              </>
+            ) : (
+              "We've emailed your ticket to the address you used at payment."
+            )}
+          </p>
+        )}
+        {ticketToken && (
+          <a
+            href={`/ticket/${ticketToken}`}
+            className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-[#7C3AED] text-white font-bold rounded-lg hover:bg-[#6D28D9] transition-colors"
+          >
+            <Ticket size={16} /> View my ticket
+          </a>
+        )}
       </div>
     );
   }
 
-  const when = form.eventDate ? dateParts(form.eventDate) : null;
-  const timeRange = [form.eventStart, form.eventEnd].filter(Boolean).join(" – ");
+  const when = eventWhen(form);
+  const timeRange = when?.time ?? "";
+  const maps = mapLink(form);
   // A date or a location is what makes this an event. Without either it's an
   // ordinary form — info gathering, feedback, a sign-up — so the questions go
   // straight on screen instead of behind a Register button.
@@ -542,7 +612,19 @@ export default function PublicFormPage() {
                   <MapPin size={18} />
                 </div>
                 <div>
-                  <p className="font-bold text-[#111827] leading-snug">{form.location}</p>
+                  {maps ? (
+                    <a
+                      href={maps}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-bold text-[#111827] leading-snug hover:underline"
+                    >
+                      {form.location}
+                      <ArrowUpRight size={15} className="text-gray-400 shrink-0" />
+                    </a>
+                  ) : (
+                    <p className="font-bold text-[#111827] leading-snug">{form.location}</p>
+                  )}
                   {form.locationNote && (
                     <p className="text-sm text-gray-500 font-medium">{form.locationNote}</p>
                   )}

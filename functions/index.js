@@ -8,6 +8,17 @@ const path = require("path");
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
 const { EMAIL_SUBJECT: MEMBERSHIP_EMAIL_SUBJECT, buildEmailText: buildMembershipEmailText, buildEmailHtml: buildMembershipEmailHtml } = require("./membershipEmail");
+const QRCode = require("qrcode");
+const {
+  SITE_URL,
+  STRICT_EMAIL,
+  isEventForm,
+  confirmationEnabled,
+  registrantEmail,
+  registrantName,
+  buildIcs,
+  buildRegistrationEmail,
+} = require("./registrationEmail");
 
 admin.initializeApp();
 
@@ -67,6 +78,18 @@ exports.sendMail = onDocumentCreated(
       } catch (err) {
         console.error(`Could not attach ${item.storagePath}:`, err.message);
       }
+    }
+
+    // Small files carried on the queue document itself — a ticket QR code
+    // (shown inline via its cid) or a calendar invite. Base64, a few KB each.
+    for (const item of data.inlineAttachments ?? []) {
+      if (!item || !item.filename || !item.content) continue;
+      attachments.push({
+        filename: item.filename,
+        content: Buffer.from(item.content, "base64"),
+        contentType: item.contentType || undefined,
+        cid: item.cid || undefined,
+      });
     }
 
     try {
@@ -656,7 +679,9 @@ exports.verifyMembershipPayment = onCall(
 // callable above would run). approvePaidOrder() is idempotent, so whichever
 // of the two paths arrives first does the work; the other is a no-op.
 exports.razorpayWebhook = onRequest(
-  { region: "us-central1", secrets: [razorpayWebhookSecret] },
+  // The key secret is for looking up a payer's email when a paid event form
+  // didn't ask for one.
+  { region: "us-central1", secrets: [razorpayWebhookSecret, razorpayKeySecret] },
   async (req, res) => {
     const signature = req.headers["x-razorpay-signature"];
     const expected = crypto
@@ -701,7 +726,7 @@ exports.razorpayWebhook = onRequest(
             .limit(1)
             .get();
           if (!reg.empty) {
-            await markRegistrationPaid(db, reg.docs[0].id, payment.id);
+            await markRegistrationPaid(db, reg.docs[0].id, payment.id, payment);
           }
         }
       }
@@ -1077,19 +1102,168 @@ exports.checkMembership = onCall(
 // ---------------------------------------------------------------------------
 
 // Idempotent: both the browser's verify call and the webhook can land, and
-// whichever arrives second must be a no-op.
-async function markRegistrationPaid(db, responseId, paymentId) {
+// whichever arrives second must be a no-op. Only the call that actually flips
+// the registration to paid sends the confirmation email.
+async function markRegistrationPaid(db, responseId, paymentId, payment) {
   const ref = db.collection("formResponses").doc(responseId);
-  await db.runTransaction(async (tx) => {
+  const flipped = await db.runTransaction(async (tx) => {
     const snap = await tx.get(ref);
-    if (!snap.exists) return;
-    if (snap.data().paymentStatus === "paid") return;
-    tx.update(ref, {
+    if (!snap.exists) return false;
+    if (snap.data().paymentStatus === "paid") return false;
+    const update = {
       paymentStatus: "paid",
       razorpayPaymentId: paymentId || null,
       paidAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    };
+    // Razorpay's checkout collects an email and phone, which covers event
+    // forms that never asked for them.
+    if (payment && payment.email) update.payerEmail = String(payment.email).trim().toLowerCase().slice(0, 200);
+    if (payment && payment.contact) update.payerPhone = String(payment.contact).slice(0, 30);
+    tx.update(ref, update);
+    return true;
   });
+  if (!flipped) return;
+
+  try {
+    await sendRegistrationConfirmation(db, responseId);
+  } catch (err) {
+    console.error(`Confirmation email failed for registration ${responseId}:`, err);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tickets and confirmation emails.
+//
+// Every event registration gets tickets/{token}: a 256-bit random id that the
+// ticket page reads and the check-in scanner looks up. The QR code on the
+// ticket is simply its link.
+// ---------------------------------------------------------------------------
+
+const TICKET_TOKEN_RE = /^[a-f0-9]{64}$/;
+const newTicketToken = () => crypto.randomBytes(32).toString("hex");
+
+/** Creates or refreshes the ticket for a registration and returns its token. */
+async function ensureTicket(db, responseRef, response) {
+  let token = TICKET_TOKEN_RE.test(response.ticketToken || "") ? response.ticketToken : null;
+  if (token) {
+    const existing = await db.collection("tickets").doc(token).get();
+    // A token already tied to another registration is never shared.
+    if (existing.exists && existing.data().responseId !== responseRef.id) token = null;
+  }
+  if (!token) {
+    token = newTicketToken();
+    await responseRef.update({ ticketToken: token });
+  }
+
+  const confirmed = response.paymentStatus ? response.paymentStatus === "paid" : true;
+  await db
+    .collection("tickets")
+    .doc(token)
+    .set(
+      {
+        responseId: responseRef.id,
+        formId: response.formId,
+        name: registrantName(response.answers),
+        status: confirmed ? "confirmed" : "pending",
+        amount: Number(response.amount) || 0,
+      },
+      { merge: true }
+    );
+  return token;
+}
+
+/**
+ * Issues the ticket (for events) and queues the confirmation email.
+ * `force` is the admin's "Send email" button: it sends even when automatic
+ * emails are off for the form, or one was already sent.
+ */
+async function sendRegistrationConfirmation(db, responseId, { force = false } = {}) {
+  const ref = db.collection("formResponses").doc(responseId);
+  const snap = await ref.get();
+  if (!snap.exists) return { sent: false, reason: "not-found" };
+  const response = snap.data();
+
+  const formSnap = await db.collection("forms").doc(response.formId).get();
+  if (!formSnap.exists) return { sent: false, reason: "form-missing" };
+  const form = formSnap.data();
+
+  if (response.paymentStatus && response.paymentStatus !== "paid") {
+    return { sent: false, reason: "unpaid" };
+  }
+
+  const token = isEventForm(form) ? await ensureTicket(db, ref, response) : null;
+  if (!force && !confirmationEnabled(form)) return { sent: false, reason: "disabled", ticketToken: token };
+  if (!force && response.confirmationSentAt) return { sent: false, reason: "already-sent", ticketToken: token };
+
+  let email = registrantEmail(response.answers) || String(response.payerEmail || "").trim().toLowerCase();
+  if (!email && response.razorpayPaymentId) {
+    // Paid before payer details were stored: ask Razorpay.
+    try {
+      const razorpay = new Razorpay({ key_id: razorpayKeyId.value(), key_secret: razorpayKeySecret.value() });
+      const payment = await razorpay.payments.fetch(response.razorpayPaymentId);
+      if (payment && payment.email) {
+        email = String(payment.email).trim().toLowerCase();
+        await ref.update({
+          payerEmail: email,
+          ...(payment.contact ? { payerPhone: String(payment.contact).slice(0, 30) } : {}),
+        });
+      }
+    } catch (err) {
+      console.error(`Could not read payer email for ${responseId}:`, err.message);
+    }
+  }
+  if (!STRICT_EMAIL.test(email)) {
+    await ref.update({ confirmationError: "no-email" });
+    return { sent: false, reason: "no-email", ticketToken: token };
+  }
+
+  const ticketUrl = token ? `${SITE_URL}/ticket/${token}` : "";
+  const inlineAttachments = [];
+  if (ticketUrl) {
+    const png = await QRCode.toBuffer(ticketUrl, { width: 360, margin: 1, errorCorrectionLevel: "M" });
+    inlineAttachments.push({
+      filename: "ticket-qr.png",
+      content: png.toString("base64"),
+      contentType: "image/png",
+      cid: "ticket-qr",
+    });
+    const ics = buildIcs(form, {
+      uid: responseId,
+      ticketUrl,
+      eventUrl: `${SITE_URL}/forms/${response.formId}`,
+    });
+    if (ics) {
+      inlineAttachments.push({
+        filename: "event.ics",
+        content: Buffer.from(ics, "utf8").toString("base64"),
+        contentType: "text/calendar; charset=utf-8; method=PUBLISH",
+      });
+    }
+  }
+
+  const { subject, html, text } = buildRegistrationEmail({
+    form,
+    formId: response.formId,
+    ticketUrl,
+    amountPaid: response.paymentStatus === "paid" ? Number(response.amount) || 0 : 0,
+    hasQr: !!ticketUrl,
+  });
+
+  await db.collection("mail").add({
+    to: email,
+    message: { subject, html, text },
+    inlineAttachments,
+    type: "registration-confirmation",
+    responseId,
+    formId: response.formId,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  await ref.update({
+    confirmationSentAt: admin.firestore.FieldValue.serverTimestamp(),
+    confirmationTo: email,
+    confirmationError: admin.firestore.FieldValue.delete(),
+  });
+  return { sent: true, email, ticketToken: token };
 }
 
 exports.createEventRegistration = onCall(
@@ -1169,6 +1343,7 @@ exports.createEventRegistration = onCall(
     }
 
     const responseRef = db.collection("formResponses").doc();
+    const ticketToken = isEventForm(form) ? newTicketToken() : null;
     const razorpay = new Razorpay({
       key_id: razorpayKeyId.value(),
       key_secret: razorpayKeySecret.value(),
@@ -1187,10 +1362,24 @@ exports.createEventRegistration = onCall(
       amount: price,
       paymentStatus: "pending",
       razorpayOrderId: rzpOrder.id,
+      ...(ticketToken ? { ticketToken } : {}),
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    // The ticket exists from the start so its link works the moment payment
+    // clears; until then it shows as awaiting payment and won't check in.
+    if (ticketToken) {
+      await db.collection("tickets").doc(ticketToken).set({
+        responseId: responseRef.id,
+        formId,
+        name: registrantName(answers),
+        status: "pending",
+        amount: price,
+      });
+    }
+
     return {
+      ticketToken,
       responseId: responseRef.id,
       razorpayOrderId: rzpOrder.id,
       amount: rzpOrder.amount,
@@ -1229,10 +1418,40 @@ exports.verifyEventPayment = onCall(
     }
 
     await markRegistrationPaid(db, responseId, paymentId);
-    return { ok: true };
+    return { ok: true, ticketToken: snap.data().ticketToken || null };
   }
 );
 
+
+// Free registrations are written straight to Firestore by the browser, so
+// their ticket and email are issued here. Paid ones carry a paymentStatus and
+// are confirmed by markRegistrationPaid once the money clears.
+exports.onFormResponseCreated = onDocumentCreated(
+  { document: "formResponses/{id}", region: "us-central1", retry: false },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+    const data = snap.data();
+    if (!data || data.paymentStatus) return;
+    try {
+      await sendRegistrationConfirmation(admin.firestore(), snap.id);
+    } catch (err) {
+      console.error(`Confirmation failed for response ${snap.id}:`, err);
+    }
+  }
+);
+
+// Admin "Send email" / "Resend" on the responses page — also how people who
+// registered before confirmation emails existed get their tickets.
+exports.sendRegistrationEmail = onCall(
+  { region: "us-central1", secrets: [razorpayKeySecret] },
+  async (request) => {
+    assertAdmin(request);
+    const responseId = String((request.data || {}).responseId || "");
+    if (!responseId) throw new HttpsError("invalid-argument", "Missing response.");
+    return sendRegistrationConfirmation(admin.firestore(), responseId, { force: true });
+  }
+);
 
 // ---------------------------------------------------------------------------
 // Unified cart: membership plans, paid downloads and free worksheets in one

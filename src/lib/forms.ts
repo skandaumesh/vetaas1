@@ -65,6 +65,17 @@ export interface FormDoc {
    * gets to say what the registration costs.
    */
   price?: number;
+  /** Google Maps link for the venue. */
+  mapUrl?: string;
+  /**
+   * Email people when they register. Absent means the default: on for events
+   * (a date or location is set), off for plain forms.
+   */
+  confirmationEmail?: boolean;
+  /** Optional subject line; defaults to "You're registered for <title>". */
+  emailSubject?: string;
+  /** Optional note added to the confirmation email — parking, what to bring. */
+  emailMessage?: string;
   createdAt?: { seconds: number };
   updatedAt?: { seconds: number };
 }
@@ -87,6 +98,15 @@ export interface FormResponseDoc {
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
   paidAt?: { seconds: number };
+  /** Event forms: the id of this registration's tickets/{token} document. */
+  ticketToken?: string;
+  checkedInAt?: { seconds: number } | null;
+  /** Email and phone given at Razorpay checkout, for forms that didn't ask. */
+  payerEmail?: string;
+  payerPhone?: string;
+  confirmationSentAt?: { seconds: number };
+  confirmationTo?: string;
+  confirmationError?: string;
   createdAt?: { seconds: number };
 }
 

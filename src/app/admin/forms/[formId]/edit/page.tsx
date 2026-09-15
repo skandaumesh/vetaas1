@@ -19,6 +19,7 @@ import {
   type FormDoc,
   type FormField,
 } from "@/lib/forms";
+import { formAsksForEmail } from "@/lib/tickets";
 import {
   ArrowLeft,
   ChevronDown,
@@ -26,6 +27,7 @@ import {
   Check,
   ImageUp,
   Loader2,
+  Mail,
   Plus,
   Trash2,
   X,
@@ -59,6 +61,11 @@ export default function EditFormPage() {
   const [hostName, setHostName] = useState("");
   const [ctaLabel, setCtaLabel] = useState("");
   const [price, setPrice] = useState("");
+  const [mapUrl, setMapUrl] = useState("");
+  // null follows the default: on for events, off for plain forms.
+  const [confirmationEmail, setConfirmationEmail] = useState<boolean | null>(null);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -84,6 +91,10 @@ export default function EditFormPage() {
         setHostName(data.hostName ?? "");
         setCtaLabel(data.ctaLabel ?? "");
         setPrice(data.price ? String(data.price) : "");
+        setMapUrl(data.mapUrl ?? "");
+        setConfirmationEmail(typeof data.confirmationEmail === "boolean" ? data.confirmationEmail : null);
+        setEmailSubject(data.emailSubject ?? "");
+        setEmailMessage(data.emailMessage ?? "");
       } catch (err) {
         console.error("Failed to load form:", err);
         setNotFound(true);
@@ -163,7 +174,21 @@ export default function EditFormPage() {
     );
   };
 
+  // Puts Name and Email questions at the top, so confirmations have an address.
+  const addContactQuestions = () => {
+    setFields((prev) => {
+      const extra: FormField[] = [];
+      if (!prev.some((f) => /name/i.test(f.label))) {
+        extra.push({ ...emptyField("short_text"), label: "Your name", required: true });
+      }
+      extra.push({ ...emptyField("email"), label: "Email", required: true });
+      return [...extra, ...prev];
+    });
+  };
+
   const save = async () => {
+    const cleanMapUrl = /^https:\/\/\S+$/i.test(mapUrl.trim()) ? mapUrl.trim() : "";
+    const isEvent = !!(eventDate.trim() || location.trim());
     setSaving(true);
     try {
       await updateDoc(doc(db, "forms", formId), {
@@ -180,6 +205,10 @@ export default function EditFormPage() {
         hostName: hostName.trim(),
         ctaLabel: ctaLabel.trim(),
         price: Math.max(0, Math.round(Number(price) || 0)),
+        mapUrl: cleanMapUrl,
+        confirmationEmail: confirmationEmail ?? isEvent,
+        emailSubject: emailSubject.trim(),
+        emailMessage: emailMessage.trim(),
         updatedAt: serverTimestamp(),
       });
       setSaved(true);
@@ -209,6 +238,11 @@ export default function EditFormPage() {
       </main>
     );
   }
+
+  const isEventNow = !!(eventDate.trim() || location.trim());
+  const emailOn = confirmationEmail ?? isEventNow;
+  const asksEmail = formAsksForEmail({ fields });
+  const mapUrlInvalid = !!mapUrl.trim() && !/^https:\/\/\S+$/i.test(mapUrl.trim());
 
   return (
     <main className="min-h-screen py-8 md:py-10 px-4 md:px-10">
@@ -388,6 +422,27 @@ export default function EditFormPage() {
             </label>
           </div>
 
+          <label className="block mb-4">
+            <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+              Google Maps link
+            </span>
+            <input
+              type="url"
+              inputMode="url"
+              value={mapUrl}
+              onChange={(e) => setMapUrl(e.target.value)}
+              placeholder="https://maps.app.goo.gl/…"
+              className={`glass-input w-full rounded-lg px-3 py-2 text-sm text-gray-700 placeholder:text-gray-300 ${
+                mapUrlInvalid ? "ring-1 ring-red-300" : ""
+              }`}
+            />
+            <span className={`block text-xs mt-1.5 ${mapUrlInvalid ? "text-red-500 font-semibold" : "text-slate-300"}`}>
+              {mapUrlInvalid
+                ? "Paste the full link, starting with https:// — it won't be saved otherwise."
+                : "In Google Maps: Share → Copy link. The location name links here on the event page, ticket and email."}
+            </span>
+          </label>
+
           <div className="grid sm:grid-cols-2 gap-4">
             <label className="block">
               <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
@@ -434,6 +489,89 @@ export default function EditFormPage() {
                 : "Leave at 0 for a free event — people just fill the form."}
             </p>
           </div>
+        </div>
+
+        {/* Confirmation email */}
+        <div className="glass-card rounded-2xl p-6 mb-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="inline-flex items-center gap-2 text-sm font-bold text-[#111827] mb-1">
+                <Mail size={15} className="text-[#7C3AED]" /> Confirmation email
+              </p>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                {isEventNow
+                  ? "Sent when someone registers (for paid events, once payment clears) with the date, time, location and map link, their QR ticket, and an Add to calendar invite."
+                  : "Sent when someone submits this form, with your message below."}
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={emailOn}
+              aria-label="Send confirmation email"
+              onClick={() => setConfirmationEmail(!emailOn)}
+              className={`relative shrink-0 w-11 h-6 rounded-full transition-colors cursor-pointer ${
+                emailOn ? "bg-[#7C3AED]" : "bg-gray-200"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  emailOn ? "translate-x-5" : ""
+                }`}
+              />
+            </button>
+          </div>
+
+          {emailOn && (
+            <div className="mt-5 space-y-4">
+              {!asksEmail && (
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+                  <p className="text-sm font-semibold text-amber-800">No question asks for an email address.</p>
+                  <p className="text-xs text-amber-700 mt-0.5 leading-relaxed">
+                    {Number(price) > 0
+                      ? "Paid registrations fall back to the email entered at payment, but asking makes sure everyone gets their ticket."
+                      : "Without one there's nowhere to send the confirmation."}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={addContactQuestions}
+                    className="mt-2 text-xs font-bold text-[#7C3AED] hover:text-[#6D28D9] cursor-pointer"
+                  >
+                    + Add Name and Email questions
+                  </button>
+                </div>
+              )}
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                  Subject
+                </span>
+                <input
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder={
+                    isEventNow
+                      ? `You're registered for ${title.trim() || "this event"}`
+                      : `Thanks for your response to ${title.trim() || "this form"}`
+                  }
+                  className="glass-input w-full rounded-lg px-3 py-2 text-sm text-gray-700 placeholder:text-gray-300"
+                />
+              </label>
+
+              <label className="block">
+                <span className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                  Message
+                </span>
+                <textarea
+                  value={emailMessage}
+                  onChange={(e) => setEmailMessage(e.target.value)}
+                  rows={4}
+                  placeholder="Anything they should know: what to bring, parking, who to call on the day."
+                  className="glass-input w-full rounded-lg px-3 py-2 text-sm text-gray-700 placeholder:text-gray-300 resize-y"
+                />
+              </label>
+            </div>
+          )}
         </div>
 
         {/* Fields */}

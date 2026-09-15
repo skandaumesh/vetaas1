@@ -12,8 +12,10 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { httpsCallable } from "firebase/functions";
+import { db, functions } from "@/lib/firebase";
 import { useAdminAuth } from "@/components/admin/AdminGate";
+import { registrantEmail } from "@/lib/tickets";
 import {
   fileNameFromUrl,
   formatAnswer,
@@ -29,12 +31,30 @@ import {
   FileText,
   Inbox,
   Loader2,
+  Mail,
+  Ticket,
   Trash2,
 } from "lucide-react";
 
 interface ResponseRow extends FormResponseDoc {
   id: string;
 }
+
+const sendRegistrationEmail = httpsCallable<
+  { responseId: string },
+  { sent: boolean; reason?: string; email?: string; ticketToken?: string | null }
+>(functions, "sendRegistrationEmail");
+
+const REASONS: Record<string, string> = {
+  "no-email": "No email address in this response",
+  unpaid: "Payment isn't complete",
+  "not-found": "Response not found",
+  "form-missing": "Form not found",
+};
+
+// Confirmed registrations that haven't been emailed yet.
+const needsEmail = (r: ResponseRow) =>
+  (!r.paymentStatus || r.paymentStatus === "paid") && !r.confirmationSentAt;
 
 const fmtDateTime = (t?: { seconds: number }) =>
   t
@@ -59,6 +79,49 @@ export default function FormResponsesPage() {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [emailStatus, setEmailStatus] = useState<Record<string, string>>({});
+  const [bulk, setBulk] = useState<{ done: number; total: number } | null>(null);
+
+  /** Returns true when the email was queued. */
+  const sendEmail = async (r: ResponseRow) => {
+    setEmailStatus((s) => ({ ...s, [r.id]: "sending" }));
+    try {
+      const { data } = await sendRegistrationEmail({ responseId: r.id });
+      if (data.sent) {
+        setEmailStatus((s) => ({ ...s, [r.id]: `Sent to ${data.email}` }));
+        setResponses((prev) =>
+          prev.map((row) =>
+            row.id === r.id
+              ? {
+                  ...row,
+                  confirmationTo: data.email,
+                  confirmationSentAt: { seconds: Math.floor(Date.now() / 1000) },
+                  ticketToken: data.ticketToken ?? row.ticketToken,
+                }
+              : row
+          )
+        );
+        return true;
+      }
+      setEmailStatus((s) => ({ ...s, [r.id]: REASONS[data.reason ?? ""] ?? "Not sent" }));
+    } catch (err) {
+      console.error("Send email failed:", err);
+      setEmailStatus((s) => ({ ...s, [r.id]: "Couldn't send. Try again." }));
+    }
+    return false;
+  };
+
+  const sendAll = async () => {
+    const pending = responses.filter(needsEmail);
+    if (pending.length === 0) return;
+    if (!window.confirm(`Email ${pending.length} ${pending.length === 1 ? "person" : "people"} their confirmation${form && (form.eventDate || form.location) ? " and ticket" : ""}?`)) return;
+    setBulk({ done: 0, total: pending.length });
+    for (let i = 0; i < pending.length; i++) {
+      await sendEmail(pending[i]);
+      setBulk({ done: i + 1, total: pending.length });
+    }
+    window.setTimeout(() => setBulk(null), 2500);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -145,13 +208,27 @@ export default function FormResponsesPage() {
               {responses.length} response{responses.length === 1 ? "" : "s"} · {thisMonthCount} this month
             </p>
           </div>
-          <button
-            onClick={exportCsv}
-            disabled={responses.length === 0}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/60 border border-white/70 text-gray-700 rounded-full text-sm font-bold hover:bg-gray-100 transition-colors disabled:opacity-40 cursor-pointer"
-          >
-            <Download size={15} /> Export CSV
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {(bulk || responses.some(needsEmail)) && (
+              <button
+                onClick={sendAll}
+                disabled={!!bulk}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#7C3AED] text-white rounded-full text-sm font-bold hover:bg-[#6D28D9] transition-colors disabled:opacity-70 cursor-pointer"
+              >
+                {bulk ? <Loader2 size={15} className="animate-spin" /> : <Mail size={15} />}
+                {bulk
+                  ? `Sending ${bulk.done}/${bulk.total}`
+                  : `Email ${responses.filter(needsEmail).length} not yet emailed`}
+              </button>
+            )}
+            <button
+              onClick={exportCsv}
+              disabled={responses.length === 0}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/60 border border-white/70 text-gray-700 rounded-full text-sm font-bold hover:bg-gray-100 transition-colors disabled:opacity-40 cursor-pointer"
+            >
+              <Download size={15} /> Export CSV
+            </button>
+          </div>
         </div>
 
         {responses.length === 0 ? (
@@ -186,6 +263,16 @@ export default function FormResponsesPage() {
                             : "Payment not received"}
                         </span>
                       )}
+                      {r.checkedInAt && (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700">
+                          Checked in
+                        </span>
+                      )}
+                      {r.confirmationSentAt && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-violet-50 text-violet-700">
+                          <Mail size={11} /> Emailed
+                        </span>
+                      )}
                     </span>
                     <span className="flex items-center gap-3">
                       {deleteConfirmId === r.id ? (
@@ -217,6 +304,49 @@ export default function FormResponsesPage() {
                   </button>
                   {open && (
                     <div className="border-t border-gray-100 bg-white/40 px-5 py-5 space-y-3">
+                      <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-gray-100">
+                        {(!r.paymentStatus || r.paymentStatus === "paid") && (
+                          <button
+                            onClick={() => sendEmail(r)}
+                            disabled={emailStatus[r.id] === "sending"}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-bold hover:bg-gray-50 transition-colors disabled:opacity-60 cursor-pointer"
+                          >
+                            {emailStatus[r.id] === "sending" ? (
+                              <Loader2 size={13} className="animate-spin" />
+                            ) : (
+                              <Mail size={13} />
+                            )}
+                            {r.confirmationSentAt ? "Resend email" : "Send confirmation email"}
+                          </button>
+                        )}
+                        {r.ticketToken && (
+                          <a
+                            href={`/ticket/${r.ticketToken}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-bold hover:bg-gray-50 transition-colors"
+                          >
+                            <Ticket size={13} /> Open ticket
+                          </a>
+                        )}
+                        <span className="text-xs text-gray-500">
+                          {emailStatus[r.id] && emailStatus[r.id] !== "sending"
+                            ? emailStatus[r.id]
+                            : r.confirmationTo
+                              ? `Last emailed to ${r.confirmationTo}`
+                              : r.confirmationError === "no-email"
+                                ? "No email address to send to"
+                                : registrantEmail(r.answers) || r.payerEmail || ""}
+                        </span>
+                      </div>
+                      {(r.payerEmail || r.payerPhone) && (
+                        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-sm border-b border-gray-100 pb-2">
+                          <span className="text-gray-500">Contact from payment</span>
+                          <span className="font-semibold text-[#111827] sm:text-right">
+                            {[r.payerEmail, r.payerPhone].filter(Boolean).join(" · ")}
+                          </span>
+                        </div>
+                      )}
                       {(r.answers ?? []).map((a, i) => {
                         const field = form?.fields.find((f) => f.id === a.fieldId);
                         const fieldType = field?.type;

@@ -94,9 +94,29 @@ service cloud.firestore {
         && !('amount' in request.resource.data)
         && !('razorpayOrderId' in request.resource.data)
         && !('razorpayPaymentId' in request.resource.data)
+        && !('checkedInAt' in request.resource.data)
+        && !('confirmationSentAt' in request.resource.data)
+        && !('payerEmail' in request.resource.data)
+        // Optional ticket token the visitor generates so their ticket link can
+        // be shown straight away; the ticket itself is issued server-side.
+        && (!('ticketToken' in request.resource.data)
+          || (request.resource.data.ticketToken is string
+            && request.resource.data.ticketToken.matches('^[a-f0-9]{64}$')))
         && get(/databases/$(database)/documents/forms/$(request.resource.data.formId))
              .data.get('price', 0) == 0;
       allow read, update, delete: if isAdmin();
+    }
+
+    // Event tickets. The document id is a 256-bit random token, so a ticket
+    // can only be opened with the exact link from the registrant's email — it
+    // can't be listed or guessed. Only Cloud Functions create them; an admin
+    // may only change the check-in time.
+    match /tickets/{token} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['checkedInAt']);
+      allow create, delete: if false;
     }
 
     // Everything else is locked
