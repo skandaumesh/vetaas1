@@ -7,6 +7,7 @@ import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
 import { useAdminAuth } from "@/components/admin/AdminGate";
+import ImageCropper from "@/components/admin/ImageCropper";
 import {
   FIELD_TYPE_GROUPS,
   FIELD_TYPE_LABELS,
@@ -25,6 +26,7 @@ import {
   ChevronDown,
   ChevronUp,
   Check,
+  Crop,
   ImageUp,
   Loader2,
   Mail,
@@ -51,6 +53,9 @@ export default function EditFormPage() {
   const [fields, setFields] = useState<FormField[]>([]);
   const [logoUrl, setLogoUrl] = useState("");
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  // Covers are square, so the picture is cropped here before it's uploaded.
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [originalCover, setOriginalCover] = useState<File | null>(null);
   const [limitOneResponse, setLimitOneResponse] = useState(false);
   // Optional event details, shown on the public page above the form.
   const [eventDate, setEventDate] = useState("");
@@ -104,12 +109,12 @@ export default function EditFormPage() {
     })();
   }, [user, formId]);
 
-  const uploadLogo = async (file: File) => {
+  const uploadLogo = async (blob: Blob) => {
     setUploadingLogo(true);
     try {
-      const ext = file.name.split(".").pop() ?? "png";
-      const ref = storageRef(storage, `formLogos/${formId}.${ext}`);
-      await uploadBytes(ref, file);
+      // One name per form, so replacing a cover doesn't leave files behind.
+      const ref = storageRef(storage, `formLogos/${formId}.jpg`);
+      await uploadBytes(ref, blob, { contentType: "image/jpeg" });
       const url = await getDownloadURL(ref);
       setLogoUrl(url);
     } catch (err) {
@@ -302,14 +307,28 @@ export default function EditFormPage() {
                     disabled={uploadingLogo}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) uploadLogo(file);
+                      if (file) {
+                        setOriginalCover(file);
+                        setCoverFile(file);
+                      }
                       e.target.value = "";
                     }}
                   />
                 </label>
+                {originalCover && logoUrl && (
+                  <button
+                    onClick={() => setCoverFile(originalCover)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <Crop size={13} /> Adjust crop
+                  </button>
+                )}
                 {logoUrl && (
                   <button
-                    onClick={() => setLogoUrl("")}
+                    onClick={() => {
+                      setOriginalCover(null);
+                      setLogoUrl("");
+                    }}
                     className="inline-flex items-center gap-1 px-3 py-1.5 text-gray-400 hover:text-red-500 rounded-full text-xs font-bold cursor-pointer"
                   >
                     <X size={13} /> Remove
@@ -796,6 +815,19 @@ export default function EditFormPage() {
           <Plus size={16} /> Add question
         </button>
       </div>
+      {coverFile && (
+        <ImageCropper
+          file={coverFile}
+          title="Crop cover image"
+          defaultAspect={1}
+          aspects={[1]}
+          onCancel={() => setCoverFile(null)}
+          onDone={(blob) => {
+            setCoverFile(null);
+            uploadLogo(blob);
+          }}
+        />
+      )}
     </main>
   );
 }

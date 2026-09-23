@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
@@ -16,11 +16,13 @@ import {
   Calendar,
   MapPin,
   Link2,
+  Crop,
   Image as ImageIcon,
   Trash2,
   Edit2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ImageCropper from "@/components/admin/ImageCropper";
 
 interface Toast {
   id: number;
@@ -43,11 +45,18 @@ export default function AdminEventsPage() {
     startTime: "",
     endTime: "",
     location: "",
+    mapUrl: "",
     highlightsUrl: "",
     registrationUrl: "",
     manualImageUrl: ""
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
+  // The picture as chosen, kept so the crop can be adjusted again.
+  const [originalFile, setOriginalFile] = useState<File | null>(null);
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  // The shape the picture was cropped to, so the events page shows it whole
+  // instead of cropping it again to a fixed box.
+  const [imageAspect, setImageAspect] = useState<number | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
@@ -98,20 +107,66 @@ export default function AdminEventsPage() {
     }
   };
 
+  // Anything typed on an earlier event is offered as a suggestion, so a venue
+  // or a host name only has to be spelled out once.
+  const suggestions = useMemo(() => {
+    const unique = (key: string) =>
+      Array.from(
+        new Set(events.map((e) => String(e?.[key] ?? "").trim()).filter(Boolean))
+      ).sort((a, b) => a.localeCompare(b));
+    return {
+      title: unique("title"),
+      location: unique("location"),
+      link: unique("registrationUrl"),
+      map: unique("mapUrl"),
+    };
+  }, [events]);
+
+  const mapUrlInvalid =
+    !!formData.mapUrl.trim() && !/^https:[/][/]\S+$/i.test(formData.mapUrl.trim());
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const next = { ...prev, [name]: value };
+      // Reusing a venue brings its map link along.
+      if (name === "location" && !prev.mapUrl.trim()) {
+        const seen = events.find(
+          (ev) =>
+            String(ev?.location ?? "").trim().toLowerCase() === value.trim().toLowerCase() &&
+            String(ev?.mapUrl ?? "").trim()
+        );
+        if (seen) next.mapUrl = String(seen.mapUrl);
+      }
+      return next;
+    });
   };
 
+  // Choosing a picture opens the cropper first; only the crop is uploaded.
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-      setImagePreview(URL.createObjectURL(file));
-    }
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setOriginalFile(file);
+    setCropFile(file);
+    e.target.value = "";
+  };
+
+  const handleCropDone = (blob: Blob, aspect: number) => {
+    const name = (originalFile?.name ?? "event").replace(/[.][^.]+$/, "");
+    setImageAspect(Number(aspect.toFixed(4)));
+    setImageFile(new File([blob], `${name}-crop.jpg`, { type: "image/jpeg" }));
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImagePreview(URL.createObjectURL(blob));
+    setCropFile(null);
+  };
+
+  const clearImage = () => {
+    setImageFile(null);
+    setOriginalFile(null);
+    setImageAspect(null);
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImagePreview(null);
+    setFormData((prev) => ({ ...prev, manualImageUrl: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -212,6 +267,9 @@ export default function AdminEventsPage() {
         endDate: formData.endDate || "",
         timeSlot: computedTimeSlot,
         location: formData.location,
+        // Only a real https link is stored, so nothing odd can be linked from
+        // the public events page.
+        mapUrl: /^https:\/\/\S+$/i.test(formData.mapUrl.trim()) ? formData.mapUrl.trim() : "",
         highlightsUrl: formData.highlightsUrl,
         registrationUrl: formData.registrationUrl,
         status: computedStatus,
@@ -219,6 +277,10 @@ export default function AdminEventsPage() {
 
       if (imageUrl) {
         eventData.image = imageUrl;
+      }
+      if (imageFile && imageAspect) {
+        // Only a fresh crop sets the shape; an untouched picture keeps its own.
+        eventData.imageAspect = imageAspect;
       }
 
       if (editingEventId) {
@@ -241,12 +303,16 @@ export default function AdminEventsPage() {
         startTime: "",
         endTime: "",
         location: "",
+        mapUrl: "",
         highlightsUrl: "",
         registrationUrl: "",
         manualImageUrl: ""
       });
       setEditingEventId(null);
       setImageFile(null);
+      setOriginalFile(null);
+      setCropFile(null);
+      setImageAspect(null);
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview);
         setImagePreview(null);
@@ -300,6 +366,7 @@ export default function AdminEventsPage() {
       startTime: parsedStart,
       endTime: parsedEnd,
       location: event.location || "",
+      mapUrl: event.mapUrl || "",
       highlightsUrl: event.highlightsUrl || "",
       registrationUrl: event.registrationUrl || "",
       manualImageUrl: event.image || ""
@@ -317,9 +384,12 @@ export default function AdminEventsPage() {
     setEditingEventId(null);
     setFormData({
       title: "", date: "", endDate: "", startTime: "", endTime: "",
-      location: "", highlightsUrl: "", registrationUrl: "", manualImageUrl: ""
+      location: "", mapUrl: "", highlightsUrl: "", registrationUrl: "", manualImageUrl: ""
     });
     setImageFile(null);
+    setOriginalFile(null);
+    setCropFile(null);
+    setImageAspect(null);
     if (imagePreview) {
       URL.revokeObjectURL(imagePreview);
       setImagePreview(null);
@@ -691,6 +761,7 @@ export default function AdminEventsPage() {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
+                  list="event-title-suggestions"
                   required
                   className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   placeholder="e.g. Creative Play Workshop"
@@ -769,10 +840,35 @@ export default function AdminEventsPage() {
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
+                  list="event-location-suggestions"
                   required
                   className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   placeholder="e.g. Virtual, Bengaluru Central"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="mapUrl" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 font-headline">
+                  Location Link (Optional)
+                </label>
+                <input
+                  type="url"
+                  inputMode="url"
+                  id="mapUrl"
+                  name="mapUrl"
+                  value={formData.mapUrl}
+                  onChange={handleInputChange}
+                  list="event-map-suggestions"
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white ${
+                    mapUrlInvalid ? "border-red-300" : "border-slate-200"
+                  }`}
+                  placeholder="e.g. https://maps.app.goo.gl/..."
+                />
+                <p className={`text-[10px] mt-1.5 ${mapUrlInvalid ? "text-red-500 font-bold" : "text-slate-300"}`}>
+                  {mapUrlInvalid
+                    ? "Paste the full link starting with https:// — it won't be saved otherwise."
+                    : "Google Maps: Share \u2192 Copy link. The location becomes tappable on the events page."}
+                </p>
               </div>
 
               <div>
@@ -785,6 +881,7 @@ export default function AdminEventsPage() {
                   name="registrationUrl"
                   value={formData.registrationUrl}
                   onChange={handleInputChange}
+                  list="event-link-suggestions"
                   className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7C3AED] focus:border-[#7C3AED] outline-none text-sm transition-all duration-200 bg-white"
                   placeholder="e.g. https://forms.gle/... or Luma link"
                 />
@@ -805,7 +902,7 @@ export default function AdminEventsPage() {
                       onChange={handleImageChange}
                       className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#00CDBA]/10 file:text-[#00CDBA] hover:file:bg-[#00CDBA]/20 cursor-pointer"
                     />
-                    <p className="text-[10px] text-slate-300 mt-2">Images compress dynamically and store instantly.</p>
+                    <p className="text-[10px] text-slate-300 mt-2">Pick a picture and crop it to fit — wide, square or portrait.</p>
                   </div>
                 </div>
                 
@@ -819,18 +916,21 @@ export default function AdminEventsPage() {
                     >
                       <div className="relative rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 aspect-video group">
                         <img src={imagePreview} alt="Preview" className="w-full h-full object-cover transition duration-300 group-hover:scale-105" />
-                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition flex items-center justify-center gap-3">
+                          {originalFile && (
+                            <button
+                              type="button"
+                              onClick={() => setCropFile(originalFile)}
+                              title="Adjust crop"
+                              className="px-4 py-2.5 bg-white/95 hover:bg-white text-[#111827] rounded-full transition shadow-lg inline-flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+                            >
+                              <Crop className="w-4 h-4" /> Adjust crop
+                            </button>
+                          )}
                           <button
                             type="button"
-                            onClick={() => {
-                              setImageFile(null);
-                              if (imagePreview) {
-                                URL.revokeObjectURL(imagePreview);
-                                setImagePreview(null);
-                              }
-                              const fileInput = document.getElementById('image') as HTMLInputElement;
-                              if (fileInput) fileInput.value = '';
-                            }}
+                            onClick={clearImage}
+                            title="Remove image"
                             className="p-2.5 bg-[#FF5C7A] hover:bg-[#ff5c7a] text-white rounded-full transition shadow-lg flex items-center justify-center cursor-pointer"
                           >
                             <X className="w-5 h-5" />
@@ -841,6 +941,27 @@ export default function AdminEventsPage() {
                   )}
                 </AnimatePresence>
               </div>
+
+              <datalist id="event-title-suggestions">
+                {suggestions.title.map((v) => (
+                  <option key={v} value={v} />
+                ))}
+              </datalist>
+              <datalist id="event-location-suggestions">
+                {suggestions.location.map((v) => (
+                  <option key={v} value={v} />
+                ))}
+              </datalist>
+              <datalist id="event-link-suggestions">
+                {suggestions.link.map((v) => (
+                  <option key={v} value={v} />
+                ))}
+              </datalist>
+              <datalist id="event-map-suggestions">
+                {suggestions.map.map((v) => (
+                  <option key={v} value={v} />
+                ))}
+              </datalist>
 
               <button
                 type="submit"
@@ -861,6 +982,15 @@ export default function AdminEventsPage() {
           </div>
           )}
         </AnimatePresence>
+
+        {cropFile && (
+          <ImageCropper
+            file={cropFile}
+            title="Crop event image"
+            onCancel={() => setCropFile(null)}
+            onDone={handleCropDone}
+          />
+        )}
 
         {/* List Section */}
         <div>

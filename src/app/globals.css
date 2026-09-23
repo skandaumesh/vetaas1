@@ -337,5 +337,11 @@ body {
   }
 }
 
-
-
+/* Cropper: dragging moves the picture, so the browser must not start its own
+   drag-and-drop ghost, which looked like the image was being copied. */
+.crop-surface,
+.crop-surface img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}

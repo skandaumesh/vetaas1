@@ -37,6 +37,7 @@ import {
   confirmationEnabled,
   eventWhen,
   isEventForm,
+  locationText,
   mapLink,
   newTicketToken,
   registrantEmail,
@@ -405,6 +406,7 @@ export default function PublicFormPage() {
   const when = eventWhen(form);
   const timeRange = when?.time ?? "";
   const maps = mapLink(form);
+  const where = locationText(form);
   // A date or a location is what makes this an event. Without either it's an
   // ordinary form — info gathering, feedback, a sign-up — so the questions go
   // straight on screen instead of behind a Register button.
@@ -429,6 +431,30 @@ export default function PublicFormPage() {
             Presented by
           </p>
           <p className="font-bold text-[#111827]">{form.hostName}</p>
+        </div>
+      )}
+      {where && (
+        // Google's keyless embed, so there's no Maps billing to manage. It
+        // loads only when scrolled into view.
+        <div className="glass-card rounded-2xl overflow-hidden">
+          <iframe
+            title={`Map of ${form.location || "the venue"}`}
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(where)}&z=16&output=embed`}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="w-full h-48 border-0 block"
+          />
+          {maps && (
+            <a
+              href={maps}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between gap-2 px-4 py-3 text-sm font-bold text-[#111827] hover:bg-white/60 transition-colors"
+            >
+              <span className="truncate">Open in Google Maps</span>
+              <ArrowUpRight size={15} className="text-gray-400 shrink-0" />
+            </a>
+          )}
         </div>
       )}
     </aside>

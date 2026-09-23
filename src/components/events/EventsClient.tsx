@@ -387,7 +387,10 @@ function EventCard({
       }`}>
         {/* Card Image */}
         {event.image && (
-          <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0">
+          <div
+          style={{ aspectRatio: String(event.imageAspect || 16 / 10) }}
+          className="relative w-full rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0"
+        >
             <Image
               src={event.image}
               alt={event.title}
@@ -427,7 +430,19 @@ function EventCard({
               {event.location && (
                 <span className="flex items-center gap-1.5">
                   <MapPin size={11} className="text-gray-400 shrink-0" />
-                  <span className="truncate">{event.location}</span>
+                  {event.mapUrl || /^https?:[/][/]/i.test(event.location) ? (
+                    <a
+                      href={event.mapUrl || event.location}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="truncate hover:underline"
+                    >
+                      {/^https?:[/][/]/i.test(event.location) ? "View location" : event.location}
+                    </a>
+                  ) : (
+                    <span className="truncate">{event.location}</span>
+                  )}
                 </span>
               )}
               <span className="flex items-center gap-1.5">
@@ -573,7 +588,10 @@ function MemoryCard({
           : "border-gray-200/60 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:border-gray-300"
       }`}>
         {/* Card Image */}
-        <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0">
+        <div
+          style={{ aspectRatio: String(event.imageAspect || 16 / 10) }}
+          className="relative w-full rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0"
+        >
           {event.image ? (
             <Image
               src={event.image}
@@ -621,7 +639,19 @@ function MemoryCard({
             {event.location && (
               <span className="flex items-center gap-1.5">
                 <MapPin size={11} className="text-gray-400 shrink-0" />
-                <span className="truncate">{event.location}</span>
+                {event.mapUrl || /^https?:[/][/]/i.test(event.location) ? (
+                  <a
+                  href={event.mapUrl || event.location}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="truncate hover:underline"
+                  >
+                  {/^https?:[/][/]/i.test(event.location) ? "View location" : event.location}
+                  </a>
+                ) : (
+                  <span className="truncate">{event.location}</span>
+                )}
               </span>
             )}
             <span className="flex items-center gap-1.5">
