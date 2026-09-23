@@ -8,7 +8,12 @@ import WaveDivider from "@/components/decor/WaveDivider";
 
 export default function Footer() {
   const pathname = usePathname();
-  if (pathname?.startsWith("/admin") || pathname?.startsWith("/forms/")) return null;
+  if (
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/forms/") ||
+    pathname?.startsWith("/ticket/")
+  )
+    return null;
 
   return (
     <footer className="bg-[#e5e5e5] text-[#111827] relative" style={{ fontFamily: 'var(--font-poppins), sans-serif' }}>

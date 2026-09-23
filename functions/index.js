@@ -8,7 +8,6 @@ const path = require("path");
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
 const { EMAIL_SUBJECT: MEMBERSHIP_EMAIL_SUBJECT, buildEmailText: buildMembershipEmailText, buildEmailHtml: buildMembershipEmailHtml } = require("./membershipEmail");
-const QRCode = require("qrcode");
 const {
   SITE_URL,
   STRICT_EMAIL,
@@ -55,17 +54,26 @@ exports.sendMail = onDocumentCreated(
       auth: { user: FROM_ADDRESS, pass: smtpPassword.value() },
     });
 
-    // Swap the remote logo URL for an embedded (CID) image so it displays
-    // even when the recipient's mail client blocks remote images.
-    const LOGO_URL = "https://www.vetaas.in/icon.png";
+    // Swap remote logo URLs for embedded (CID) images so they display even
+    // when the recipient's mail client blocks remote images. The full logo is
+    // for white backgrounds; the round icon sits on the coloured headers.
+    const LOGOS = [
+      { url: "https://www.vetaas.in/logo.jpeg", file: "logo.png", cid: "vetaas-logo" },
+      { url: "https://www.vetaas.in/icon.png", file: "icon.png", cid: "vetaas-icon" },
+      { url: "https://www.vetaas.in/email/pin.png", file: "pin.png", cid: "vetaas-pin" },
+    ];
     let html = data.message.html || undefined;
     const attachments = [];
-    if (html && html.includes(LOGO_URL)) {
-      html = html.split(LOGO_URL).join("cid:vetaas-logo");
+    for (const logo of LOGOS) {
+      if (!html || !html.includes(logo.url)) continue;
+      html = html.split(logo.url).join(`cid:${logo.cid}`);
       attachments.push({
-        filename: "vetaas-logo.png",
-        path: path.join(__dirname, "logo.png"),
-        cid: "vetaas-logo",
+        filename: logo.file,
+        path: path.join(__dirname, logo.file),
+        cid: logo.cid,
+        // Without this, mail clients list the logo as a file attachment
+        // instead of just drawing it in the message.
+        contentDisposition: "inline",
       });
     }
 
@@ -1220,13 +1228,8 @@ async function sendRegistrationConfirmation(db, responseId, { force = false } = 
   const ticketUrl = token ? `${SITE_URL}/ticket/${token}` : "";
   const inlineAttachments = [];
   if (ticketUrl) {
-    const png = await QRCode.toBuffer(ticketUrl, { width: 360, margin: 1, errorCorrectionLevel: "M" });
-    inlineAttachments.push({
-      filename: "ticket-qr.png",
-      content: png.toString("base64"),
-      contentType: "image/png",
-      cid: "ticket-qr",
-    });
+    // The QR code stays on the ticket page, behind the "My Ticket" button, so
+    // the email itself is plain text and two links.
     const ics = buildIcs(form, {
       uid: responseId,
       ticketUrl,
@@ -1246,7 +1249,6 @@ async function sendRegistrationConfirmation(db, responseId, { force = false } = 
     formId: response.formId,
     ticketUrl,
     amountPaid: response.paymentStatus === "paid" ? Number(response.amount) || 0 : 0,
-    hasQr: !!ticketUrl,
   });
 
   await db.collection("mail").add({
@@ -1632,7 +1634,7 @@ function buildDownloadsHtml({ name, attachments, links, tooBig }) {
     '<div style="margin:0;padding:24px 12px;background:#faf9f6;font-family:Segoe UI,Helvetica,Arial,sans-serif;">' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #eee;">' +
         '<tr><td style="padding:32px 32px 8px;text-align:center;">' +
-          '<img src="https://www.vetaas.in/icon.png" width="72" height="72" alt="Vetaas" style="border-radius:50%;display:block;margin:0 auto 14px;background:#ffffff;" />' +
+          '<img src="https://www.vetaas.in/logo.jpeg" width="97" height="104" alt="Vetaas" style="display:block;margin:0 auto 14px;border-radius:10px;" />' +
           '<p style="margin:0;font-size:20px;font-weight:bold;color:#111827;">Your downloads</p>' +
         '</td></tr>' +
         '<tr><td style="padding:16px 32px 0;">' +

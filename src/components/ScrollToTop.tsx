@@ -29,7 +29,12 @@ export default function ScrollToTop() {
     });
   };
 
-  if (pathname?.startsWith("/admin")) return null;
+  if (
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/forms/") ||
+    pathname?.startsWith("/ticket/")
+  )
+    return null;
 
   return (
     <AnimatePresence>

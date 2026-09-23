@@ -1,10 +1,11 @@
-// Registration confirmation email for forms and events — the Luma-style
-// "You have registered for" message with the event details, a QR ticket and
-// calendar links. Plain module (no Firebase) so it can be rendered and checked
-// locally. Mirrors the helpers in src/lib/tickets.ts; keep the two in sync.
+// Registration confirmation email for forms and events: a plain message with
+// the event details and two buttons — the ticket QR stays on the ticket page.
+// Plain module (no Firebase) so it can be rendered and checked locally.
+// Mirrors the helpers in src/lib/tickets.ts; keep the two in sync.
 
 const SITE_URL = "https://www.vetaas.in";
-const LOGO_URL = "https://www.vetaas.in/icon.png"; // swapped for an embedded image by sendMail
+const LOGO_URL = "https://www.vetaas.in/logo.jpeg"; // swapped for an embedded image by sendMail
+const PIN_URL = "https://www.vetaas.in/email/pin.png"; // the site's map-pin icon, same treatment
 const IST_OFFSET_MIN = 330;
 
 const STRICT_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -174,44 +175,50 @@ const inr = (n) => `₹${Number(n || 0).toLocaleString("en-IN")}`;
 const nl2br = (s) => escapeHtml(s).replace(/\r?\n/g, "<br />");
 
 /**
+ * Plain, Luma-style confirmation: who it's from, what they registered for,
+ * when and where, and two buttons. The QR code lives on the ticket page
+ * behind "My Ticket" rather than in the message.
+ *
  * @param {object} p
  * @param {object} p.form        the form document
  * @param {string} p.formId
  * @param {string} [p.ticketUrl] present for events
  * @param {number} [p.amountPaid] rupees, for paid registrations
- * @param {boolean} [p.hasQr]    whether a cid:ticket-qr image is attached
  */
-function buildRegistrationEmail({ form, formId, ticketUrl, amountPaid, hasQr }) {
+function buildRegistrationEmail({ form, formId, ticketUrl, amountPaid }) {
   const title = (form.title || "").trim() || "Vetaas event";
   const eventUrl = `${SITE_URL}/forms/${formId}`;
   const isEvent = isEventForm(form);
   const timing = isEvent ? eventTiming(form) : null;
   const maps = isEvent ? mapLink(form) : "";
-  const calendar = isEvent && ticketUrl ? googleCalendarUrl(form, ticketUrl) : "";
   const message = (form.emailMessage || "").trim();
   const subject =
     (form.emailSubject || "").trim() ||
     (isEvent ? `You're registered for ${title}` : `Thanks for your response to ${title}`);
 
+  const p = (text, style) => `<p style="margin:0;${style}">${text}</p>`;
+  const divider = '<tr><td style="padding:20px 0;"><div style="border-top:1px solid #ececec;"></div></td></tr>';
+
+  // Icon on the left, two lines of text on the right.
   const row = (tile, body) =>
-    '<tr><td style="padding:16px 32px 0;">' +
+    '<tr><td>' +
     '<table role="presentation" cellpadding="0" cellspacing="0"><tr>' +
-    '<td width="48" valign="top">' + tile + "</td>" +
+    '<td width="44" valign="top">' + tile + "</td>" +
     '<td style="padding-left:14px;vertical-align:middle;">' + body + "</td>" +
     "</tr></table></td></tr>";
 
   const dateTile =
-    '<table role="presentation" width="48" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;border-collapse:separate;overflow:hidden;">' +
-    '<tr><td style="background:#f3f4f6;font-size:10px;font-weight:bold;letter-spacing:1px;color:#6b7280;text-align:center;padding:3px 0;">' +
-    escapeHtml(timing?.month || "") + "</td></tr>" +
-    '<tr><td style="font-size:19px;font-weight:bold;color:#111827;text-align:center;padding:5px 0 6px;">' +
-    escapeHtml(timing?.day || "") + "</td></tr></table>";
+    '<table role="presentation" width="44" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;border-collapse:separate;overflow:hidden;">' +
+    '<tr><td style="background:#f7f7f8;font-size:9px;font-weight:bold;letter-spacing:1px;color:#9ca3af;text-align:center;padding:3px 0;">' +
+    escapeHtml(timing ? timing.month : "") + "</td></tr>" +
+    '<tr><td style="font-size:17px;font-weight:bold;color:#111827;text-align:center;padding:4px 0 5px;">' +
+    escapeHtml(timing ? timing.day : "") + "</td></tr></table>";
 
-  const iconTile = (glyph) =>
-    '<table role="presentation" width="48" height="48" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;border-collapse:separate;">' +
-    '<tr><td style="text-align:center;font-size:20px;line-height:46px;">' + glyph + "</td></tr></table>";
-
-  const p = (text, style) => `<p style="margin:0;${style}">${text}</p>`;
+  const pinTile =
+    '<table role="presentation" width="44" height="44" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:8px;border-collapse:separate;">' +
+    '<tr><td align="center" style="height:42px;vertical-align:middle;">' +
+    `<img src="${PIN_URL}" width="18" height="18" alt="" style="display:block;" />` +
+    "</td></tr></table>";
 
   let rows = "";
   if (timing) {
@@ -223,94 +230,79 @@ function buildRegistrationEmail({ form, formId, ticketUrl, amountPaid, hasQr }) 
   }
   if (isEvent && (form.location || "").trim()) {
     const name = escapeHtml(form.location.trim()) + " &#8599;";
-    rows += row(
-      iconTile("&#128205;"),
-      p(
-        maps
-          ? `<a href="${escapeHtml(maps)}" style="color:#111827;text-decoration:none;">${name}</a>`
-          : name,
-        "font-size:15px;font-weight:bold;color:#111827;"
-      ) +
-        ((form.locationNote || "").trim()
-          ? p(escapeHtml(form.locationNote.trim()), "font-size:14px;color:#6b7280;margin-top:2px;line-height:1.45;")
-          : "")
-    );
+    rows += (timing ? '<tr><td style="height:14px;"></td></tr>' : "") +
+      row(
+        pinTile,
+        p(
+          maps ? `<a href="${escapeHtml(maps)}" style="color:#111827;text-decoration:none;">${name}</a>` : name,
+          "font-size:15px;font-weight:bold;color:#111827;"
+        ) +
+          ((form.locationNote || "").trim()
+            ? p(escapeHtml(form.locationNote.trim()), "font-size:14px;color:#6b7280;margin-top:2px;line-height:1.45;")
+            : "")
+      );
   }
   if (amountPaid > 0) {
-    rows += row(
-      iconTile("&#127915;"),
-      p("Ticket confirmed", "font-size:15px;font-weight:bold;color:#111827;") +
-        p(`${inr(amountPaid)} paid`, "font-size:14px;color:#6b7280;margin-top:2px;")
-    );
+    rows +=
+      '<tr><td style="padding-top:14px;">' +
+      p(`Ticket &middot; ${inr(amountPaid)} paid`, "font-size:14px;color:#6b7280;") +
+      "</td></tr>";
   }
 
   const messageBlock = message
-    ? '<tr><td style="padding:22px 32px 0;">' +
-      '<div style="background:#f7f5ff;border-radius:12px;padding:16px 18px;font-size:14px;line-height:1.65;color:#374151;">' +
-      nl2br(message) +
-      "</div></td></tr>"
+    ? '<tr><td style="padding-top:20px;">' +
+      p(nl2br(message), "font-size:15px;color:#374151;line-height:1.65;") +
+      "</td></tr>"
     : "";
 
-  const qrBlock =
-    hasQr && ticketUrl
-      ? '<tr><td style="padding:26px 32px 0;text-align:center;">' +
-        '<img src="cid:ticket-qr" width="180" height="180" alt="Your ticket QR code" style="display:block;margin:0 auto;border:1px solid #eee;border-radius:12px;" />' +
-        p("Show this QR code at the entrance", "font-size:13px;color:#6b7280;margin-top:10px;") +
-        "</td></tr>"
-      : "";
-
   const button = (href, label, primary) =>
-    `<a href="${escapeHtml(href)}" style="display:block;text-align:center;padding:12px 10px;border-radius:10px;font-size:14px;font-weight:bold;text-decoration:none;` +
-    (primary ? "background:#7C3AED;color:#ffffff;border:1px solid #7C3AED;" : "background:#ffffff;color:#111827;border:1px solid #e5e7eb;") +
+    `<a href="${escapeHtml(href)}" style="display:inline-block;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:bold;text-decoration:none;` +
+    (primary ? "background:#7C3AED;color:#ffffff;" : "background:#f3f4f6;color:#111827;") +
     `">${label}</a>`;
 
   const buttons = ticketUrl
-    ? '<tr><td style="padding:24px 32px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' +
-      `<td width="50%" style="padding-right:6px;">${button(eventUrl, "Event Page", false)}</td>` +
-      `<td width="50%" style="padding-left:6px;">${button(ticketUrl, "My Ticket", true)}</td>` +
+    ? '<tr><td style="padding-top:22px;">' +
+      '<table role="presentation" cellpadding="0" cellspacing="0"><tr>' +
+      `<td>${button(eventUrl, "View Event", true)}</td>` +
+      `<td style="padding-left:10px;">${button(ticketUrl, "My Ticket", false)}</td>` +
       "</tr></table></td></tr>"
     : "";
 
-  const calendarBlock = calendar
-    ? '<tr><td style="padding:16px 32px 0;text-align:center;font-size:13px;color:#6b7280;">' +
-      `Add to calendar: <a href="${escapeHtml(calendar)}" style="color:#7C3AED;font-weight:bold;text-decoration:none;">Google Calendar</a>` +
-      " &middot; Apple / Outlook: open the attached invite</td></tr>"
-    : "";
-
   const html =
-    '<div style="margin:0;padding:24px 12px;background:#faf9f6;font-family:Segoe UI,Helvetica,Arial,sans-serif;">' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:18px;border:1px solid #eee;">' +
-    '<tr><td style="padding:28px 32px 0;"><table role="presentation" cellpadding="0" cellspacing="0"><tr>' +
-    `<td><img src="${LOGO_URL}" width="36" height="36" alt="Vetaas" style="display:block;border-radius:50%;" /></td>` +
-    '<td style="padding-left:10px;font-size:15px;font-weight:bold;color:#111827;">Vetaas</td>' +
-    "</tr></table></td></tr>" +
-    '<tr><td style="padding:22px 32px 0;">' +
-    p(isEvent ? "You have registered for" : "Thanks for your response to", "font-size:15px;color:#6b7280;") +
-    `<h1 style="margin:6px 0 0;font-size:26px;line-height:1.25;color:#111827;">${escapeHtml(title)}</h1>` +
+    '<div style="margin:0;padding:28px 16px;background:#ffffff;font-family:Segoe UI,Helvetica,Arial,sans-serif;">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;">' +
+    '<tr><td style="padding-bottom:20px;">' +
+    `<img src="${LOGO_URL}" width="54" height="58" alt="Vetaas" style="display:block;border-radius:6px;" />` +
     "</td></tr>" +
-    rows +
-    messageBlock +
-    qrBlock +
-    buttons +
-    calendarBlock +
-    '<tr><td style="padding:28px 32px 26px;"><div style="border-top:1px solid #f1f1f1;padding-top:18px;text-align:center;">' +
-    p("Questions? Just reply to this email.", "font-size:13px;color:#9ca3af;") +
+    "<tr><td>" +
+    `<h1 style="margin:0;font-size:24px;line-height:1.3;color:#111827;">${escapeHtml(title)}</h1>` +
     p(
-      `Vetaas Education Foundation &middot; <a href="${SITE_URL}" style="color:#9ca3af;text-decoration:none;">www.vetaas.in</a>`,
-      "font-size:13px;color:#9ca3af;margin-top:4px;"
+      isEvent ? "You have registered" : "Thanks for your response",
+      "font-size:17px;color:#9ca3af;margin-top:6px;"
     ) +
-    "</div></td></tr></table></div>";
+    "</td></tr>" +
+    (rows ? divider + rows : "") +
+    messageBlock +
+    (buttons ? divider.replace("padding:20px 0;", "padding:22px 0 0;") + buttons : "") +
+    '<tr><td style="padding-top:28px;">' +
+    p(
+      `Questions? Just reply to this email. &middot; <a href="${SITE_URL}" style="color:#9ca3af;text-decoration:none;">vetaas.in</a>`,
+      "font-size:12px;color:#9ca3af;"
+    ) +
+    "</td></tr></table></div>";
 
   const text = [
-    isEvent ? "You have registered for" : "Thanks for your response to",
     title,
+    isEvent ? "You have registered" : "Thanks for your response",
     "",
-    ...(timing ? [timing.dateLine, ...(timing.timeLine ? [timing.timeLine] : []), ""] : []),
-    ...(isEvent && form.location ? [form.location.trim(), ...(form.locationNote ? [form.locationNote.trim()] : []), ...(maps ? [maps] : []), ""] : []),
-    ...(amountPaid > 0 ? [`Ticket confirmed - ${inr(amountPaid)} paid`, ""] : []),
+    ...(timing ? [timing.dateLine, ...(timing.timeLine ? [timing.timeLine] : [])] : []),
+    ...(isEvent && form.location
+      ? [form.location.trim(), ...(form.locationNote ? [form.locationNote.trim()] : []), ...(maps ? [maps] : [])]
+      : []),
+    ...(amountPaid > 0 ? [`Ticket - ${inr(amountPaid)} paid`] : []),
+    "",
     ...(message ? [message, ""] : []),
-    ...(ticketUrl ? [`My Ticket (show the QR code at the entrance): ${ticketUrl}`, `Event Page: ${eventUrl}`, ""] : []),
-    ...(calendar ? [`Add to Google Calendar: ${calendar}`, ""] : []),
+    ...(ticketUrl ? [`View event: ${eventUrl}`, `My ticket: ${ticketUrl}`, ""] : []),
     "Questions? Just reply to this email.",
     "Vetaas Education Foundation - www.vetaas.in",
   ].join("\n");

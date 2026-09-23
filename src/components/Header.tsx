@@ -7,7 +7,10 @@ import Navbar from "./Navbar";
 
 export default function Header() {
   const pathname = usePathname();
-  const hideChrome = pathname?.startsWith("/admin") || pathname?.startsWith("/forms/");
+  const hideChrome =
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/forms/") ||
+    pathname?.startsWith("/ticket/");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
