@@ -32,8 +32,9 @@ service firebase.storage {
     // Form upload answers: a visitor filling out a public form may upload an
     // image or common document under 10 MB. Types are an explicit allowlist —
     // no executables, archives or HTML, which could be served back to someone.
-    // The uploader needs read to fetch its download URL; only an admin sees
-    // them in the responses view.
+    // Nobody but an admin can read them back: the response stores the storage
+    // path, not a download link, and the admin panel resolves it when viewing.
+    // (Older responses hold tokenised download URLs, which keep working.)
     match /formUploads/{formId}/{file} {
       allow create: if request.auth != null
         && request.resource.size < 10 * 1024 * 1024
@@ -49,7 +50,7 @@ service firebase.storage {
             'text/plain',
             'text/csv'
           ]);
-      allow read: if request.auth != null;
+      allow read: if isAdmin();
     }
 
     // Legacy payment screenshots from before Razorpay.

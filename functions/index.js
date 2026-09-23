@@ -691,6 +691,10 @@ exports.razorpayWebhook = onRequest(
   // didn't ask for one.
   { region: "us-central1", secrets: [razorpayWebhookSecret, razorpayKeySecret] },
   async (req, res) => {
+    if (!req.rawBody) {
+      res.status(400).send("Missing body");
+      return;
+    }
     const signature = req.headers["x-razorpay-signature"];
     const expected = crypto
       .createHmac("sha256", razorpayWebhookSecret.value())

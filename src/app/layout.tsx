@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Playfair_Display, Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { jsonLd } from "@/lib/json-ld";
 import ScrollToTop from "@/components/ScrollToTop";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { CartProvider } from "@/lib/cart";
@@ -254,7 +255,7 @@ export default function RootLayout({
       <body className={`${plusJakarta.variable} ${playfair.variable} ${poppins.variable} min-h-screen flex flex-col antialiased`}>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
         />
         <Script
           src="https://ozlabsprototype1.vercel.app/api/v1/track/script?key=d0a677c9-0c0e-4005-9876-3e091add411d"

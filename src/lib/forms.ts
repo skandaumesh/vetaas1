@@ -221,6 +221,18 @@ export function formatAnswer(value: AnswerValue | undefined): string {
     .join("; ");
 }
 
+/** Upload answers now store a storage path; older ones hold a download URL. */
+export const isStoragePath = (value: string) => value.startsWith("formUploads/");
+
+/**
+ * The original file name from a storage path, which is stored as
+ * `formUploads/<form>/<fieldId>-<timestamp>-<random>-<name>`.
+ */
+export function fileNameFromPath(path: string): string {
+  const last = path.split("/").pop() ?? "";
+  return last.replace(/^[a-z0-9]+-[0-9]+-[a-z0-9]+-/i, "") || "Uploaded file";
+}
+
 /**
  * The original file name from a Firebase download URL. Uploads are stored as
  * `formUploads/<form>/<fieldId>-<timestamp>-<name>`, so that prefix is dropped.

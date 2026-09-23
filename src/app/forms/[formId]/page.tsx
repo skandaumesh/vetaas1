@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { signInAnonymously } from "firebase/auth";
-import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
+import { ref as storageRef, uploadBytes } from "firebase/storage";
 import { httpsCallable } from "firebase/functions";
 import { auth, db, functions, storage } from "@/lib/firebase";
 import { loadRazorpayScript, openRazorpay } from "@/lib/razorpay";
@@ -13,8 +13,10 @@ import {
   FILE_UPLOAD_MAX_BYTES,
   GRID_FIELD_TYPES,
   emptyAnswer,
+  fileNameFromPath,
   fileNameFromUrl,
   isAnswerEmpty,
+  isStoragePath,
   type AnswerValue,
   type FormDoc,
   type FormField,
@@ -726,6 +728,8 @@ function FieldInput({
 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  // Shows the picture they just chose without needing to read it back.
+  const [preview, setPreview] = useState<string | null>(null);
 
   // Shared by image and file questions. The original name is kept, made safe,
   // in the storage path so the responses view can show what was uploaded.
@@ -747,9 +751,14 @@ function FieldInput({
       // check it, so fill it in from the extension.
       const contentType = file.type || EXTENSION_TYPES[ext];
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "_").slice(-80) || "file";
-      const ref = storageRef(storage, `formUploads/${formId}/${field.id}-${Date.now()}-${safeName}`);
-      await uploadBytes(ref, file, contentType ? { contentType } : undefined);
-      onChange(await getDownloadURL(ref));
+      // A random part makes the path unguessable, and the answer keeps the
+      // path rather than a shareable download link — only the admin panel can
+      // read these files back.
+      const secret = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+      const path = `formUploads/${formId}/${field.id}-${Date.now()}-${secret}-${safeName}`;
+      await uploadBytes(storageRef(storage, path), file, contentType ? { contentType } : undefined);
+      setPreview(URL.createObjectURL(file));
+      onChange(path);
     } catch (err) {
       console.error("Failed to upload file:", err);
       setUploadError(
@@ -851,10 +860,26 @@ function FieldInput({
         <div>
           {value ? (
             <div className="relative w-40">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={value as string} alt="Uploaded" className="w-40 h-40 object-cover rounded-lg border border-gray-200" />
+              {preview || (typeof value === "string" && value.startsWith("http")) ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={preview ?? (value as string)}
+                  alt="Uploaded"
+                  className="w-40 h-40 object-cover rounded-lg border border-gray-200"
+                />
+              ) : (
+                <div className="w-40 h-40 rounded-lg border border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2 text-gray-500">
+                  <CheckCircle2 size={22} className="text-[#00CDBA]" />
+                  <span className="text-xs font-semibold px-3 text-center break-all">
+                    {fileNameFromPath(value as string)}
+                  </span>
+                </div>
+              )}
               <button
-                onClick={() => onChange("")}
+                onClick={() => {
+                  setPreview(null);
+                  onChange("");
+                }}
                 className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-red-500 flex items-center justify-center cursor-pointer shadow-sm"
                 aria-label="Remove image"
                 type="button"
@@ -892,17 +917,15 @@ function FieldInput({
           {typeof value === "string" && value ? (
             <div className="flex items-center gap-3 max-w-md rounded-lg border border-gray-200 px-3 py-2.5">
               <FileText size={18} className="shrink-0 text-[#7C3AED]" />
-              <a
-                href={value}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-medium text-gray-800 truncate hover:underline"
-              >
-                {fileNameFromUrl(value)}
-              </a>
+              <span className="text-sm font-medium text-gray-800 truncate">
+                {isStoragePath(value) ? fileNameFromPath(value) : fileNameFromUrl(value)}
+              </span>
               <button
                 type="button"
-                onClick={() => onChange("")}
+                onClick={() => {
+                  setPreview(null);
+                  onChange("");
+                }}
                 aria-label="Remove file"
                 className="ml-auto text-gray-400 hover:text-red-500 cursor-pointer"
               >

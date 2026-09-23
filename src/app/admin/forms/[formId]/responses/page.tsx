@@ -13,12 +13,15 @@ import {
   where,
 } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
-import { db, functions } from "@/lib/firebase";
+import { getDownloadURL, ref as storageRef } from "firebase/storage";
+import { db, functions, storage } from "@/lib/firebase";
 import { useAdminAuth } from "@/components/admin/AdminGate";
 import { registrantEmail } from "@/lib/tickets";
 import {
+  fileNameFromPath,
   fileNameFromUrl,
   formatAnswer,
+  isStoragePath,
   type FormDoc,
   type FormResponseDoc,
   type GridAnswer,
@@ -357,20 +360,9 @@ export default function FormResponsesPage() {
                           <div key={i} className="flex flex-col sm:flex-row sm:justify-between gap-1 text-sm border-b border-gray-100 pb-2">
                             <span className="text-gray-500">{a.label}</span>
                             {isImage ? (
-                              <a href={a.value as string} target="_blank" rel="noopener noreferrer">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={a.value as string} alt="" className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
-                              </a>
+                              <Uploaded value={a.value as string} image />
                             ) : isFile ? (
-                              <a
-                                href={a.value as string}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 font-semibold text-[#7C3AED] hover:underline break-all sm:text-right"
-                              >
-                                <FileText size={14} className="shrink-0" />
-                                {fileNameFromUrl(a.value as string)}
-                              </a>
+                              <Uploaded value={a.value as string} />
                             ) : isGrid ? (
                               <dl className="space-y-0.5 sm:text-right">
                                 {Object.entries(a.value as GridAnswer).map(([row, cell]) => (
@@ -406,5 +398,55 @@ export default function FormResponsesPage() {
         )}
       </div>
     </main>
+  );
+}
+
+/**
+ * An uploaded answer. Newer responses hold a storage path, which only an admin
+ * can open, so the link is fetched here; older ones hold a download URL.
+ */
+function Uploaded({ value, image = false }: { value: string; image?: boolean }) {
+  const [url, setUrl] = useState(isStoragePath(value) ? "" : value);
+  const name = isStoragePath(value) ? fileNameFromPath(value) : fileNameFromUrl(value);
+
+  useEffect(() => {
+    // A plain URL is already in state from the initial value.
+    if (!isStoragePath(value)) return;
+    let live = true;
+    getDownloadURL(storageRef(storage, value))
+      .then((u) => live && setUrl(u))
+      .catch((err) => console.error("Could not open upload:", err));
+    return () => {
+      live = false;
+    };
+  }, [value]);
+
+  if (!url) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-gray-400 text-xs sm:text-right">
+        <Loader2 size={13} className="animate-spin" /> {name}
+      </span>
+    );
+  }
+
+  if (image) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={url} alt={name} className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1.5 font-semibold text-[#7C3AED] hover:underline break-all sm:text-right"
+    >
+      <FileText size={14} className="shrink-0" />
+      {name}
+    </a>
   );
 }

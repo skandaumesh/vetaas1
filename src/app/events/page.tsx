@@ -1,4 +1,5 @@
 import EventsClient from "@/components/events/EventsClient";
+import { jsonLd } from "@/lib/json-ld";
 import { fetchEvents, prettyDate, upcoming } from "@/lib/events-seo";
 
 const SITE_URL = "https://www.vetaas.in";
@@ -68,7 +69,7 @@ export default async function EventsPage() {
       {eventSchema.length > 0 && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }}
+          dangerouslySetInnerHTML={{ __html: jsonLd(eventSchema) }}
         />
       )}
 
