@@ -22,6 +22,7 @@ import {
   BarChart3,
   Check,
   Copy,
+  CopyPlus,
   FileText,
   Loader2,
   Lock,
@@ -44,6 +45,7 @@ export default function AdminFormsPage() {
   const [creating, setCreating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<FormRow | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -84,6 +86,48 @@ export default function AdminFormsPage() {
     } catch (err) {
       console.error("Failed to create form:", err);
       setCreating(false);
+    }
+  };
+
+  /**
+   * Run the same session again without rebuilding it: everything comes across
+   * except the date, which belongs to the new occurrence. The copy starts
+   * closed so it can't take registrations before it's ready.
+   */
+  const duplicate = async (form: FormRow) => {
+    setDuplicatingId(form.id);
+    try {
+      const ref = await addDoc(collection(db, "forms"), {
+        title: `${form.title || "Untitled form"} (copy)`,
+        description: form.description ?? "",
+        fields: form.fields ?? [],
+        status: "closed",
+        logoUrl: form.logoUrl ?? "",
+        limitOneResponse: form.limitOneResponse ?? false,
+        eventDate: "",
+        eventStart: form.eventStart ?? "",
+        eventEnd: form.eventEnd ?? "",
+        location: form.location ?? "",
+        locationNote: form.locationNote ?? "",
+        mapUrl: form.mapUrl ?? "",
+        hostName: form.hostName ?? "",
+        ctaLabel: form.ctaLabel ?? "",
+        price: form.price ?? 0,
+        ...(typeof form.confirmationEmail === "boolean"
+          ? { confirmationEmail: form.confirmationEmail }
+          : {}),
+        emailSubject: form.emailSubject ?? "",
+        emailMessage: form.emailMessage ?? "",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      try {
+        sessionStorage.setItem("formJustCopied:" + ref.id, "1");
+      } catch {}
+      router.push(`/admin/forms/${ref.id}/edit`);
+    } catch (err) {
+      console.error("Failed to duplicate form:", err);
+      setDuplicatingId(null);
     }
   };
 
@@ -189,6 +233,19 @@ export default function AdminFormsPage() {
                   >
                     <BarChart3 size={13} /> Responses
                   </Link>
+                  <button
+                    onClick={() => duplicate(form)}
+                    disabled={duplicatingId === form.id}
+                    title="Make a copy for the next time you run this"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors disabled:opacity-60 cursor-pointer"
+                  >
+                    {duplicatingId === form.id ? (
+                      <Loader2 size={13} className="animate-spin" />
+                    ) : (
+                      <CopyPlus size={13} />
+                    )}
+                    Duplicate
+                  </button>
                   <button
                     onClick={() => copyLink(form.id)}
                     className="inline-flex items-center justify-center w-8 h-8 bg-white/60 border border-white/70 text-gray-500 rounded-full hover:bg-gray-100 transition-colors cursor-pointer ml-auto"

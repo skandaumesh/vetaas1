@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
@@ -34,6 +34,14 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+
+/** Unsaved work, kept per form on this device. */
+const draftKey = (formId: string) => "formDraft:" + formId;
+const copiedKey = (formId: string) => "formJustCopied:" + formId;
+
+/** The last time a draft was kept, as "4:08 pm". */
+const atTime = (ms: number) =>
+  new Date(ms).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" });
 
 /** The list-shaped settings a question can have. */
 type ListKey = "options" | "rows" | "columns";
@@ -71,6 +79,78 @@ export default function EditFormPage() {
   const [confirmationEmail, setConfirmationEmail] = useState<boolean | null>(null);
   const [emailSubject, setEmailSubject] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
+  // Set when this form was made with Duplicate, so the copy explains itself.
+  const [isCopy, setIsCopy] = useState(false);
+  // When unsaved work was found on this device and put back.
+  const [restoredAt, setRestoredAt] = useState<number | null>(null);
+  /** What Firestore holds, as JSON, to tell edited from saved. */
+  const savedJson = useRef("");
+
+  // Everything the builder is holding, in one object: this is what gets kept
+  // on the device and compared against the saved version.
+  const working = useMemo(
+    () => ({
+      title,
+      description,
+      fields,
+      logoUrl,
+      limitOneResponse,
+      eventDate,
+      eventStart,
+      eventEnd,
+      location,
+      locationNote,
+      hostName,
+      ctaLabel,
+      price,
+      mapUrl,
+      confirmationEmail,
+      emailSubject,
+      emailMessage,
+    }),
+    [
+      title,
+      description,
+      fields,
+      logoUrl,
+      limitOneResponse,
+      eventDate,
+      eventStart,
+      eventEnd,
+      location,
+      locationNote,
+      hostName,
+      ctaLabel,
+      price,
+      mapUrl,
+      confirmationEmail,
+      emailSubject,
+      emailMessage,
+    ]
+  );
+  type Working = typeof working;
+
+  const apply = useCallback((w: Working) => {
+    setTitle(w.title);
+    setDescription(w.description);
+    setFields(w.fields);
+    setLogoUrl(w.logoUrl);
+    setLimitOneResponse(w.limitOneResponse);
+    setEventDate(w.eventDate);
+    setEventStart(w.eventStart);
+    setEventEnd(w.eventEnd);
+    setLocation(w.location);
+    setLocationNote(w.locationNote);
+    setHostName(w.hostName);
+    setCtaLabel(w.ctaLabel);
+    setPrice(w.price);
+    setMapUrl(w.mapUrl);
+    setConfirmationEmail(w.confirmationEmail);
+    setEmailSubject(w.emailSubject);
+    setEmailMessage(w.emailMessage);
+  }, []);
+
+  const unsaved = !loading && !notFound && JSON.stringify(working) !== savedJson.current;
 
   useEffect(() => {
     if (!user) return;
@@ -83,23 +163,49 @@ export default function EditFormPage() {
           return;
         }
         const data = snap.data() as FormDoc;
-        setTitle(data.title ?? "");
-        setDescription(data.description ?? "");
-        setFields(data.fields ?? []);
-        setLogoUrl(data.logoUrl ?? "");
-        setLimitOneResponse(data.limitOneResponse ?? false);
-        setEventDate(data.eventDate ?? "");
-        setEventStart(data.eventStart ?? "");
-        setEventEnd(data.eventEnd ?? "");
-        setLocation(data.location ?? "");
-        setLocationNote(data.locationNote ?? "");
-        setHostName(data.hostName ?? "");
-        setCtaLabel(data.ctaLabel ?? "");
-        setPrice(data.price ? String(data.price) : "");
-        setMapUrl(data.mapUrl ?? "");
-        setConfirmationEmail(typeof data.confirmationEmail === "boolean" ? data.confirmationEmail : null);
-        setEmailSubject(data.emailSubject ?? "");
-        setEmailMessage(data.emailMessage ?? "");
+        const fromDoc: Working = {
+          title: data.title ?? "",
+          description: data.description ?? "",
+          fields: data.fields ?? [],
+          logoUrl: data.logoUrl ?? "",
+          limitOneResponse: data.limitOneResponse ?? false,
+          eventDate: data.eventDate ?? "",
+          eventStart: data.eventStart ?? "",
+          eventEnd: data.eventEnd ?? "",
+          location: data.location ?? "",
+          locationNote: data.locationNote ?? "",
+          hostName: data.hostName ?? "",
+          ctaLabel: data.ctaLabel ?? "",
+          price: data.price ? String(data.price) : "",
+          mapUrl: data.mapUrl ?? "",
+          confirmationEmail:
+            typeof data.confirmationEmail === "boolean" ? data.confirmationEmail : null,
+          emailSubject: data.emailSubject ?? "",
+          emailMessage: data.emailMessage ?? "",
+        };
+        savedJson.current = JSON.stringify(fromDoc);
+
+        // Work left behind by a closed tab, a phone reloading the app, or a
+        // trip to another admin page comes back instead of being lost.
+        let kept: { at: number; working: Working } | null = null;
+        try {
+          const raw = localStorage.getItem(draftKey(formId));
+          if (raw) {
+            const parsed = JSON.parse(raw) as { at: number; working: Working };
+            if (parsed?.working && JSON.stringify(parsed.working) !== savedJson.current) {
+              kept = parsed;
+            } else {
+              localStorage.removeItem(draftKey(formId));
+            }
+          }
+          if (sessionStorage.getItem(copiedKey(formId))) {
+            setIsCopy(true);
+            sessionStorage.removeItem(copiedKey(formId));
+          }
+        } catch {}
+
+        apply(kept ? kept.working : fromDoc);
+        setRestoredAt(kept ? kept.at : null);
       } catch (err) {
         console.error("Failed to load form:", err);
         setNotFound(true);
@@ -107,7 +213,33 @@ export default function EditFormPage() {
         setLoading(false);
       }
     })();
-  }, [user, formId]);
+  }, [user, formId, apply]);
+
+  useEffect(() => {
+    if (!unsaved) return;
+    const timer = window.setTimeout(() => {
+      try {
+        localStorage.setItem(draftKey(formId), JSON.stringify({ at: Date.now(), working }));
+      } catch {}
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [working, unsaved, formId]);
+
+  useEffect(() => {
+    if (!unsaved) return;
+    const confirmLeave = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", confirmLeave);
+    return () => window.removeEventListener("beforeunload", confirmLeave);
+  }, [unsaved]);
+
+  /** Throws away the kept draft and goes back to the saved version. */
+  const discardDraft = () => {
+    try {
+      localStorage.removeItem(draftKey(formId));
+    } catch {}
+    if (savedJson.current) apply(JSON.parse(savedJson.current) as Working);
+    setRestoredAt(null);
+  };
 
   const uploadLogo = async (blob: Blob) => {
     setUploadingLogo(true);
@@ -216,6 +348,12 @@ export default function EditFormPage() {
         emailMessage: emailMessage.trim(),
         updatedAt: serverTimestamp(),
       });
+      savedJson.current = JSON.stringify(working);
+      setRestoredAt(null);
+      setIsCopy(false);
+      try {
+        localStorage.removeItem(draftKey(formId));
+      } catch {}
       setSaved(true);
       setTimeout(() => setSaved(false), 1800);
     } catch (err) {
@@ -259,19 +397,52 @@ export default function EditFormPage() {
           >
             <ArrowLeft size={15} /> Forms
           </Link>
-          <button
-            onClick={save}
-            disabled={saving}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#7C3AED] text-white rounded-full text-sm font-bold hover:bg-[#6D28D9] transition-colors disabled:opacity-60 cursor-pointer"
-          >
-            {saving ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : saved ? (
-              <Check size={16} />
-            ) : null}
-            {saved ? "Saved" : "Save"}
-          </button>
+          <div className="flex items-center gap-3">
+            {unsaved && !saving && (
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                Unsaved changes
+              </span>
+            )}
+            <button
+              onClick={save}
+              disabled={saving}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#7C3AED] text-white rounded-full text-sm font-bold hover:bg-[#6D28D9] transition-colors disabled:opacity-60 cursor-pointer"
+            >
+              {saving ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : saved ? (
+                <Check size={16} />
+              ) : null}
+              {saved ? "Saved" : "Save"}
+            </button>
+          </div>
         </div>
+
+        {restoredAt !== null && (
+          <div className="mb-4 rounded-2xl bg-amber-50 border border-amber-200 px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-amber-900">
+              <span className="font-bold">Your unsaved changes are back.</span> Kept on this device
+              at {atTime(restoredAt)}. Press Save to keep them for good.
+            </p>
+            <button
+              onClick={discardDraft}
+              className="text-xs font-bold text-amber-800 underline hover:no-underline cursor-pointer"
+            >
+              Discard them
+            </button>
+          </div>
+        )}
+
+        {isCopy && (
+          <div className="mb-4 rounded-2xl bg-violet-50 border border-violet-200 px-5 py-4">
+            <p className="text-sm text-violet-900">
+              <span className="font-bold">This is a copy.</span> The questions, cover, venue, price
+              and email were brought across — set the new date, save, then open it for responses on
+              the Forms page.
+            </p>
+          </div>
+        )}
 
         {/* Cover image. Always shown 1:1 — here and on the public page — so
             what you see in the preview is what people actually get. */}
