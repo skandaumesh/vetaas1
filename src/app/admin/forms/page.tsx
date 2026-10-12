@@ -32,6 +32,14 @@ import {
   Unlock,
 } from "lucide-react";
 
+const ACTION =
+  "inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-full bg-slate-50 " +
+  "border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-100 " +
+  "transition-colors cursor-pointer disabled:opacity-60";
+const ICON_ACTION =
+  "inline-flex items-center justify-center w-9 h-9 shrink-0 rounded-full bg-slate-50 " +
+  "border border-slate-200 text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer";
+
 interface FormRow extends FormDoc {
   id: string;
 }
@@ -220,30 +228,24 @@ export default function AdminFormsPage() {
                   </p>
                 </div>
 
-                {/* Two fixed rows, so every card's footer lines up at any
-                    width instead of five pills fighting for one line. */}
+                {/* Two full-width rows of equal-height controls, so the
+                    footers line up across cards at any screen width. */}
                 <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-2">
-                  <div className="flex items-stretch gap-2">
-                    <Link
-                      href={`/admin/forms/${form.id}/edit`}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors"
-                    >
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link href={`/admin/forms/${form.id}/edit`} className={ACTION}>
                       <Pencil size={13} /> Edit
                     </Link>
-                    <Link
-                      href={`/admin/forms/${form.id}/responses`}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors"
-                    >
+                    <Link href={`/admin/forms/${form.id}/responses`} className={ACTION}>
                       <BarChart3 size={13} /> Responses
                     </Link>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex gap-2">
                     <button
                       onClick={() => duplicate(form)}
                       disabled={duplicatingId === form.id}
                       title="Make a copy for the next time you run this"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors disabled:opacity-60 cursor-pointer"
+                      className={`${ACTION} flex-1`}
                     >
                       {duplicatingId === form.id ? (
                         <Loader2 size={13} className="animate-spin" />
@@ -252,29 +254,26 @@ export default function AdminFormsPage() {
                       )}
                       Duplicate
                     </button>
-
-                    <div className="ml-auto flex items-center gap-2 shrink-0">
-                      <button
-                        onClick={() => copyLink(form.id)}
-                        className="inline-flex items-center justify-center w-8 h-8 bg-white/60 border border-white/70 text-gray-500 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-                        aria-label="Copy share link"
-                        title="Copy share link"
-                      >
-                        {copiedId === form.id ? (
-                          <Check size={13} className="text-green-600" />
-                        ) : (
-                          <Copy size={13} />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget(form)}
-                        className="inline-flex items-center justify-center w-8 h-8 bg-white/60 border border-white/70 text-gray-400 rounded-full hover:text-red-500 transition-colors cursor-pointer"
-                        aria-label="Delete form"
-                        title="Delete form"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => copyLink(form.id)}
+                      className={ICON_ACTION}
+                      aria-label="Copy share link"
+                      title="Copy share link"
+                    >
+                      {copiedId === form.id ? (
+                        <Check size={13} className="text-green-600" />
+                      ) : (
+                        <Copy size={13} />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setDeleteTarget(form)}
+                      className={`${ICON_ACTION} hover:text-red-500`}
+                      aria-label="Delete form"
+                      title="Delete form"
+                    >
+                      <Trash2 size={13} />
+                    </button>
                   </div>
                 </div>
               </div>
