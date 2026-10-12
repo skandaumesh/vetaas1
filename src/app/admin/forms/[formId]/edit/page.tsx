@@ -390,7 +390,7 @@ export default function EditFormPage() {
   return (
     <main className="min-h-screen py-8 md:py-10 px-4 md:px-10">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <Link
             href="/admin/forms"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-gray-800"
@@ -768,17 +768,17 @@ export default function EditFormPage() {
         <div className="space-y-4">
           {fields.map((field, i) => (
             <div key={field.id} className="glass-card rounded-2xl p-5">
-              <div className="flex items-start gap-3 mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-start gap-3 mb-4">
                 <input
                   value={field.label}
                   onChange={(e) => updateField(field.id, { label: e.target.value })}
                   placeholder="Question"
-                  className="flex-grow font-semibold text-[#111827] placeholder:text-gray-300 border-b border-gray-200 pb-2 focus:outline-none focus:border-[#7C3AED]"
+                  className="w-full min-w-0 sm:flex-grow font-semibold text-[#111827] placeholder:text-gray-300 border-b border-gray-200 pb-2 focus:outline-none focus:border-[#7C3AED]"
                 />
                 <select
                   value={field.type}
                   onChange={(e) => setFieldType(field.id, e.target.value as FieldType)}
-                  className="text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none cursor-pointer"
+                  className="w-full sm:w-auto min-w-0 max-w-full shrink-0 bg-white text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none cursor-pointer"
                 >
                   {FIELD_TYPE_GROUPS.map((group) => (
                     <optgroup key={group.label} label={group.label}>
