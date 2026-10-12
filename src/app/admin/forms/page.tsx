@@ -195,7 +195,7 @@ export default function AdminFormsPage() {
               >
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <h2 className="font-extrabold text-[#111827] leading-snug">
+                    <h2 className="min-w-0 font-extrabold text-[#111827] leading-snug break-words">
                       {form.title || "Untitled form"}
                     </h2>
                     <button
@@ -220,48 +220,62 @@ export default function AdminFormsPage() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 mt-auto pt-3 border-t border-gray-100">
-                  <Link
-                    href={`/admin/forms/${form.id}/edit`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors"
-                  >
-                    <Pencil size={13} /> Edit
-                  </Link>
-                  <Link
-                    href={`/admin/forms/${form.id}/responses`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors"
-                  >
-                    <BarChart3 size={13} /> Responses
-                  </Link>
-                  <button
-                    onClick={() => duplicate(form)}
-                    disabled={duplicatingId === form.id}
-                    title="Make a copy for the next time you run this"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors disabled:opacity-60 cursor-pointer"
-                  >
-                    {duplicatingId === form.id ? (
-                      <Loader2 size={13} className="animate-spin" />
-                    ) : (
-                      <CopyPlus size={13} />
-                    )}
-                    Duplicate
-                  </button>
-                  <button
-                    onClick={() => copyLink(form.id)}
-                    className="inline-flex items-center justify-center w-8 h-8 bg-white/60 border border-white/70 text-gray-500 rounded-full hover:bg-gray-100 transition-colors cursor-pointer ml-auto"
-                    aria-label="Copy share link"
-                    title="Copy share link"
-                  >
-                    {copiedId === form.id ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-                  </button>
-                  <button
-                    onClick={() => setDeleteTarget(form)}
-                    className="inline-flex items-center justify-center w-8 h-8 bg-white/60 border border-white/70 text-gray-400 rounded-full hover:text-red-500 transition-colors cursor-pointer"
-                    aria-label="Delete form"
-                    title="Delete form"
-                  >
-                    <Trash2 size={13} />
-                  </button>
+                {/* Two fixed rows, so every card's footer lines up at any
+                    width instead of five pills fighting for one line. */}
+                <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col gap-2">
+                  <div className="flex items-stretch gap-2">
+                    <Link
+                      href={`/admin/forms/${form.id}/edit`}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors"
+                    >
+                      <Pencil size={13} /> Edit
+                    </Link>
+                    <Link
+                      href={`/admin/forms/${form.id}/responses`}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors"
+                    >
+                      <BarChart3 size={13} /> Responses
+                    </Link>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => duplicate(form)}
+                      disabled={duplicatingId === form.id}
+                      title="Make a copy for the next time you run this"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/60 border border-white/70 text-gray-600 rounded-full text-xs font-bold hover:bg-gray-100 transition-colors disabled:opacity-60 cursor-pointer"
+                    >
+                      {duplicatingId === form.id ? (
+                        <Loader2 size={13} className="animate-spin" />
+                      ) : (
+                        <CopyPlus size={13} />
+                      )}
+                      Duplicate
+                    </button>
+
+                    <div className="ml-auto flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => copyLink(form.id)}
+                        className="inline-flex items-center justify-center w-8 h-8 bg-white/60 border border-white/70 text-gray-500 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                        aria-label="Copy share link"
+                        title="Copy share link"
+                      >
+                        {copiedId === form.id ? (
+                          <Check size={13} className="text-green-600" />
+                        ) : (
+                          <Copy size={13} />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(form)}
+                        className="inline-flex items-center justify-center w-8 h-8 bg-white/60 border border-white/70 text-gray-400 rounded-full hover:text-red-500 transition-colors cursor-pointer"
+                        aria-label="Delete form"
+                        title="Delete form"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
