@@ -353,15 +353,12 @@ export default function FormResponsesPage() {
                       {(r.answers ?? []).map((a, i) => {
                         const field = form?.fields.find((f) => f.id === a.fieldId);
                         const fieldType = field?.type;
-                        const isImage = fieldType === "image_upload" && typeof a.value === "string" && a.value;
                         const isFile = fieldType === "file_upload" && typeof a.value === "string" && a.value;
                         const isGrid = !!a.value && typeof a.value === "object" && !Array.isArray(a.value);
                         return (
                           <div key={i} className="flex flex-col sm:flex-row sm:justify-between gap-1 text-sm border-b border-gray-100 pb-2">
                             <span className="text-gray-500">{a.label}</span>
-                            {isImage ? (
-                              <Uploaded value={a.value as string} image />
-                            ) : isFile ? (
+                            {isFile ? (
                               <Uploaded value={a.value as string} />
                             ) : isGrid ? (
                               <dl className="space-y-0.5 sm:text-right">

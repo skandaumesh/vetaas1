@@ -26,7 +26,6 @@ import {
   ArrowUpRight,
   CheckCircle2,
   FileText,
-  ImageUp,
   Loader2,
   Lock,
   MapPin,
@@ -728,8 +727,6 @@ function FieldInput({
 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  // Shows the picture they just chose without needing to read it back.
-  const [preview, setPreview] = useState<string | null>(null);
 
   // Shared by image and file questions. The original name is kept, made safe,
   // in the storage path so the responses view can show what was uploaded.
@@ -757,14 +754,11 @@ function FieldInput({
       const secret = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
       const path = `formUploads/${formId}/${field.id}-${Date.now()}-${secret}-${safeName}`;
       await uploadBytes(storageRef(storage, path), file, contentType ? { contentType } : undefined);
-      setPreview(URL.createObjectURL(file));
       onChange(path);
     } catch (err) {
       console.error("Failed to upload file:", err);
       setUploadError(
-        field.type === "image_upload"
-          ? "Upload failed. Please use a PNG, JPG, GIF, WebP or HEIC image and try again."
-          : "Upload failed. Please use a PDF, Word, Excel, PowerPoint, text or image file and try again."
+        "Upload failed. Please use a PDF, Word, Excel, PowerPoint, text or image file and try again."
       );
     } finally {
       setUploading(false);
@@ -856,62 +850,6 @@ function FieldInput({
         </select>
       )}
 
-      {field.type === "image_upload" && (
-        <div>
-          {value ? (
-            <div className="relative w-40">
-              {preview || (typeof value === "string" && value.startsWith("http")) ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={preview ?? (value as string)}
-                  alt="Uploaded"
-                  className="w-40 h-40 object-cover rounded-lg border border-gray-200"
-                />
-              ) : (
-                <div className="w-40 h-40 rounded-lg border border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-2 text-gray-500">
-                  <CheckCircle2 size={22} className="text-[#00CDBA]" />
-                  <span className="text-xs font-semibold px-3 text-center break-all">
-                    {fileNameFromPath(value as string)}
-                  </span>
-                </div>
-              )}
-              <button
-                onClick={() => {
-                  setPreview(null);
-                  onChange("");
-                }}
-                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-red-500 flex items-center justify-center cursor-pointer shadow-sm"
-                aria-label="Remove image"
-                type="button"
-              >
-                <X size={13} />
-              </button>
-            </div>
-          ) : (
-            <label
-              className={`flex flex-col items-center justify-center gap-2 w-40 h-40 rounded-lg border border-dashed ${
-                error ? "border-red-400" : "border-gray-300"
-              } text-gray-400 hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors cursor-pointer`}
-            >
-              {uploading ? <Loader2 size={20} className="animate-spin" /> : <ImageUp size={20} />}
-              <span className="text-xs font-semibold">{uploading ? "Uploading…" : "Upload image"}</span>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={uploading}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) upload(file);
-                  e.target.value = "";
-                }}
-              />
-            </label>
-          )}
-          {uploadError && <p className="text-xs font-semibold text-red-500 mt-2">{uploadError}</p>}
-        </div>
-      )}
-
       {field.type === "file_upload" && (
         <div>
           {typeof value === "string" && value ? (
@@ -922,10 +860,7 @@ function FieldInput({
               </span>
               <button
                 type="button"
-                onClick={() => {
-                  setPreview(null);
-                  onChange("");
-                }}
+                onClick={() => onChange("")}
                 aria-label="Remove file"
                 className="ml-auto text-gray-400 hover:text-red-500 cursor-pointer"
               >

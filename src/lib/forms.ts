@@ -9,7 +9,6 @@ export type FieldType =
   | "checkboxes"
   | "dropdown"
   | "file_upload"
-  | "image_upload"
   | "linear_scale"
   | "rating"
   | "mc_grid"
@@ -118,7 +117,6 @@ export const FIELD_TYPE_LABELS: Record<FieldType, string> = {
   checkboxes: "Checkboxes",
   dropdown: "Drop-down",
   file_upload: "File upload",
-  image_upload: "Image upload",
   linear_scale: "Linear scale",
   rating: "Rating",
   mc_grid: "Multiple-choice grid",
@@ -131,7 +129,7 @@ export const FIELD_TYPE_LABELS: Record<FieldType, string> = {
 export const FIELD_TYPE_GROUPS: { label: string; types: FieldType[] }[] = [
   { label: "Text", types: ["short_text", "paragraph", "email"] },
   { label: "Choice", types: ["multiple_choice", "checkboxes", "dropdown"] },
-  { label: "Upload", types: ["file_upload", "image_upload"] },
+  { label: "Upload", types: ["file_upload"] },
   { label: "Scale", types: ["linear_scale", "rating"] },
   { label: "Grid", types: ["mc_grid", "checkbox_grid"] },
   { label: "Date & time", types: ["date", "time"] },
