@@ -153,7 +153,7 @@ export default function EventsClient() {
             empty={upcomingEvents.length === 0}
             emptyLabel="No upcoming events right now. Stay tuned!"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {upcomingEvents.map((event, i) => (
                 <EventCard
                   key={event.id}
@@ -397,7 +397,7 @@ function EventCard({
         {/* Card Image */}
         {event.image && (
           <div
-          style={{ aspectRatio: cardAspect(event), maxHeight: "18rem" }}
+          style={{ aspectRatio: cardAspect(event), maxHeight: "15rem" }}
           className="relative w-full rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0"
         >
             <Image
@@ -598,7 +598,7 @@ function MemoryCard({
       }`}>
         {/* Card Image */}
         <div
-          style={{ aspectRatio: cardAspect(event), maxHeight: "18rem" }}
+          style={{ aspectRatio: cardAspect(event), maxHeight: "15rem" }}
           className="relative w-full rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0"
         >
           {event.image ? (
