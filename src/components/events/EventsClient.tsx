@@ -22,6 +22,13 @@ import {
 import Image from "next/image";
 import { parseLumaUrl, initLumaCheckout, formatEventDateRange } from "@/lib/luma";
 
+/**
+ * How tall a poster may be on a card. A square crop in a two-column grid is
+ * around 550px tall on its own, which dwarfs everything beside it.
+ */
+const cardAspect = (event: { imageAspect?: number }) =>
+  String(Math.max(1.4, Number(event.imageAspect) || 16 / 10));
+
 export default function EventsClient() {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -390,7 +397,7 @@ function EventCard({
         {/* Card Image */}
         {event.image && (
           <div
-          style={{ aspectRatio: String(event.imageAspect || 16 / 10) }}
+          style={{ aspectRatio: cardAspect(event), maxHeight: "18rem" }}
           className="relative w-full rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0"
         >
             <Image
@@ -591,7 +598,7 @@ function MemoryCard({
       }`}>
         {/* Card Image */}
         <div
-          style={{ aspectRatio: String(event.imageAspect || 16 / 10) }}
+          style={{ aspectRatio: cardAspect(event), maxHeight: "18rem" }}
           className="relative w-full rounded-2xl overflow-hidden mb-5 border border-gray-100 shrink-0"
         >
           {event.image ? (
