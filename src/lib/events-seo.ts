@@ -28,11 +28,14 @@ export interface PublicEvent {
 }
 
 type RestValue = {
+  /** Present on cancelled events, which are left out of everything public. */
   stringValue?: string;
   timestampValue?: string;
   integerValue?: string;
   booleanValue?: boolean;
 };
+
+const isTrue = (v?: RestValue) => v?.booleanValue === true;
 
 const str = (v?: RestValue) => {
   if (!v) return undefined;
@@ -61,6 +64,7 @@ export async function fetchEvents(): Promise<PublicEvent[]> {
         const date = str(f.date);
         const title = str(f.title);
         if (!date || !title) return null;
+        if (isTrue(f.cancelled)) return null;
         return {
           id: doc.name.split("/").pop() ?? "",
           title,

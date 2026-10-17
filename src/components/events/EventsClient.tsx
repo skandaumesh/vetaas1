@@ -93,8 +93,10 @@ export default function EventsClient() {
     }
   };
 
-  const upcomingEvents = events.filter((e) => !isCompleted(e));
-  const pastEvents = events.filter((e) => isCompleted(e));
+  // A cancelled event comes off the website entirely.
+  const liveEvents = events.filter((e) => !e.cancelled);
+  const upcomingEvents = liveEvents.filter((e) => !isCompleted(e));
+  const pastEvents = liveEvents.filter((e) => isCompleted(e));
 
   // Initialize Luma checkout widget and dynamic script binding
   useEffect(() => {

@@ -20,7 +20,9 @@ import {
   Image as ImageIcon,
   Trash2,
   Edit2,
-  Copy
+  Copy,
+  Ban,
+  RotateCcw
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageCropper from "@/components/admin/ImageCropper";
@@ -494,6 +496,27 @@ export default function AdminEventsPage() {
     }
   };
 
+  /**
+   * Calling an event off keeps the record but takes it off the public page.
+   * The date-based status is left alone, so restoring it needs no repair.
+   */
+  const setCancelled = async (event: { id: string }, cancelled: boolean) => {
+    setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, cancelled } : e)));
+    try {
+      await updateDoc(doc(db, "events", event.id), { cancelled });
+      showToast(
+        cancelled
+          ? "Event cancelled — it no longer shows on the website."
+          : "Event restored to the website.",
+        cancelled ? "info" : "success"
+      );
+    } catch (error) {
+      console.error("Error updating cancelled state: ", error);
+      setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, cancelled: !cancelled } : e)));
+      showToast("Couldn't update the event. Check the connection and try again.", "error");
+    }
+  };
+
   const renderCard = (event: any) => {
     const computedStatus = isEventPast(event) ? "completed" : "upcoming";
     return (
@@ -518,11 +541,13 @@ export default function AdminEventsPage() {
                 {event.title}
               </h3>
               <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-full leading-none shrink-0 ${
-                computedStatus === 'completed'
-                  ? 'bg-gray-100 text-gray-500'
-                  : 'bg-green-100 text-green-700'
+                event.cancelled
+                  ? 'bg-rose-100 text-rose-700'
+                  : computedStatus === 'completed'
+                    ? 'bg-gray-100 text-gray-500'
+                    : 'bg-green-100 text-green-700'
               }`}>
-                {computedStatus}
+                {event.cancelled ? "cancelled" : computedStatus}
               </span>
             </div>
 
@@ -618,6 +643,25 @@ export default function AdminEventsPage() {
               <Copy size={14} />
               Host Again
             </button>
+            {event.cancelled ? (
+              <button
+                onClick={() => setCancelled(event, false)}
+                className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition duration-200 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer text-xs font-semibold uppercase tracking-wide"
+                title="Put this event back on the website"
+              >
+                <RotateCcw size={14} />
+                Restore
+              </button>
+            ) : (
+              <button
+                onClick={() => setCancelled(event, true)}
+                className="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl transition duration-200 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer text-xs font-semibold uppercase tracking-wide"
+                title="Call this event off and take it off the website"
+              >
+                <Ban size={14} />
+                Cancel
+              </button>
+            )}
             <button
               onClick={() => handleEditClick(event)}
               className="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl transition duration-200 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer text-xs font-semibold uppercase tracking-wide"
@@ -640,10 +684,11 @@ export default function AdminEventsPage() {
     );
   };
 
+  const cancelledEvents = events.filter((e) => e.cancelled);
   const upcomingEvents = events
-    .filter((e) => !isEventPast(e))
+    .filter((e) => !e.cancelled && !isEventPast(e))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const completedEvents = events.filter((e) => isEventPast(e));
+  const completedEvents = events.filter((e) => !e.cancelled && isEventPast(e));
 
   // Authenticated Admin Panel
   return (
@@ -759,7 +804,7 @@ export default function AdminEventsPage() {
         </header>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-px bg-slate-200 border border-slate-200 rounded-xl overflow-hidden mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-slate-200 border border-slate-200 rounded-xl overflow-hidden mb-8">
           {[
             { label: "Total events", value: String(events.length), sub: "all time" },
             {
@@ -768,6 +813,11 @@ export default function AdminEventsPage() {
               sub: upcomingEvents.length > 0 ? "scheduled ahead" : "nothing scheduled",
             },
             { label: "Completed", value: String(completedEvents.length), sub: "already held" },
+            {
+              label: "Cancelled",
+              value: String(cancelledEvents.length),
+              sub: cancelledEvents.length > 0 ? "called off" : "none called off",
+            },
           ].map((card) => (
             <div key={card.label} className="bg-white px-5 py-5">
               <p className="text-[13px] font-medium text-slate-400 mb-3">{card.label}</p>
@@ -1086,6 +1136,22 @@ export default function AdminEventsPage() {
                     </div>
                   )}
                 </section>
+
+                {/* Cancelled events — kept for the record */}
+                {cancelledEvents.length > 0 && (
+                  <section>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="w-2 h-2 rounded-full bg-rose-500" />
+                      <h3 className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                        Cancelled
+                      </h3>
+                      <span className="text-xs text-slate-400 tabular-nums">{cancelledEvents.length}</span>
+                    </div>
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 font-body items-start">
+                      {cancelledEvents.map(renderCard)}
+                    </div>
+                  </section>
+                )}
 
                 {/* Completed events — second section */}
                 {completedEvents.length > 0 && (
