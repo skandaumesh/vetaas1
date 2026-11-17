@@ -54,8 +54,62 @@ interface Toast {
   type: "success" | "error" | "info";
 }
 
+type EventSort = "date" | "added" | "name";
+const EVENT_SORT_KEY = "adminEventsSort";
+const EVENT_SORTS: { key: EventSort; label: string }[] = [
+  { key: "date", label: "Event date" },
+  { key: "added", label: "Recently added" },
+  { key: "name", label: "Name" },
+];
+
+interface SortableEvent {
+  title?: string;
+  date?: string;
+  timeSlot?: string;
+  createdAt?: string;
+}
+
+const dayMs = (event: SortableEvent) => new Date(event.date ?? "").getTime() || 0;
+const startMin = (event: SortableEvent) => minutesFromSlot(event.timeSlot)?.start ?? 0;
+
+/**
+ * Orders one section of the list. By date, upcoming events run soonest first
+ * and past or cancelled ones latest first, with same-day events by start time.
+ * Events made before createdAt was recorded sort after the rest when ordering
+ * by when they were added.
+ */
+function sortEvents<T extends SortableEvent>(list: T[], sort: EventSort, soonestFirst: boolean): T[] {
+  const byDate = (a: T, b: T) =>
+    (soonestFirst ? dayMs(a) - dayMs(b) : dayMs(b) - dayMs(a)) || startMin(a) - startMin(b);
+  const compare =
+    sort === "name"
+      ? (a: T, b: T) =>
+          String(a.title ?? "").localeCompare(String(b.title ?? ""), undefined, { sensitivity: "base" }) ||
+          byDate(a, b)
+      : sort === "added"
+        ? (a: T, b: T) =>
+            String(b.createdAt ?? "").localeCompare(String(a.createdAt ?? "")) || dayMs(b) - dayMs(a)
+        : byDate;
+  return [...list].sort(compare);
+}
+
 export default function AdminEventsPage() {
   const { user } = useAdminAuth();
+  const [sortBy, setSortBy] = useState<EventSort>("date");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(EVENT_SORT_KEY);
+      if (saved === "date" || saved === "added" || saved === "name") setSortBy(saved);
+    } catch {}
+  }, []);
+
+  const changeSort = (next: EventSort) => {
+    setSortBy(next);
+    try {
+      localStorage.setItem(EVENT_SORT_KEY, next);
+    } catch {}
+  };
 
   // Events & logic states
   const [events, setEvents] = useState<any[]>([]);
@@ -732,11 +786,17 @@ export default function AdminEventsPage() {
     );
   };
 
-  const cancelledEvents = events.filter((e) => e.cancelled);
-  const upcomingEvents = events
-    .filter((e) => !e.cancelled && !isEventPast(e))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const completedEvents = events.filter((e) => !e.cancelled && isEventPast(e));
+  const cancelledEvents = sortEvents(events.filter((e) => e.cancelled), sortBy, false);
+  const upcomingEvents = sortEvents(
+    events.filter((e) => !e.cancelled && !isEventPast(e)),
+    sortBy,
+    true
+  );
+  const completedEvents = sortEvents(
+    events.filter((e) => !e.cancelled && isEventPast(e)),
+    sortBy,
+    false
+  );
 
   // Authenticated Admin Panel
   return (
@@ -1197,6 +1257,26 @@ export default function AdminEventsPage() {
               </p>
             ) : (
               <div className="space-y-10">
+                <div className="flex flex-wrap items-center gap-3 -mb-4">
+                  <span className="text-[13px] font-medium text-slate-400">Sort by</span>
+                  <div className="inline-flex bg-slate-100 rounded-lg p-0.5">
+                    {EVENT_SORTS.map((s) => (
+                      <button
+                        key={s.key}
+                        onClick={() => changeSort(s.key)}
+                        aria-pressed={sortBy === s.key}
+                        className={`px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors cursor-pointer ${
+                          sortBy === s.key
+                            ? "bg-white text-slate-900 shadow-sm"
+                            : "text-slate-500 hover:text-slate-700"
+                        }`}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Upcoming events — first section */}
                 <section>
                   <div className="flex items-center gap-2 mb-4">
