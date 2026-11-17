@@ -6,7 +6,7 @@ service cloud.firestore {
     // Keep this list in sync with src/lib/admin.ts and storage.rules.
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email in ['kirti.vetaas@gmail.com'];
+        && request.auth.token.email in ['kirti.vetaas@gmail.com', 'skandaumesh82@gmail.com'];
     }
 
     // Events: anyone can view; only an admin can manage them

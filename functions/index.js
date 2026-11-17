@@ -768,7 +768,7 @@ function getAnalyticsClient() {
   return analyticsClient;
 }
 
-const ADMIN_EMAILS = ["kirti.vetaas@gmail.com"];
+const ADMIN_EMAILS = ["kirti.vetaas@gmail.com", "skandaumesh82@gmail.com"];
 
 function assertAdmin(request) {
   const email = request.auth && request.auth.token && request.auth.token.email;

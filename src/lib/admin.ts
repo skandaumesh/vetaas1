@@ -4,7 +4,7 @@ import type { User } from "firebase/auth";
 // UI AND in the Firestore/Storage security rules (firestore.rules / storage.rules)
 // — both must list the same emails. Being logged in is NOT enough; the account's
 // email must be on this list. Keep the two in sync when changing admins.
-export const ADMIN_EMAILS = ["kirti.vetaas@gmail.com"];
+export const ADMIN_EMAILS = ["kirti.vetaas@gmail.com", "skandaumesh82@gmail.com"];
 
 export function isAdminUser(user: User | null): boolean {
   const email = user?.email?.toLowerCase();

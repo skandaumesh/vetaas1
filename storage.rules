@@ -6,7 +6,7 @@ service firebase.storage {
     // Keep this list in sync with src/lib/admin.ts and firestore.rules.
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email in ['kirti.vetaas@gmail.com'];
+        && request.auth.token.email in ['kirti.vetaas@gmail.com', 'skandaumesh82@gmail.com'];
     }
 
     // Paid downloads. Never readable through these rules — after payment a
