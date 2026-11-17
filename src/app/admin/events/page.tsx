@@ -25,6 +25,7 @@ import {
   RotateCcw
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import ImageCropper from "@/components/admin/ImageCropper";
 
 /** "14:30" -> 870 minutes past midnight. */
@@ -628,8 +629,10 @@ export default function AdminEventsPage() {
       >
         <div className="flex gap-4 items-start">
           {event.image ? (
-            <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-100">
-              <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+            // Through the image optimizer: the full posters add up to over
+            // 20 MB, far too much to fetch for 64px thumbnails.
+            <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-100 bg-gray-50">
+              <Image src={event.image} alt={event.title} fill sizes="64px" className="object-cover" />
             </div>
           ) : (
             <div className="w-16 h-16 rounded-xl bg-gray-50 border border-slate-100 flex items-center justify-center text-gray-400 shrink-0">
@@ -1256,27 +1259,28 @@ export default function AdminEventsPage() {
                 No events yet. Click &quot;Add Event&quot; to create your first one.
               </p>
             ) : (
-              <div className="space-y-10">
-                <div className="flex flex-wrap items-center gap-3 -mb-4">
-                  <span className="text-[13px] font-medium text-slate-400">Sort by</span>
-                  <div className="inline-flex bg-slate-100 rounded-lg p-0.5">
-                    {EVENT_SORTS.map((s) => (
-                      <button
-                        key={s.key}
-                        onClick={() => changeSort(s.key)}
-                        aria-pressed={sortBy === s.key}
-                        className={`px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors cursor-pointer ${
-                          sortBy === s.key
-                            ? "bg-white text-slate-900 shadow-sm"
-                            : "text-slate-500 hover:text-slate-700"
-                        }`}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
+              <>
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <span className="text-[13px] font-medium text-slate-400">Sort by</span>
+                <div className="inline-flex bg-slate-100 rounded-lg p-0.5">
+                  {EVENT_SORTS.map((s) => (
+                    <button
+                      key={s.key}
+                      onClick={() => changeSort(s.key)}
+                      aria-pressed={sortBy === s.key}
+                      className={`px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors cursor-pointer ${
+                        sortBy === s.key
+                          ? "bg-white text-slate-900 shadow-sm"
+                          : "text-slate-500 hover:text-slate-700"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
                 </div>
+              </div>
 
+              <div className="space-y-10">
                 {/* Upcoming events — first section */}
                 <section>
                   <div className="flex items-center gap-2 mb-4">
@@ -1329,6 +1333,7 @@ export default function AdminEventsPage() {
                   </section>
                 )}
               </div>
+              </>
             )}
         </div>
       </div>
