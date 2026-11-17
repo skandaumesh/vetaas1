@@ -2,7 +2,7 @@
   "name": "vetaas-functions",
   "description": "Cloud Functions for Vetaas — membership confirmation emails",
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "main": "index.js",
   "dependencies": {
