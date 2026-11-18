@@ -210,6 +210,17 @@ export default function AdminFormsPage() {
     [responseCounts]
   );
 
+  const stats = useMemo(() => {
+    const today = istToday();
+    return {
+      open: forms.filter((f) => f.status === "open").length,
+      upcoming: forms.filter((f) => {
+        const d = eventDay(f);
+        return d !== "" && d >= today;
+      }).length,
+    };
+  }, [forms]);
+
   // By event date: upcoming soonest first, then past most recent first, then
   // forms with no date (plain forms and fresh copies) by last edit.
   const groups = useMemo(() => {
@@ -328,10 +339,7 @@ export default function AdminFormsPage() {
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-[2.15rem] font-semibold tracking-[-0.02em] text-slate-900">Forms <span className="text-slate-300">builder</span></h1>
-            <p className="text-sm text-slate-400">
-              Build your own forms and share the link — {forms.length} form{forms.length === 1 ? "" : "s"},{" "}
-              {totalResponses} response{totalResponses === 1 ? "" : "s"} total.
-            </p>
+            <p className="text-sm text-slate-400">Build your own forms and share the link.</p>
           </div>
           <button
             onClick={createForm}
@@ -341,6 +349,32 @@ export default function AdminFormsPage() {
             {creating ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
             New form
           </button>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-slate-200 border border-slate-200 rounded-xl overflow-hidden mb-8">
+          {[
+            { label: "Total forms", value: forms.length, sub: "all time" },
+            {
+              label: "Open",
+              value: stats.open,
+              sub: stats.open > 0 ? "taking responses" : "none open",
+            },
+            {
+              label: "Upcoming events",
+              value: stats.upcoming,
+              sub: stats.upcoming > 0 ? "scheduled ahead" : "nothing scheduled",
+            },
+            { label: "Responses", value: totalResponses, sub: "across all forms" },
+          ].map((card) => (
+            <div key={card.label} className="bg-white px-5 py-5">
+              <p className="text-[13px] font-medium text-slate-400 mb-3">{card.label}</p>
+              <p className="text-[2.5rem] font-semibold tabular-nums tracking-[-0.03em] leading-none mb-2 text-slate-900">
+                {loading ? "–" : card.value}
+              </p>
+              <p className="text-xs text-slate-300">{card.sub}</p>
+            </div>
+          ))}
         </div>
 
         {loading ? (
