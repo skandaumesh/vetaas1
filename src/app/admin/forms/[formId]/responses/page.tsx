@@ -398,11 +398,24 @@ export default function FormResponsesPage() {
   );
 }
 
+// Older responses hold a download URL, and a free registration is written by
+// the visitor's own browser — so a "file" could point anywhere, such as a fake
+// sign-in page. It's only made a link when it leads into this project's storage.
+const OWN_STORAGE_URL = "https://firebasestorage.googleapis.com/v0/b/vetaas-7aeae.firebasestorage.app/o/";
+
 /**
  * An uploaded answer. Newer responses hold a storage path, which only an admin
  * can open, so the link is fetched here; older ones hold a download URL.
  */
 function Uploaded({ value, image = false }: { value: string; image?: boolean }) {
+  const trusted = isStoragePath(value) || value.startsWith(OWN_STORAGE_URL);
+  if (!trusted) {
+    return <span className="text-gray-500 text-xs break-all sm:text-right">{value}</span>;
+  }
+  return <TrustedUpload value={value} image={image} />;
+}
+
+function TrustedUpload({ value, image }: { value: string; image: boolean }) {
   const [url, setUrl] = useState(isStoragePath(value) ? "" : value);
   const name = isStoragePath(value) ? fileNameFromPath(value) : fileNameFromUrl(value);
 

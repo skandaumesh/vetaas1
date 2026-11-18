@@ -7,8 +7,7 @@ import { jsonLd } from "@/lib/json-ld";
 import ScrollToTop from "@/components/ScrollToTop";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { CartProvider } from "@/lib/cart";
-
-import Script from "next/script";
+import VisitorTracking from "@/components/VisitorTracking";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -257,10 +256,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
         />
-        <Script
-          src="https://ozlabsprototype1.vercel.app/api/v1/track/script?key=d0a677c9-0c0e-4005-9876-3e091add411d"
-          strategy="afterInteractive"
-        />
+        <VisitorTracking />
 
         {/* Google Analytics 4 — sends page views manually so /admin is excluded
             (see GoogleAnalytics.tsx). Otherwise the team's own dashboard

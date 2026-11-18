@@ -11,7 +11,19 @@ const SECURITY_HEADERS = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // The camera is needed for the admin check-in scanner; nothing else is.
   { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" },
+  // A deliberately small policy: no plugins, no rewriting where relative links
+  // point, no framing by other sites. Scripts aren't restricted here, so
+  // Razorpay, Luma and Analytics keep working exactly as before.
+  {
+    key: "Content-Security-Policy",
+    value: "object-src 'none'; base-uri 'self'; frame-ancestors 'self'",
+  },
 ];
+
+// Only this project's own bucket. Matching the whole Firebase or Google Cloud
+// host would let anyone run images from any project through this site's
+// image optimizer, on this site's bill.
+const BUCKET = "vetaas-7aeae.firebasestorage.app";
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -27,16 +39,18 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "firebasestorage.googleapis.com",
+        pathname: `/v0/b/${BUCKET}/o/**`,
       },
       {
         protocol: "https",
-        hostname: "vetaas-7aeae.firebasestorage.app",
+        hostname: BUCKET,
       },
       {
         // Plain GCS URLs — some event posters were written in this form before
         // the migration switched to Firebase download URLs.
         protocol: "https",
         hostname: "storage.googleapis.com",
+        pathname: `/${BUCKET}/**`,
       },
     ],
   },
