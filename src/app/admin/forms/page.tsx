@@ -17,7 +17,8 @@ import {
 import { db } from "@/lib/firebase";
 import { useAdminAuth } from "@/components/admin/AdminGate";
 import PasswordConfirmDialog from "@/components/admin/PasswordConfirmDialog";
-import type { FormDoc } from "@/lib/forms";
+import type { FormDoc, FormResponseDoc } from "@/lib/forms";
+import { registrantEmail } from "@/lib/tickets";
 import {
   BarChart3,
   CalendarDays,
@@ -79,7 +80,11 @@ export default function AdminFormsPage() {
   const { user } = useAdminAuth();
   const router = useRouter();
   const [forms, setForms] = useState<FormRow[]>([]);
-  const [responseCounts, setResponseCounts] = useState<Record<string, number>>({});
+  // Confirmed registrations per form: free ones, and paid ones whose payment
+  // went through. A checkout that was opened but never paid is counted apart.
+  const [registeredCounts, setRegisteredCounts] = useState<Record<string, number>>({});
+  const [unpaidCounts, setUnpaidCounts] = useState<Record<string, number>>({});
+  const [peopleCount, setPeopleCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<FormRow | null>(null);
@@ -111,12 +116,26 @@ export default function AdminFormsPage() {
           getDocs(collection(db, "formResponses")),
         ]);
         setForms(formsSnap.docs.map((d) => ({ id: d.id, ...d.data() } as FormRow)));
-        const counts: Record<string, number> = {};
+        const registered: Record<string, number> = {};
+        const unpaid: Record<string, number> = {};
+        const emails = new Set<string>();
+        let withoutEmail = 0;
         responsesSnap.docs.forEach((d) => {
-          const formId = d.data().formId as string;
-          counts[formId] = (counts[formId] ?? 0) + 1;
+          const r = d.data() as FormResponseDoc;
+          if (r.paymentStatus === "pending") {
+            unpaid[r.formId] = (unpaid[r.formId] ?? 0) + 1;
+            return;
+          }
+          registered[r.formId] = (registered[r.formId] ?? 0) + 1;
+          // One person may register several times; their email tells them
+          // apart. Someone who gave no email is counted on their own.
+          const email = registrantEmail(r.answers) || r.payerEmail?.trim().toLowerCase() || "";
+          if (email) emails.add(email);
+          else withoutEmail++;
         });
-        setResponseCounts(counts);
+        setRegisteredCounts(registered);
+        setUnpaidCounts(unpaid);
+        setPeopleCount(emails.size + withoutEmail);
       } catch (err) {
         console.error("Failed to load forms:", err);
       } finally {
@@ -205,9 +224,9 @@ export default function AdminFormsPage() {
     });
   };
 
-  const totalResponses = useMemo(
-    () => Object.values(responseCounts).reduce((s, n) => s + n, 0),
-    [responseCounts]
+  const totalRegistrations = useMemo(
+    () => Object.values(registeredCounts).reduce((s, n) => s + n, 0),
+    [registeredCounts]
   );
 
   const stats = useMemo(() => {
@@ -246,6 +265,8 @@ export default function AdminFormsPage() {
 
   const renderCard = (form: FormRow) => {
     const day = eventDay(form);
+    const registered = registeredCounts[form.id] ?? 0;
+    const unpaid = unpaidCounts[form.id] ?? 0;
     return (
       <div key={form.id} className="glass-card rounded-2xl p-5 flex flex-col gap-4">
         <div>
@@ -277,7 +298,15 @@ export default function AdminFormsPage() {
           )}
           <p className="text-xs text-gray-400 font-semibold mt-2">
             {form.fields.length} field{form.fields.length === 1 ? "" : "s"} ·{" "}
-            {responseCounts[form.id] ?? 0} response{(responseCounts[form.id] ?? 0) === 1 ? "" : "s"}
+            {registered} registration{registered === 1 ? "" : "s"}
+            {unpaid > 0 && (
+              <span
+                className="text-amber-600"
+                title="Opened the payment but didn't pay — not counted as registered"
+              >
+                {" "}· {unpaid} unpaid
+              </span>
+            )}
           </p>
         </div>
 
@@ -365,7 +394,14 @@ export default function AdminFormsPage() {
               value: stats.upcoming,
               sub: stats.upcoming > 0 ? "scheduled ahead" : "nothing scheduled",
             },
-            { label: "Responses", value: totalResponses, sub: "across all forms" },
+            {
+              label: "Registrations",
+              value: totalRegistrations,
+              sub:
+                peopleCount > 0
+                  ? `by ${peopleCount} ${peopleCount === 1 ? "person" : "people"}`
+                  : "none yet",
+            },
           ].map((card) => (
             <div key={card.label} className="bg-white px-5 py-5">
               <p className="text-[13px] font-medium text-slate-400 mb-3">{card.label}</p>
