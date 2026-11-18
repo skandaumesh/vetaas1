@@ -313,6 +313,7 @@ function buildRegistrationEmail({ form, formId, ticketUrl, amountPaid }) {
 module.exports = {
   SITE_URL,
   STRICT_EMAIL,
+  escapeHtml,
   isEventForm,
   confirmationEnabled,
   registrantEmail,

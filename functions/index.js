@@ -11,6 +11,7 @@ const { EMAIL_SUBJECT: MEMBERSHIP_EMAIL_SUBJECT, buildEmailText: buildMembership
 const {
   SITE_URL,
   STRICT_EMAIL,
+  escapeHtml,
   isEventForm,
   confirmationEnabled,
   registrantEmail,
@@ -30,6 +31,70 @@ const SMTP_HOST = "smtp.hostinger.com";
 const SMTP_PORT = 465;
 const FROM_ADDRESS = "kirti@vetaas.in";
 const FROM_NAME = "Vetaas Education Foundation";
+
+// ---------------------------------------------------------------------------
+// Abuse limits.
+//
+// Quizzes and free registrations are written straight from the browser, and
+// each one makes this project send an email to whatever address was typed in.
+// Without a cap, a script could use kirti@vetaas.in to mail strangers in bulk,
+// which would get the mailbox blacklisted. Checkouts are capped the same way so
+// nobody can flood Razorpay and the admin lists with abandoned orders.
+//
+// Each limit is a small counter document in rateLimits/, which the security
+// rules keep closed to everyone; only this code (Admin SDK) touches it.
+// ---------------------------------------------------------------------------
+
+const HOUR = 3600000;
+const DAY = 24 * HOUR;
+
+const hashKey = (s) => crypto.createHash("sha256").update(String(s)).digest("hex").slice(0, 40);
+
+/** True, and counts one use, if `key` has been used fewer than `max` times in the window. */
+async function withinLimit(key, max, windowMs) {
+  const db = admin.firestore();
+  const ref = db.collection("rateLimits").doc(key);
+  return db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const now = Date.now();
+    const data = snap.exists ? snap.data() : null;
+    if (!data || now - data.windowStart >= windowMs) {
+      tx.set(ref, { windowStart: now, count: 1 });
+      return true;
+    }
+    if (data.count >= max) return false;
+    tx.update(ref, { count: data.count + 1 });
+    return true;
+  });
+}
+
+/** Caps emails a visitor's action can send to one address, and in total. */
+async function mayEmailVisitor(kind, email, { perAddressPerDay, totalPerHour }) {
+  if (!(await withinLimit(`${kind}-total`, totalPerHour, HOUR))) return false;
+  return withinLimit(`${kind}-to-${hashKey(String(email).toLowerCase())}`, perAddressPerDay, DAY);
+}
+
+/** Caps how many checkouts one visitor (and everyone together) can start. */
+async function assertCheckoutAllowed(request) {
+  const perVisitor = await withinLimit(`checkout-uid-${hashKey(request.auth.uid)}`, 10, HOUR);
+  const overall = perVisitor && (await withinLimit("checkout-total", 400, HOUR));
+  if (!perVisitor || !overall) {
+    throw new HttpsError(
+      "resource-exhausted",
+      "Too many attempts just now. Please wait a few minutes and try again."
+    );
+  }
+}
+
+/** Constant-time comparison for payment signatures. */
+function signatureMatches(expectedHex, given) {
+  const a = Buffer.from(String(expectedHex), "utf8");
+  const b = Buffer.from(String(given || ""), "utf8");
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+/** Trims a free-text value from a visitor and caps its length. */
+const clean = (v, max) => String(v ?? "").trim().slice(0, max);
 
 // Replaces the deprecated "Trigger Email" extension: any doc written to the
 // `mail` collection ({ to, message: { subject, text | html } }) gets sent via
@@ -190,6 +255,74 @@ exports.sendExpiryReminders = onSchedule(
 const QUIZ_ADMIN_EMAIL = "kirti@vetaas.in";
 const LOGO_SRC = "https://www.vetaas.in/icon.png"; // swapped to CID by sendMail
 
+// The server's own copy of each quiz's wording. A submission comes straight
+// from a browser, so its quiz name, result text and section names could say
+// anything — and this email goes to an address the visitor chose. Only the
+// score is taken from the submission. Keep in sync with
+// src/components/products/SelAssessment.tsx and ParentReflectionQuiz.tsx.
+const QUIZZES = {
+  "sel-assessment": {
+    name: "SEL Assessment for Children",
+    sections: ["Self-Awareness", "Self-Management", "Social Awareness", "Relationship Skills", "Decision-Making"],
+    bands: [
+      {
+        min: 80,
+        label: "Strongly Developing ⭐",
+        blurb:
+          "Your child shows strong social-emotional skills across the board. Keep nurturing these strengths with play, conversation, and encouragement.",
+      },
+      {
+        min: 55,
+        label: "Developing 🌱",
+        blurb:
+          "Your child is building these skills nicely, with clear strengths and a few areas that will bloom with gentle practice and support.",
+      },
+      {
+        min: 0,
+        label: "Emerging 🌼",
+        blurb:
+          "These skills are just beginning to grow — which is completely normal. With the right playful support, children make big leaps here.",
+      },
+    ],
+  },
+  "parent-reflection": {
+    name: "In Sync: Parent Reflection",
+    sections: ["Emotions", "Connection", "Everyday Parenting", "Learning"],
+    bands: [
+      {
+        min: 80,
+        label: "Deeply Attuned 💛",
+        blurb:
+          "You lead with warmth and empathy, and you see your child's feelings as something to understand rather than fix. Keep trusting that instinct.",
+      },
+      {
+        min: 55,
+        label: "Warm & Growing 🌱",
+        blurb:
+          "You're building emotionally-aware habits and already do a lot of things beautifully. A few small shifts can make those connected moments even easier.",
+      },
+      {
+        min: 0,
+        label: "Just Getting Started 🤍",
+        blurb:
+          "Every parent begins somewhere, and the fact that you're reflecting already says a lot. Small, gentle changes can go a long way — we'd love to walk with you.",
+      },
+    ],
+  },
+};
+
+const pctOf = (v) => Math.min(100, Math.max(0, Math.round(Number(v) || 0)));
+
+/**
+ * The visitor's name, only when it is plainly a name: letters, spaces,
+ * apostrophes and hyphens. Anything else — a link, a domain, a phone number —
+ * would let this email carry someone else's message, so it's dropped.
+ */
+function safeName(name) {
+  const n = String(name ?? "").trim().replace(/\s+/g, " ").slice(0, 40);
+  return /^[\p{L}\p{M}' -]+$/u.test(n) ? n : "";
+}
+
 exports.sendQuizResult = onDocumentCreated(
   { document: "quizSubmissions/{id}", region: "us-central1" },
   async (event) => {
@@ -198,36 +331,60 @@ exports.sendQuizResult = onDocumentCreated(
     const s = snap.data();
     if (!s || !s.email || s.emailedAt) return;
 
+    const quiz = QUIZZES[s.quizId];
+    const email = String(s.email).trim().toLowerCase();
+    if (!quiz || !STRICT_EMAIL.test(email)) return;
+    if (!(await mayEmailVisitor("quiz", email, { perAddressPerDay: 3, totalPerHour: 150 }))) {
+      await snap.ref.update({ emailSkipped: "rate-limited" });
+      return;
+    }
+
     const db = admin.firestore();
-    const pct = Math.round(s.percentage || 0);
-    const greeting = s.name ? `Hi ${s.name},` : "Hi there,";
-    const sections = Array.isArray(s.sections) ? s.sections : [];
+    const pct = pctOf(s.percentage);
+    const result =
+      [...quiz.bands].sort((a, b) => b.min - a.min).find((b) => pct >= b.min) ??
+      quiz.bands[quiz.bands.length - 1];
+    const firstName = safeName(s.name);
+    const greeting = firstName ? `Hi ${firstName},` : "Hi there,";
+    // Only this quiz's own section names, each once, with a sane percentage.
+    const sections = [];
+    for (const sec of Array.isArray(s.sections) ? s.sections : []) {
+      if (!sec || !quiz.sections.includes(sec.title)) continue;
+      if (sections.some((x) => x.title === sec.title)) continue;
+      sections.push({ title: sec.title, pct: pctOf(sec.pct) });
+    }
 
     const barColor = "#7C3AED";
     const sectionRows = sections
       .map(
         (sec) => `
         <tr>
-          <td style="padding:8px 0;font-size:14px;color:#374151;">${sec.title}</td>
-          <td align="right" style="padding:8px 0;font-size:14px;font-weight:bold;color:#111827;width:56px;">${Math.round(sec.pct || 0)}%</td>
+          <td style="padding:8px 0;font-size:14px;color:#374151;">${escapeHtml(sec.title)}</td>
+          <td align="right" style="padding:8px 0;font-size:14px;font-weight:bold;color:#111827;width:56px;">${sec.pct}%</td>
         </tr>
         <tr><td colspan="2" style="padding:0 0 12px;">
           <div style="background:#eef0f2;border-radius:999px;height:8px;width:100%;">
-            <div style="background:${barColor};border-radius:999px;height:8px;width:${Math.max(4, Math.round(sec.pct || 0))}%;"></div>
+            <div style="background:${barColor};border-radius:999px;height:8px;width:${Math.max(4, sec.pct)}%;"></div>
           </div>
         </td></tr>`
       )
       .join("");
 
-    const answerRows = (s.answers || [])
+    // Only ever sent to Vetaas, but still visitor-written, so escaped.
+    const answers = (Array.isArray(s.answers) ? s.answers : []).slice(0, 40).map((a) => ({
+      question: clean(a && a.question, 300),
+      answer: clean(a && a.answer, 100),
+    }));
+    const answerRows = answers
       .map(
         (a) => `
         <tr>
-          <td style="padding:6px 0;font-size:13px;color:#6b7280;border-bottom:1px solid #f0f0f0;">${a.question}</td>
-          <td align="right" style="padding:6px 0 6px 12px;font-size:13px;color:#111827;font-weight:bold;border-bottom:1px solid #f0f0f0;white-space:nowrap;">${a.answer}</td>
+          <td style="padding:6px 0;font-size:13px;color:#6b7280;border-bottom:1px solid #f0f0f0;">${escapeHtml(a.question)}</td>
+          <td align="right" style="padding:6px 0 6px 12px;font-size:13px;color:#111827;font-weight:bold;border-bottom:1px solid #f0f0f0;white-space:nowrap;">${escapeHtml(a.answer)}</td>
         </tr>`
       )
       .join("");
+    const visitorName = clean(s.name, 120);
 
     const html = `<!DOCTYPE html>
 <html>
@@ -238,19 +395,19 @@ exports.sendQuizResult = onDocumentCreated(
         <tr>
           <td align="center" bgcolor="#7C3AED" style="background-color:#7C3AED;background-image:linear-gradient(135deg,#7C3AED 0%,#00CDBA 100%);padding:28px 24px;">
             <img src="${LOGO_SRC}" width="56" height="56" alt="Vetaas" style="border-radius:50%;display:block;margin:0 auto 10px;background:#ffffff;" />
-            <h1 style="margin:0;font-size:19px;color:#ffffff;">${s.quizName || "Your Assessment Result"}</h1>
+            <h1 style="margin:0;font-size:19px;color:#ffffff;">${escapeHtml(quiz.name)}</h1>
           </td>
         </tr>
         <tr>
           <td style="padding:28px 32px;">
-            <p style="margin:0 0 18px;font-size:15px;color:#374151;">${greeting}</p>
+            <p style="margin:0 0 18px;font-size:15px;color:#374151;">${escapeHtml(greeting)}</p>
             <p style="margin:0 0 22px;font-size:15px;color:#374151;line-height:1.6;">Thank you for taking a few minutes to reflect. Here's your result:</p>
 
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:24px;">
               <tr><td align="center" style="padding:24px;">
                 <div style="font-size:44px;font-weight:800;color:${barColor};line-height:1;">${pct}%</div>
-                <div style="font-size:17px;font-weight:700;color:#111827;margin-top:8px;">${s.band || ""}</div>
-                <p style="font-size:14px;color:#6b7280;line-height:1.6;margin:10px auto 0;max-width:420px;">${s.bandBlurb || ""}</p>
+                <div style="font-size:17px;font-weight:700;color:#111827;margin-top:8px;">${escapeHtml(result.label)}</div>
+                <p style="font-size:14px;color:#6b7280;line-height:1.6;margin:10px auto 0;max-width:420px;">${escapeHtml(result.blurb)}</p>
               </td></tr>
             </table>
 
@@ -285,14 +442,14 @@ exports.sendQuizResult = onDocumentCreated(
 
     // 1) Result email to the visitor
     await db.collection("mail").add({
-      to: s.email,
+      to: email,
       message: {
-        subject: `Your result — ${s.quizName || "Vetaas Assessment"} (${pct}%)`,
+        subject: `Your result — ${quiz.name} (${pct}%)`,
         text:
-          `${greeting}\n\nThank you for taking the ${s.quizName || "assessment"}.\n\n` +
-          `Your result: ${pct}% — ${s.band || ""}\n${s.bandBlurb || ""}\n\n` +
+          `${greeting}\n\nThank you for taking the ${quiz.name}.\n\n` +
+          `Your result: ${pct}% — ${result.label}\n${result.blurb}\n\n` +
           (sections.length > 1
-            ? sections.map((sec) => `- ${sec.title}: ${Math.round(sec.pct || 0)}%`).join("\n") + "\n\n"
+            ? sections.map((sec) => `- ${sec.title}: ${sec.pct}%`).join("\n") + "\n\n"
             : "") +
           `Explore our programs: https://www.vetaas.in/services#membership\n\n` +
           `Warm regards,\nVetaas Education Foundation\nwww.vetaas.in`,
@@ -307,22 +464,22 @@ exports.sendQuizResult = onDocumentCreated(
     await db.collection("mail").add({
       to: QUIZ_ADMIN_EMAIL,
       message: {
-        subject: `📝 ${s.quizName || "Quiz"} completed — ${s.name || s.email} (${pct}%)`,
+        subject: `📝 ${quiz.name} completed — ${visitorName || email} (${pct}%)`,
         text:
-          `A visitor completed "${s.quizName}".\n\n` +
-          `Name: ${s.name || "-"}\nEmail: ${s.email}\n` +
-          `Score: ${pct}% — ${s.band}\n\n` +
+          `A visitor completed "${quiz.name}".\n\n` +
+          `Name: ${visitorName || "-"}\nEmail: ${email}\n` +
+          `Score: ${pct}% — ${result.label}\n\n` +
           (sections.length > 1
-            ? "Breakdown:\n" + sections.map((sec) => `- ${sec.title}: ${Math.round(sec.pct || 0)}%`).join("\n") + "\n\n"
+            ? "Breakdown:\n" + sections.map((sec) => `- ${sec.title}: ${sec.pct}%`).join("\n") + "\n\n"
             : "") +
           "Answers:\n" +
-          (s.answers || []).map((a) => `- ${a.question}\n  -> ${a.answer}`).join("\n"),
+          answers.map((a) => `- ${a.question}\n  -> ${a.answer}`).join("\n"),
         html: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#f4f4f5;padding:24px 12px;">
           <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border-radius:14px;overflow:hidden;margin:0 auto;">
-            <tr><td bgcolor="#7C3AED" style="background-color:#7C3AED;background-image:linear-gradient(135deg,#7C3AED,#00CDBA);padding:20px 24px;color:#fff;font-size:16px;font-weight:bold;">📝 New quiz lead — ${s.quizName || "Quiz"}</td></tr>
+            <tr><td bgcolor="#7C3AED" style="background-color:#7C3AED;background-image:linear-gradient(135deg,#7C3AED,#00CDBA);padding:20px 24px;color:#fff;font-size:16px;font-weight:bold;">📝 New quiz lead — ${escapeHtml(quiz.name)}</td></tr>
             <tr><td style="padding:24px 28px;">
-              <p style="margin:0 0 6px;font-size:14px;color:#374151;"><b>${s.name || "(no name)"}</b> &lt;<a href="mailto:${s.email}" style="color:#7C3AED;">${s.email}</a>&gt;</p>
-              <p style="margin:0 0 18px;font-size:22px;color:#7C3AED;font-weight:800;">${pct}% — <span style="color:#111827;font-size:15px;">${s.band || ""}</span></p>
+              <p style="margin:0 0 6px;font-size:14px;color:#374151;"><b>${escapeHtml(visitorName || "(no name)")}</b> &lt;<a href="mailto:${escapeHtml(email)}" style="color:#7C3AED;">${escapeHtml(email)}</a>&gt;</p>
+              <p style="margin:0 0 18px;font-size:22px;color:#7C3AED;font-weight:800;">${pct}% — <span style="color:#111827;font-size:15px;">${escapeHtml(result.label)}</span></p>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${answerRows}</table>
             </td></tr>
           </table></body></html>`,
@@ -349,7 +506,10 @@ exports.notifyNewOrder = onDocumentCreated(
     // Razorpay-flow orders are created in "pending" the instant checkout
     // starts, before payment completes — there's nothing to verify yet, so
     // skip this and notify from approvePaidOrder once payment is confirmed.
-    if (!o || o.status !== "pending" || o.razorpayOrderId) return;
+    // A cart checkout writes its membership line before the Razorpay order
+    // exists, so it's recognised by cartOrderId; without this every started
+    // (and abandoned) cart sent a "verify & approve" email.
+    if (!o || o.status !== "pending" || o.razorpayOrderId || o.cartOrderId) return;
 
     const inr = (n) => `₹${Math.round(n || 0).toLocaleString("en-IN")}`;
     const items = (o.items || [])
@@ -361,7 +521,7 @@ exports.notifyNewOrder = onDocumentCreated(
         (i) => `
           <tr>
             <td style="padding:8px 0;border-bottom:1px solid #eee;font-size:14px;color:#374151;">
-              ${i.plan} membership <span style="color:#9ca3af;">× ${i.qty}</span>
+              ${escapeHtml(i.plan)} membership <span style="color:#9ca3af;">× ${escapeHtml(i.qty)}</span>
             </td>
             <td align="right" style="padding:8px 0;border-bottom:1px solid #eee;font-size:14px;color:#111827;font-weight:bold;">
               ${inr(i.monthly)}/month
@@ -396,11 +556,11 @@ exports.notifyNewOrder = onDocumentCreated(
 
             <p style="margin:0 0 10px;font-size:11px;letter-spacing:1px;color:#6b7280;font-weight:bold;">CUSTOMER DETAILS</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
-              ${detailRow("Parent", o.parentName)}
-              ${detailRow("Child", o.childAge ? `${o.childName} (${o.childAge} yrs)` : o.childName)}
-              ${o.attendees ? detailRow("Attending", o.attendees) : ""}
-              ${detailRow("Email", o.email ? `<a href="mailto:${o.email}" style="color:#7C3AED;text-decoration:none;">${o.email}</a>` : "-")}
-              ${detailRow("Phone", o.phone ? `<a href="tel:${o.phone}" style="color:#7C3AED;text-decoration:none;">${o.phone}</a>` : "-")}
+              ${detailRow("Parent", escapeHtml(o.parentName))}
+              ${detailRow("Child", escapeHtml(o.childAge ? `${o.childName} (${o.childAge} yrs)` : o.childName))}
+              ${o.attendees ? detailRow("Attending", escapeHtml(o.attendees)) : ""}
+              ${detailRow("Email", o.email ? `<a href="mailto:${escapeHtml(o.email)}" style="color:#7C3AED;text-decoration:none;">${escapeHtml(o.email)}</a>` : "-")}
+              ${detailRow("Phone", o.phone ? `<a href="tel:${escapeHtml(o.phone)}" style="color:#7C3AED;text-decoration:none;">${escapeHtml(o.phone)}</a>` : "-")}
             </table>
 
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:24px;">
@@ -425,7 +585,7 @@ exports.notifyNewOrder = onDocumentCreated(
             </table>
             ${
               o.screenshotUrl
-                ? `<p style="margin:0;font-size:13px;text-align:center;"><a href="${o.screenshotUrl}" style="color:#7C3AED;font-weight:bold;text-decoration:none;">View payment screenshot ↗</a></p>`
+                ? `<p style="margin:0;font-size:13px;text-align:center;"><a href="${escapeHtml(o.screenshotUrl)}" style="color:#7C3AED;font-weight:bold;text-decoration:none;">View payment screenshot ↗</a></p>`
                 : `<p style="margin:0;font-size:13px;color:#ef4444;text-align:center;font-weight:bold;">No payment screenshot attached</p>`
             }
 
@@ -492,10 +652,10 @@ const PLAN_PRICES = {
 
 const planTotal = (plan, qty) => plan.price + (qty - 1) * plan.price * (1 - plan.siblingDiscount);
 
-// Single-admin usage, same approach as the client-side nextMembershipId in
-// admin/memberships/page.tsx — a Firestore counter/transaction isn't warranted.
-async function nextMembershipId(db) {
-  const snap = await db.collection("membershipOrders").get();
+// The next ID after the highest one issued, e.g. VET-0007. Called inside the
+// approval transaction, so two orders paid at the same moment can't both be
+// given the same number.
+function nextMembershipIdFrom(snap) {
   let highest = 0;
   snap.forEach((d) => {
     const id = d.data().membershipId;
@@ -523,21 +683,30 @@ function validityRange(startMs, endMs) {
 // status === "approved" first) since either path can fire for the same order.
 async function approvePaidOrder(db, orderId) {
   const ref = db.collection("membershipOrders").doc(orderId);
-  const snap = await ref.get();
-  if (!snap.exists) return;
-  const order = snap.data();
-  if (order.status === "approved") return;
-
   const nowMs = Date.now();
   const expiresAtMs = nowMs + MEMBERSHIP_DAYS * 86400000;
-  const membershipId = order.membershipId || (await nextMembershipId(db));
 
-  await ref.update({
-    status: "approved",
-    approvedAt: admin.firestore.FieldValue.serverTimestamp(),
-    expiresAt: admin.firestore.Timestamp.fromMillis(expiresAtMs),
-    membershipId,
+  // The browser's verify call and Razorpay's webhook often land together.
+  // Claiming the order and picking its ID in one transaction means only one
+  // of them approves it, so the parent gets one welcome email and one ID.
+  const claimed = await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) return null;
+    const order = snap.data();
+    if (order.status === "approved") return null;
+    const membershipId =
+      order.membershipId ||
+      nextMembershipIdFrom(await tx.get(db.collection("membershipOrders").select("membershipId")));
+    tx.update(ref, {
+      status: "approved",
+      approvedAt: admin.firestore.FieldValue.serverTimestamp(),
+      expiresAt: admin.firestore.Timestamp.fromMillis(expiresAtMs),
+      membershipId,
+    });
+    return { order, membershipId };
   });
+  if (!claimed) return;
+  const { order, membershipId } = claimed;
 
   const validity = validityRange(nowMs, expiresAtMs);
   const emailOrder = {
@@ -594,14 +763,20 @@ exports.createMembershipOrder = onCall(
     }
 
     const data = request.data || {};
-    const items = Array.isArray(data.items) ? data.items : [];
+    const items = Array.isArray(data.items) ? data.items.slice(0, 10) : [];
     if (items.length === 0) throw new HttpsError("invalid-argument", "Cart is empty.");
-    if (!data.parentName || !data.childName || !data.email || !data.phone || !data.attendees) {
+    const parentName = clean(data.parentName, 120);
+    const childName = clean(data.childName, 120);
+    const email = clean(data.email, 200).toLowerCase();
+    const phone = clean(data.phone, 30);
+    const attendees = clean(data.attendees, 20);
+    if (!parentName || !childName || !email || !phone || !attendees) {
       throw new HttpsError("invalid-argument", "Missing required fields.");
     }
-    if (!/.+@.+\..+/.test(data.email)) {
+    if (!STRICT_EMAIL.test(email)) {
       throw new HttpsError("invalid-argument", "Invalid email.");
     }
+    await assertCheckoutAllowed(request);
 
     const orderItems = [];
     let totalMonthly = 0;
@@ -627,18 +802,18 @@ exports.createMembershipOrder = onCall(
       amount: totalMonthly * 100, // paise
       currency: "INR",
       receipt: orderRef.id,
-      notes: { parentName: String(data.parentName), childName: String(data.childName) },
+      notes: { parentName, childName },
     });
 
     await orderRef.set({
       items: orderItems,
       totalMonthly,
-      parentName: String(data.parentName).trim(),
-      childName: String(data.childName).trim(),
-      childAge: String(data.childAge || "").trim(),
-      attendees: String(data.attendees),
-      email: String(data.email).trim(),
-      phone: String(data.phone).trim(),
+      parentName,
+      childName,
+      childAge: clean(data.childAge, 10),
+      attendees,
+      email,
+      phone,
       razorpayOrderId: rzpOrder.id,
       status: "pending",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -667,7 +842,7 @@ exports.verifyMembershipPayment = onCall(
       .createHmac("sha256", razorpayKeySecret.value())
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
-    if (expected !== razorpay_signature) {
+    if (!signatureMatches(expected, razorpay_signature)) {
       throw new HttpsError("permission-denied", "Payment signature mismatch.");
     }
 
@@ -700,7 +875,7 @@ exports.razorpayWebhook = onRequest(
       .createHmac("sha256", razorpayWebhookSecret.value())
       .update(req.rawBody)
       .digest("hex");
-    if (!signature || signature !== expected) {
+    if (!signature || !signatureMatches(expected, signature)) {
       res.status(400).send("Invalid signature");
       return;
     }
@@ -1229,6 +1404,18 @@ async function sendRegistrationConfirmation(db, responseId, { force = false } = 
     return { sent: false, reason: "no-email", ticketToken: token };
   }
 
+  // A free registration is written by the visitor's own browser, so this
+  // address is whatever they typed. It's capped like the quiz email; anyone
+  // held back shows on the responses page as still needing an email, where
+  // the admin can send it by hand (force skips this).
+  if (!force && !response.paymentStatus) {
+    const ok = await mayEmailVisitor("registration", email, { perAddressPerDay: 10, totalPerHour: 300 });
+    if (!ok) {
+      await ref.update({ confirmationError: "rate-limited" });
+      return { sent: false, reason: "rate-limited", ticketToken: token };
+    }
+  }
+
   const ticketUrl = token ? `${SITE_URL}/ticket/${token}` : "";
   const inlineAttachments = [];
   if (ticketUrl) {
@@ -1281,7 +1468,8 @@ exports.createEventRegistration = onCall(
 
     const data = request.data || {};
     const formId = String(data.formId || "").trim();
-    if (!formId) throw new HttpsError("invalid-argument", "Missing form.");
+    // Firestore ids only — a slash would reach into a different path.
+    if (!/^[A-Za-z0-9_-]{1,60}$/.test(formId)) throw new HttpsError("invalid-argument", "Missing form.");
 
     const db = admin.firestore();
     const formSnap = await db.collection("forms").doc(formId).get();
@@ -1347,6 +1535,7 @@ exports.createEventRegistration = onCall(
     if (missing) {
       throw new HttpsError("invalid-argument", "Please answer all required questions.");
     }
+    await assertCheckoutAllowed(request);
 
     const responseRef = db.collection("formResponses").doc();
     const ticketToken = isEventForm(form) ? newTicketToken() : null;
@@ -1411,7 +1600,7 @@ exports.verifyEventPayment = onCall(
       .createHmac("sha256", razorpayKeySecret.value())
       .update(`${orderId}|${paymentId}`)
       .digest("hex");
-    if (expected !== signature) {
+    if (!signatureMatches(expected, signature)) {
       throw new HttpsError("permission-denied", "Payment could not be verified.");
     }
 
@@ -1520,7 +1709,7 @@ function priceCart(rawItems) {
 
     if (raw.kind === "membership") {
       const plan = PLAN_PRICES[raw.id];
-      if (!plan) throw new HttpsError("invalid-argument", `Unknown plan: ${raw.id}`);
+      if (!plan) throw new HttpsError("invalid-argument", "Unknown plan.");
       const monthly = Math.round(planTotal(plan, qty));
       membership.push({ plan: plan.name, planId: raw.id, pricePerMonth: plan.price, qty, monthly });
       total += monthly;
@@ -1529,7 +1718,9 @@ function priceCart(rawItems) {
 
     if (raw.kind === "product") {
       const product = DIGITAL_PRODUCTS[raw.id];
-      if (!product) throw new HttpsError("invalid-argument", `Unknown product: ${raw.id}`);
+      if (!product) throw new HttpsError("invalid-argument", "Unknown product.");
+      // The same download twice would charge twice for one file.
+      if (digital.some((d) => d.id === raw.id)) continue;
       // Downloads are per-household, so quantity never multiplies the price.
       const line = Math.round(product.price);
       digital.push({ id: raw.id, name: product.name, price: line });
@@ -1642,7 +1833,7 @@ function buildDownloadsHtml({ name, attachments, links, tooBig }) {
           '<p style="margin:0;font-size:20px;font-weight:bold;color:#111827;">Your downloads</p>' +
         '</td></tr>' +
         '<tr><td style="padding:16px 32px 0;">' +
-          '<p style="margin:0 0 14px;font-size:15px;color:#374151;">Hi ' + (name || "there") + ',</p>' +
+          '<p style="margin:0 0 14px;font-size:15px;color:#374151;">Hi ' + escapeHtml(name || "there") + ',</p>' +
           '<p style="margin:0 0 16px;font-size:15px;color:#374151;">Thank you for your order.</p>' +
           '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;">' + rows + '</table>' +
           '<p style="margin:0 0 24px;font-size:13px;color:#6b7280;line-height:1.6;">' + note + '</p>' +
@@ -1769,20 +1960,21 @@ exports.createCartOrder = onCall(
     }
 
     const data = request.data || {};
-    const items = Array.isArray(data.items) ? data.items : [];
+    const items = Array.isArray(data.items) ? data.items.slice(0, 20) : [];
     if (items.length === 0) throw new HttpsError("invalid-argument", "Cart is empty.");
 
-    const name = String(data.name || "").trim();
-    const email = String(data.email || "").trim();
-    const phone = String(data.phone || "").trim();
+    const name = clean(data.name, 120);
+    const email = clean(data.email, 200).toLowerCase();
+    const phone = clean(data.phone, 30);
     if (!name || !email) throw new HttpsError("invalid-argument", "Name and email are required.");
-    if (!/.+@.+\..+/.test(email)) throw new HttpsError("invalid-argument", "Invalid email.");
+    if (!STRICT_EMAIL.test(email)) throw new HttpsError("invalid-argument", "Invalid email.");
 
     const { membership, digital, total } = priceCart(items);
+    await assertCheckoutAllowed(request);
 
     // Membership needs the child's details for the welcome email and the
     // admin list, so require them only when a plan is actually in the cart.
-    const childName = String(data.childName || "").trim();
+    const childName = clean(data.childName, 120);
     if (membership.length > 0 && (!childName || !phone)) {
       throw new HttpsError(
         "invalid-argument",
@@ -1807,8 +1999,8 @@ exports.createCartOrder = onCall(
         totalMonthly: membership.reduce((sum, m) => sum + m.monthly, 0),
         parentName: name,
         childName,
-        childAge: String(data.childAge || "").trim(),
-        attendees: String(data.attendees || membership.reduce((n, m) => n + m.qty, 0)),
+        childAge: clean(data.childAge, 10),
+        attendees: clean(data.attendees || membership.reduce((n, m) => n + m.qty, 0), 20),
         email,
         phone,
         status: "pending",
@@ -1892,7 +2084,7 @@ exports.verifyCartPayment = onCall(
       .createHmac("sha256", razorpayKeySecret.value())
       .update(`${rzpOrderId}|${paymentId}`)
       .digest("hex");
-    if (expected !== signature) {
+    if (!signatureMatches(expected, signature)) {
       throw new HttpsError("permission-denied", "Payment could not be verified.");
     }
 

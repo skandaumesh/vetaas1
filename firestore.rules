@@ -33,9 +33,18 @@ service cloud.firestore {
     // a Cloud Function emails the score. Only an admin can read them back.
     match /quizSubmissions/{subId} {
       allow create: if request.auth != null
-        && request.resource.data.quizId is string
-        && request.resource.data.quizId.size() < 60
+        && request.resource.data.keys().hasOnly([
+             'quizId', 'quizName', 'name', 'email', 'score', 'maxScore', 'percentage',
+             'band', 'bandBlurb', 'sections', 'answers', 'createdAt'])
+        && request.resource.data.quizId in ['sel-assessment', 'parent-reflection']
         && request.resource.data.quizName is string
+        && request.resource.data.quizName.size() < 100
+        && (!('band' in request.resource.data)
+          || (request.resource.data.band is string && request.resource.data.band.size() < 100))
+        && (!('bandBlurb' in request.resource.data)
+          || (request.resource.data.bandBlurb is string && request.resource.data.bandBlurb.size() < 400))
+        && (!('sections' in request.resource.data)
+          || (request.resource.data.sections is list && request.resource.data.sections.size() <= 10))
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
         && request.resource.data.name.size() < 120
@@ -84,6 +93,7 @@ service cloud.firestore {
     // free response can't be forged to look paid).
     match /formResponses/{responseId} {
       allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['formId', 'formTitle', 'answers', 'ticketToken', 'createdAt'])
         && request.resource.data.formId is string
         && request.resource.data.formId.size() < 60
         && request.resource.data.formTitle is string
@@ -103,8 +113,18 @@ service cloud.firestore {
           || (request.resource.data.ticketToken is string
             && request.resource.data.ticketToken.matches('^[a-f0-9]{64}$')))
         && get(/databases/$(database)/documents/forms/$(request.resource.data.formId))
-             .data.get('price', 0) == 0;
+             .data.get('price', 0) == 0
+        // A closed form takes no more registrations, even written directly.
+        && get(/databases/$(database)/documents/forms/$(request.resource.data.formId))
+             .data.get('status', 'open') == 'open';
       allow read, update, delete: if isAdmin();
+    }
+
+    // Abuse-limit counters (see withinLimit in functions/index.js). Only the
+    // Cloud Functions touch these; the catch-all below already denies the
+    // browser, this just says so where someone will look.
+    match /rateLimits/{key} {
+      allow read, write: if false;
     }
 
     // Event tickets. The document id is a 256-bit random token, so a ticket
