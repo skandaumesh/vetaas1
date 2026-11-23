@@ -9,7 +9,7 @@ import {
   User,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { isAdminUser } from "@/lib/admin";
+import { checkAdminAccess } from "@/lib/admin";
 import { Loader2 } from "lucide-react";
 import AdminSidebar from "./AdminSidebar";
 
@@ -27,18 +27,37 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
   const [loggingIn, setLoggingIn] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      // Only allowlisted admin emails get in — being logged in is not enough
-      if (currentUser && !currentUser.isAnonymous && !isAdminUser(currentUser)) {
-        setLoginError("This account is not authorized for admin access.");
-        signOut(auth);
+    let live = true;
+    let latest = 0;
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      const check = ++latest;
+      if (!currentUser || currentUser.isAnonymous) {
         setUser(null);
+        setAuthLoading(false);
+        return;
+      }
+      // Being logged in is not enough: the server decides who is an admin.
+      setAuthLoading(true);
+      const access = await checkAdminAccess(currentUser);
+      // A later sign-in or sign-out has already taken over.
+      if (!live || check !== latest) return;
+      if (access === "admin") {
+        setUser(currentUser);
       } else {
-        setUser(isAdminUser(currentUser) ? currentUser : null);
+        setUser(null);
+        if (access === "not-admin") {
+          setLoginError("This account is not authorized for admin access.");
+          signOut(auth);
+        } else {
+          setLoginError("Couldn't confirm admin access. Check the connection and try again.");
+        }
       }
       setAuthLoading(false);
     });
-    return () => unsubscribe();
+    return () => {
+      live = false;
+      unsubscribe();
+    };
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {

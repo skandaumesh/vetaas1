@@ -1,12 +1,25 @@
 import type { User } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { collection, getDocsFromServer, limit, query } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
-// The only accounts allowed into the admin panel. This is enforced here in the
-// UI AND in the Firestore/Storage security rules (firestore.rules / storage.rules)
-// — both must list the same emails. Being logged in is NOT enough; the account's
-// email must be on this list. Keep the two in sync when changing admins.
-export const ADMIN_EMAILS = ["kirti.vetaas@gmail.com", "skandaumesh82@gmail.com"];
+export type AdminAccess = "admin" | "not-admin" | "offline";
 
-export function isAdminUser(user: User | null): boolean {
-  const email = user?.email?.toLowerCase();
-  return !!email && !user?.isAnonymous && ADMIN_EMAILS.includes(email);
+/**
+ * Whether a signed-in account may use the admin panel.
+ *
+ * The list of admins lives only on the server — in firestore.rules,
+ * storage.rules and functions/index.js — so this asks rather than knowing:
+ * it reads one record that the rules give to admins alone. Keeping a copy of
+ * the list here would ship the exact accounts to attack to every visitor's
+ * browser.
+ */
+export async function checkAdminAccess(user: User | null): Promise<AdminAccess> {
+  if (!user || user.isAnonymous) return "not-admin";
+  try {
+    await getDocsFromServer(query(collection(db, "membershipOrders"), limit(1)));
+    return "admin";
+  } catch (err) {
+    return err instanceof FirebaseError && err.code === "permission-denied" ? "not-admin" : "offline";
+  }
 }

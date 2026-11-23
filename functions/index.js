@@ -1244,6 +1244,20 @@ exports.checkMembership = onCall(
       throw new HttpsError("invalid-argument", "Membership ID and email are both required.");
     }
 
+    // Same response whether the ID doesn't exist or the email doesn't match,
+    // so this can't be used to discover which IDs are real.
+    const notFound = { found: false };
+    if (!/^VET-\d{1,6}$/.test(membershipId)) return notFound;
+
+    // IDs run in sequence, so cap the guessing: a handful of tries per ID (no
+    // one can work through emails against one member) and a ceiling overall.
+    const allowed =
+      (await withinLimit(`member-check-${hashKey(membershipId)}`, 10, HOUR)) &&
+      (await withinLimit("member-check-total", 600, HOUR));
+    if (!allowed) {
+      throw new HttpsError("resource-exhausted", "Too many checks just now. Please try again in an hour.");
+    }
+
     const db = admin.firestore();
     const snap = await db
       .collection("membershipOrders")
@@ -1251,9 +1265,6 @@ exports.checkMembership = onCall(
       .limit(1)
       .get();
 
-    // Same response whether the ID doesn't exist or the email doesn't match,
-    // so this can't be used to discover which IDs are real.
-    const notFound = { found: false };
     if (snap.empty) return notFound;
 
     const order = snap.docs[0].data();

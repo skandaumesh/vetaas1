@@ -12,7 +12,9 @@ import { usePathname } from "next/navigation";
  */
 export default function VisitorTracking() {
   const pathname = usePathname();
-  if (!pathname || pathname.startsWith("/admin")) return null;
+  // Ticket pages too: a ticket's link is its only key, and a tracker records
+  // the address of every page it runs on.
+  if (!pathname || pathname.startsWith("/admin") || pathname.startsWith("/ticket")) return null;
   return (
     <Script
       src="https://ozlabsprototype1.vercel.app/api/v1/track/script?key=d0a677c9-0c0e-4005-9876-3e091add411d"

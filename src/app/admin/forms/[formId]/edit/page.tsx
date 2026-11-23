@@ -759,6 +759,12 @@ export default function EditFormPage() {
                   placeholder="Anything they should know: what to bring, parking, who to call on the day."
                   className="glass-input w-full rounded-lg px-3 py-2 text-sm text-gray-700 placeholder:text-gray-300 resize-y"
                 />
+                {/* The form document is public — the registration page reads it —
+                    so this note can be read without registering. */}
+                <span className="block text-[11px] text-amber-600 mt-1.5">
+                  Anyone can read this message, even without registering. Don&apos;t put private
+                  links here, like a Zoom or WhatsApp group link for paid guests only.
+                </span>
               </label>
             </div>
           )}

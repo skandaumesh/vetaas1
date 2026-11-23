@@ -14,6 +14,10 @@ declare global {
 
 const isTracked = (path: string | null) => !!path && !path.startsWith("/admin");
 
+// A ticket's link is its only key — whoever has it can open the ticket — so
+// the code in /ticket/<code> never goes to Analytics.
+const redact = (url: string) => url.replace(/\/ticket\/[^/?#]+/, "/ticket/redacted");
+
 /**
  * Loads GA4 and sends page views manually.
  *
@@ -25,10 +29,15 @@ export default function GoogleAnalytics({ gaId }: { gaId: string }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!window.gtag || !isTracked(pathname)) return;
+    if (!window.gtag) return;
+    // Every later event — scrolls, outbound clicks — reports this location
+    // too, so it's set before anything else is sent.
+    const location = redact(window.location.href);
+    window.gtag("set", { page_location: location, page_path: redact(pathname ?? "") });
+    if (!isTracked(pathname)) return;
     window.gtag("event", "page_view", {
-      page_path: pathname,
-      page_location: window.location.href,
+      page_path: redact(pathname ?? ""),
+      page_location: location,
       page_title: document.title,
     });
   }, [pathname]);
@@ -44,7 +53,10 @@ export default function GoogleAnalytics({ gaId }: { gaId: string }) {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${gaId}', { send_page_view: false });
+          gtag('config', '${gaId}', {
+            send_page_view: false,
+            page_location: location.href.replace(/\\/ticket\\/[^/?#]+/, '/ticket/redacted')
+          });
         `}
       </Script>
     </>

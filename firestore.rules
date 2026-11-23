@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Admin = a signed-in account whose email is on the allowlist.
-    // Keep this list in sync with src/lib/admin.ts and storage.rules.
+    // Keep this list in sync with storage.rules and ADMIN_EMAILS in functions/index.js.
     function isAdmin() {
       return request.auth != null
         && request.auth.token.email in ['kirti.vetaas@gmail.com', 'skandaumesh82@gmail.com'];
