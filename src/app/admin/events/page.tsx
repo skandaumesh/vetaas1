@@ -57,11 +57,37 @@ interface Toast {
 
 type EventSort = "date" | "added" | "name";
 const EVENT_SORT_KEY = "adminEventsSort";
+const EVENT_MONTH_KEY = "adminEventsMonth";
 const EVENT_SORTS: { key: EventSort; label: string }[] = [
   { key: "date", label: "Event date" },
   { key: "added", label: "Recently added" },
   { key: "name", label: "Name" },
 ];
+
+/** "2026-11-15" → "2026-11". */
+const toYearMonth = (dateStr?: string) => {
+  const m = /^(\d{4}-\d{2})/.exec(dateStr ?? "");
+  return m ? m[1] : null;
+};
+
+/** True when an event's dates touch the given month — a 30 Oct–2 Nov event is in both. */
+const inMonth = (event: { date?: string; endDate?: string }, ym: string) => {
+  const start = toYearMonth(event.date);
+  if (!start) return false;
+  const end = toYearMonth(event.endDate) ?? start;
+  return start <= ym && ym <= end;
+};
+
+/** "2026-11" → "Nov 2026". */
+const formatYearMonth = (ym: string) => {
+  const [y, m] = ym.split("-");
+  const label = new Date(Date.UTC(Number(y), Number(m) - 1, 1)).toLocaleDateString("en-IN", {
+    timeZone: "UTC",
+    month: "short",
+    year: "numeric",
+  });
+  return label;
+};
 
 interface SortableEvent {
   title?: string;
@@ -109,6 +135,22 @@ export default function AdminEventsPage() {
     setSortBy(next);
     try {
       localStorage.setItem(EVENT_SORT_KEY, next);
+    } catch {}
+  };
+
+  const [filterMonth, setFilterMonth] = useState<string>("all");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(EVENT_MONTH_KEY);
+      if (saved) setFilterMonth(saved);
+    } catch {}
+  }, []);
+
+  const changeMonth = (next: string) => {
+    setFilterMonth(next);
+    try {
+      localStorage.setItem(EVENT_MONTH_KEY, next);
     } catch {}
   };
 
@@ -789,14 +831,37 @@ export default function AdminEventsPage() {
     );
   };
 
-  const cancelledEvents = sortEvents(events.filter((e) => e.cancelled), sortBy, false);
+  /** Every month an event starts or ends in, newest first. */
+  const availableMonths = useMemo(() => {
+    const months = new Set<string>();
+    events.forEach((e) => {
+      for (const ym of [toYearMonth(e.date), toYearMonth(e.endDate)]) if (ym) months.add(ym);
+    });
+    return Array.from(months).sort().reverse();
+  }, [events]);
+
+  // A month remembered from an earlier visit may no longer have any events;
+  // then the list shows everything rather than silently showing nothing.
+  const activeMonth =
+    filterMonth !== "all" && availableMonths.includes(filterMonth) ? filterMonth : "all";
+  const monthFilter = (e: { date?: string; endDate?: string }) =>
+    activeMonth === "all" || inMonth(e, activeMonth);
+
+  // The stats tiles always count every event, like "Total events" beside them.
+  const totals = {
+    upcoming: events.filter((e) => !e.cancelled && !isEventPast(e)).length,
+    completed: events.filter((e) => !e.cancelled && isEventPast(e)).length,
+    cancelled: events.filter((e) => e.cancelled).length,
+  };
+
+  const cancelledEvents = sortEvents(events.filter((e) => e.cancelled && monthFilter(e)), sortBy, false);
   const upcomingEvents = sortEvents(
-    events.filter((e) => !e.cancelled && !isEventPast(e)),
+    events.filter((e) => !e.cancelled && !isEventPast(e) && monthFilter(e)),
     sortBy,
     true
   );
   const completedEvents = sortEvents(
-    events.filter((e) => !e.cancelled && isEventPast(e)),
+    events.filter((e) => !e.cancelled && isEventPast(e) && monthFilter(e)),
     sortBy,
     false
   );
@@ -920,14 +985,14 @@ export default function AdminEventsPage() {
             { label: "Total events", value: String(events.length), sub: "all time" },
             {
               label: "Upcoming",
-              value: String(upcomingEvents.length),
-              sub: upcomingEvents.length > 0 ? "scheduled ahead" : "nothing scheduled",
+              value: String(totals.upcoming),
+              sub: totals.upcoming > 0 ? "scheduled ahead" : "nothing scheduled",
             },
-            { label: "Completed", value: String(completedEvents.length), sub: "already held" },
+            { label: "Completed", value: String(totals.completed), sub: "already held" },
             {
               label: "Cancelled",
-              value: String(cancelledEvents.length),
-              sub: cancelledEvents.length > 0 ? "called off" : "none called off",
+              value: String(totals.cancelled),
+              sub: totals.cancelled > 0 ? "called off" : "none called off",
             },
           ].map((card) => (
             <div key={card.label} className="bg-white px-5 py-5">
@@ -1278,6 +1343,26 @@ export default function AdminEventsPage() {
                     </button>
                   ))}
                 </div>
+
+                {availableMonths.length > 1 && (
+                  <>
+                    <span className="hidden sm:inline text-slate-200 select-none">|</span>
+                    <span className="text-[13px] font-medium text-slate-400">Month</span>
+                    <select
+                      value={activeMonth}
+                      aria-label="Show events from one month"
+                      onChange={(e) => changeMonth(e.target.value)}
+                      className="text-[13px] font-medium text-slate-700 bg-slate-100 rounded-lg px-3 py-1.5 border-0 outline-none cursor-pointer hover:bg-slate-200 transition-colors"
+                    >
+                      <option value="all">All months</option>
+                      {availableMonths.map((ym) => (
+                        <option key={ym} value={ym}>
+                          {formatYearMonth(ym)}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                )}
               </div>
 
               <div className="space-y-10">
@@ -1292,7 +1377,9 @@ export default function AdminEventsPage() {
                   </div>
                   {upcomingEvents.length === 0 ? (
                     <p className="text-sm text-slate-400 py-8 text-center bg-white/50 rounded-2xl border border-dashed border-gray-200 text-sm">
-                      No upcoming events. Click &quot;Add Event&quot; to schedule one.
+                      {activeMonth === "all"
+                        ? 'No upcoming events. Click "Add Event" to schedule one.'
+                        : `No upcoming events in ${formatYearMonth(activeMonth)}.`}
                     </p>
                   ) : (
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 font-body items-start">

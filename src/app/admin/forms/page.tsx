@@ -48,10 +48,27 @@ interface FormRow extends FormDoc {
 
 type SortMode = "event" | "edited";
 const SORT_KEY = "adminFormsSort";
+const MONTH_KEY = "adminFormsMonth";
 const SORTS: { key: SortMode; label: string }[] = [
   { key: "event", label: "Event date" },
   { key: "edited", label: "Last edited" },
 ];
+
+/** "2026-11-15" → "2026-11". */
+const toYearMonth = (dateStr?: string) => {
+  const m = /^(\d{4}-\d{2})/.exec(dateStr ?? "");
+  return m ? m[1] : null;
+};
+
+/** "2026-11" → "Nov 2026". */
+const formatYearMonth = (ym: string) => {
+  const [y, mo] = ym.split("-");
+  return new Date(Date.UTC(Number(y), Number(mo) - 1, 1)).toLocaleDateString("en-IN", {
+    timeZone: "UTC",
+    month: "short",
+    year: "numeric",
+  });
+};
 
 /** Today in India, as "2026-11-04", to compare against event dates. */
 const istToday = () => new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10);
@@ -91,11 +108,16 @@ export default function AdminFormsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   const [sort, setSort] = useState<SortMode>("event");
+  const [filterMonth, setFilterMonth] = useState<string>("all");
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(SORT_KEY);
       if (saved === "event" || saved === "edited") setSort(saved);
+    } catch {}
+    try {
+      const saved = localStorage.getItem(MONTH_KEY);
+      if (saved) setFilterMonth(saved);
     } catch {}
   }, []);
 
@@ -103,6 +125,13 @@ export default function AdminFormsPage() {
     setSort(next);
     try {
       localStorage.setItem(SORT_KEY, next);
+    } catch {}
+  };
+
+  const changeMonth = (next: string) => {
+    setFilterMonth(next);
+    try {
+      localStorage.setItem(MONTH_KEY, next);
     } catch {}
   };
 
@@ -240,15 +269,33 @@ export default function AdminFormsPage() {
     };
   }, [forms]);
 
+  /** All distinct months present in the data, sorted newest first. */
+  const availableMonths = useMemo(() => {
+    const months = new Set<string>();
+    forms.forEach((f) => {
+      const ym = toYearMonth(f.eventDate);
+      if (ym) months.add(ym);
+    });
+    return Array.from(months).sort().reverse();
+  }, [forms]);
+
+  // A month remembered from an earlier visit may no longer have any forms;
+  // then the list shows everything rather than silently showing nothing.
+  const activeMonth =
+    filterMonth !== "all" && availableMonths.includes(filterMonth) ? filterMonth : "all";
+
   // By event date: upcoming soonest first, then past most recent first, then
-  // forms with no date (plain forms and fresh copies) by last edit.
+  // forms with no date (plain forms and fresh copies) by last edit. Picking a
+  // month keeps only that month's events, so forms without a date drop out.
   const groups = useMemo(() => {
-    if (sort === "edited") return [{ key: "all", label: "", dot: "", forms }];
+    const filtered =
+      activeMonth === "all" ? forms : forms.filter((f) => toYearMonth(f.eventDate) === activeMonth);
+    if (sort === "edited") return [{ key: "all", label: "", dot: "", forms: filtered }];
     const today = istToday();
     const upcoming: FormRow[] = [];
     const past: FormRow[] = [];
     const undated: FormRow[] = [];
-    for (const f of forms) {
+    for (const f of filtered) {
       const d = eventDay(f);
       if (!d) undated.push(f);
       else if (d >= today) upcoming.push(f);
@@ -261,7 +308,7 @@ export default function AdminFormsPage() {
       { key: "past", label: "Past", dot: "bg-slate-300", forms: past },
       { key: "undated", label: "No event date", dot: "bg-slate-200", forms: undated },
     ].filter((g) => g.forms.length > 0);
-  }, [forms, sort]);
+  }, [forms, sort, activeMonth]);
 
   const renderCard = (form: FormRow) => {
     const day = eventDay(form);
@@ -442,6 +489,26 @@ export default function AdminFormsPage() {
                   </button>
                 ))}
               </div>
+
+              {availableMonths.length > 1 && (
+                <>
+                  <span className="hidden sm:inline text-slate-200 select-none">|</span>
+                  <span className="text-[13px] font-medium text-slate-400">Month</span>
+                  <select
+                    value={activeMonth}
+                    aria-label="Show forms for events in one month"
+                    onChange={(e) => changeMonth(e.target.value)}
+                    className="text-[13px] font-medium text-slate-700 bg-slate-100 rounded-lg px-3 py-1.5 border-0 outline-none cursor-pointer hover:bg-slate-200 transition-colors"
+                  >
+                    <option value="all">All months</option>
+                    {availableMonths.map((ym) => (
+                      <option key={ym} value={ym}>
+                        {formatYearMonth(ym)}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
             </div>
 
             <div className="space-y-10">
