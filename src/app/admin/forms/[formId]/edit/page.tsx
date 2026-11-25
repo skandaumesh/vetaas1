@@ -3,7 +3,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteField,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
 import { useAdminAuth } from "@/components/admin/AdminGate";
@@ -23,6 +35,8 @@ import {
 import { formAsksForEmail } from "@/lib/tickets";
 import {
   ArrowLeft,
+  CalendarCheck,
+  CalendarPlus,
   ChevronDown,
   ChevronUp,
   Check,
@@ -45,6 +59,41 @@ const atTime = (ms: number) =>
 
 /** The list-shaped settings a question can have. */
 type ListKey = "options" | "rows" | "columns";
+
+/** The public registration link, as events point to it. */
+const formUrl = (formId: string) => `https://www.vetaas.in/forms/${formId}`;
+
+/** "14:30" → "2:30 PM", the way the Events page writes times. */
+function to12h(t: string): string {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(t.trim());
+  if (!m) return "";
+  const h = Number(m[1]);
+  return `${h % 12 || 12}:${m[2]} ${h >= 12 ? "PM" : "AM"}`;
+}
+
+/**
+ * What an Events-page entry takes from its registration form. The form is
+ * where these are typed; the event only ever copies them.
+ */
+function eventDetailsFrom(
+  form: { title: string; eventDate: string; eventStart: string; eventEnd: string; location: string; mapUrl: string },
+  formId: string
+) {
+  const date = form.eventDate.trim();
+  const start = to12h(form.eventStart);
+  const end = to12h(form.eventEnd);
+  const today = new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10);
+  return {
+    title: form.title.trim() || "Untitled event",
+    date,
+    timeSlot: start && end ? `${start} - ${end}` : start,
+    location: form.location.trim(),
+    mapUrl: /^https:\/\/\S+$/i.test(form.mapUrl.trim()) ? form.mapUrl.trim() : "",
+    registrationUrl: formUrl(formId),
+    status: date && date < today ? "completed" : "upcoming",
+    formId,
+  };
+}
 
 export default function EditFormPage() {
   const { user } = useAdminAuth();
@@ -83,6 +132,16 @@ export default function EditFormPage() {
   const [isCopy, setIsCopy] = useState(false);
   // When unsaved work was found on this device and put back.
   const [restoredAt, setRestoredAt] = useState<number | null>(null);
+  // The Events-page entry made from this form, kept in step on every save.
+  const [linkedEventId, setLinkedEventId] = useState("");
+  // An event that already points at this form but was made before linking
+  // existed — offered for linking so it isn't added a second time.
+  const [matchingEvent, setMatchingEvent] = useState<{ id: string; title: string } | null>(null);
+  const [eventBusy, setEventBusy] = useState(false);
+  const [eventNotice, setEventNotice] = useState("");
+  // The cover as last saved. A linked event's poster follows the cover only
+  // while it is still that cover, so a poster uploaded on the Events page stays.
+  const savedLogo = useRef("");
   /** What Firestore holds, as JSON, to tell edited from saved. */
   const savedJson = useRef("");
 
@@ -184,6 +243,31 @@ export default function EditFormPage() {
           emailMessage: data.emailMessage ?? "",
         };
         savedJson.current = JSON.stringify(fromDoc);
+        savedLogo.current = data.logoUrl ?? "";
+
+        // Its Events-page entry, if it has one that still exists. Otherwise,
+        // an event made earlier by hand that already links here.
+        try {
+          let linked = "";
+          if (data.eventId) {
+            const ev = await getDoc(doc(db, "events", data.eventId));
+            if (ev.exists()) linked = ev.id;
+          }
+          setLinkedEventId(linked);
+          if (!linked) {
+            const match = await getDocs(
+              query(
+                collection(db, "events"),
+                where("registrationUrl", "in", [formUrl(formId), formUrl(formId).replace("://www.", "://")]),
+                limit(1)
+              )
+            );
+            const first = match.docs[0];
+            setMatchingEvent(first ? { id: first.id, title: String(first.data().title ?? "") } : null);
+          }
+        } catch (err) {
+          console.error("Could not check the Events page:", err);
+        }
 
         // Work left behind by a closed tab, a phone reloading the app, or a
         // trip to another admin page comes back instead of being lost.
@@ -323,7 +407,35 @@ export default function EditFormPage() {
     });
   };
 
-  const save = async () => {
+  /**
+   * Brings the linked Events-page entry in line with this form. Only what the
+   * form owns is written; highlights, cancellation and a multi-day range set
+   * on the Events page are left alone.
+   */
+  const syncEvent = async (eventId: string) => {
+    const ref = doc(db, "events", eventId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) {
+      // Deleted on the Events page: forget the link rather than recreate it.
+      await updateDoc(doc(db, "forms", formId), { eventId: deleteField() });
+      setLinkedEventId("");
+      return;
+    }
+    const ev = snap.data();
+    const details = eventDetailsFrom(working, formId);
+    const update: Record<string, unknown> = { ...details };
+    // An event can't be without a date or place, so a cleared one isn't copied.
+    if (!details.date) delete update.date;
+    if (!details.location) delete update.location;
+    if (details.date && ev.endDate && ev.endDate < details.date) update.endDate = "";
+    if (logoUrl && logoUrl !== ev.image && (!ev.image || ev.image === savedLogo.current)) {
+      update.image = logoUrl;
+      update.imageAspect = 1;
+    }
+    await updateDoc(ref, update);
+  };
+
+  const save = async (): Promise<boolean> => {
     const cleanMapUrl = /^https:\/\/\S+$/i.test(mapUrl.trim()) ? mapUrl.trim() : "";
     const isEvent = !!(eventDate.trim() || location.trim());
     setSaving(true);
@@ -348,6 +460,15 @@ export default function EditFormPage() {
         emailMessage: emailMessage.trim(),
         updatedAt: serverTimestamp(),
       });
+      if (linkedEventId) {
+        try {
+          await syncEvent(linkedEventId);
+        } catch (err) {
+          console.error("Failed to update the linked event:", err);
+          setEventNotice("The form saved, but its event on the Events page didn't update. Save again to retry.");
+        }
+      }
+      savedLogo.current = logoUrl;
       savedJson.current = JSON.stringify(working);
       setRestoredAt(null);
       setIsCopy(false);
@@ -356,10 +477,61 @@ export default function EditFormPage() {
       } catch {}
       setSaved(true);
       setTimeout(() => setSaved(false), 1800);
+      return true;
     } catch (err) {
       console.error("Failed to save form:", err);
+      return false;
     } finally {
       setSaving(false);
+    }
+  };
+
+  /** Puts this form on the Events page, built from the details above. */
+  const addToEvents = async () => {
+    if (!eventDate.trim() || !location.trim()) {
+      setEventNotice("Fill in the date and location above first — the Events page needs both.");
+      return;
+    }
+    setEventBusy(true);
+    setEventNotice("");
+    try {
+      if (unsaved && !(await save())) throw new Error("Form didn't save");
+      const ref = await addDoc(collection(db, "events"), {
+        ...eventDetailsFrom(working, formId),
+        endDate: "",
+        highlightsUrl: "",
+        image: logoUrl || "",
+        ...(logoUrl ? { imageAspect: 1 } : {}),
+        createdAt: new Date().toISOString(),
+      });
+      await updateDoc(doc(db, "forms", formId), { eventId: ref.id });
+      setLinkedEventId(ref.id);
+      setEventNotice("Added to the Events page.");
+    } catch (err) {
+      console.error("Failed to add to the Events page:", err);
+      setEventNotice("Couldn't add it to the Events page. Check the connection and try again.");
+    } finally {
+      setEventBusy(false);
+    }
+  };
+
+  /** Links an event made earlier by hand, and brings it in line with this form. */
+  const linkMatchingEvent = async () => {
+    if (!matchingEvent) return;
+    setEventBusy(true);
+    setEventNotice("");
+    try {
+      if (unsaved && !(await save())) throw new Error("Form didn't save");
+      await updateDoc(doc(db, "forms", formId), { eventId: matchingEvent.id });
+      await syncEvent(matchingEvent.id);
+      setLinkedEventId(matchingEvent.id);
+      setMatchingEvent(null);
+      setEventNotice("Linked. The event now matches this form.");
+    } catch (err) {
+      console.error("Failed to link the event:", err);
+      setEventNotice("Couldn't link the event. Check the connection and try again.");
+    } finally {
+      setEventBusy(false);
     }
   };
 
@@ -680,6 +852,51 @@ export default function EditFormPage() {
             </p>
           </div>
         </div>
+
+        {/* Events page — the details above are typed once and the event copies them */}
+        {isEventNow && (
+          <div className="glass-card rounded-2xl p-6 mb-4">
+            {linkedEventId ? (
+              <div className="flex items-start gap-3">
+                <CalendarCheck size={18} className="text-green-600 shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-[#111827] mb-1">On the Events page</p>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Saving this form updates the event&apos;s title, date, time, location and map
+                    link there too, and its Register button opens this form. Add a highlights reel
+                    or a different poster on the{" "}
+                    <Link href="/admin/events" className="font-semibold text-[#7C3AED] hover:underline">
+                      Events page
+                    </Link>
+                    .
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-[#111827] mb-1">Show on the Events page</p>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    {matchingEvent
+                      ? `“${matchingEvent.title || "An event"}” on the Events page already links to this form. Link the two and that event will match this form from now on — its title, date, time and place update when you save here.`
+                      : "Creates the event from the details above — no need to type them again — with Register opening this form. After that, saving here keeps the event up to date."}
+                  </p>
+                </div>
+                <button
+                  onClick={matchingEvent ? linkMatchingEvent : addToEvents}
+                  disabled={eventBusy || saving}
+                  className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#7C3AED] text-white text-xs font-bold hover:bg-[#6D28D9] transition-colors disabled:opacity-60 cursor-pointer"
+                >
+                  {eventBusy ? <Loader2 size={14} className="animate-spin" /> : <CalendarPlus size={14} />}
+                  {matchingEvent ? "Link to that event" : "Add to Events page"}
+                </button>
+              </div>
+            )}
+            {eventNotice && (
+              <p className="text-xs font-semibold text-[#7C3AED] mt-3">{eventNotice}</p>
+            )}
+          </div>
+        )}
 
         {/* Confirmation email */}
         <div className="glass-card rounded-2xl p-6 mb-4">

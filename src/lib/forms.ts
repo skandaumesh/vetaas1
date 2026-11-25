@@ -75,6 +75,12 @@ export interface FormDoc {
   emailSubject?: string;
   /** Optional note added to the confirmation email — parking, what to bring. */
   emailMessage?: string;
+  /**
+   * The Events-page entry made from this form. Saving the form keeps that
+   * event's title, date, time, place and map link the same as the form's, so
+   * the details are only ever typed once.
+   */
+  eventId?: string;
   createdAt?: { seconds: number };
   updatedAt?: { seconds: number };
 }

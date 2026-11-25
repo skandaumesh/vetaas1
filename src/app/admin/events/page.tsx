@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import NextLink from "next/link";
 import ImageCropper from "@/components/admin/ImageCropper";
 
 /** "14:30" -> 870 minutes past midnight. */
@@ -715,6 +716,16 @@ export default function AdminEventsPage() {
                   </a>
                 </span>
               )}
+              {event.formId && (
+                <NextLink
+                  href={`/admin/forms/${event.formId}/edit`}
+                  className="flex items-center gap-1.5 text-[#7C3AED] font-semibold hover:underline"
+                  title="Title, date, time, location and map link are kept in step with this form"
+                >
+                  <Edit2 size={11} className="shrink-0" />
+                  Details from its registration form
+                </NextLink>
+              )}
             </div>
           </div>
         </div>
@@ -846,6 +857,11 @@ export default function AdminEventsPage() {
     filterMonth !== "all" && availableMonths.includes(filterMonth) ? filterMonth : "all";
   const monthFilter = (e: { date?: string; endDate?: string }) =>
     activeMonth === "all" || inMonth(e, activeMonth);
+
+  // The registration form the event being edited takes its details from.
+  const editingFormId: string | undefined = editingEventId
+    ? events.find((e) => e.id === editingEventId)?.formId
+    : undefined;
 
   // The stats tiles always count every event, like "Total events" beside them.
   const totals = {
@@ -1038,6 +1054,17 @@ export default function AdminEventsPage() {
               </button>
             </div>
             
+            {editingFormId && (
+              <p className="mb-5 rounded-xl bg-violet-50 border border-violet-200 px-4 py-3 text-xs text-violet-900 leading-relaxed">
+                This event&apos;s title, date, time, location and map link come from its{" "}
+                <NextLink href={`/admin/forms/${editingFormId}/edit`} className="font-bold underline">
+                  registration form
+                </NextLink>
+                , and saving that form overwrites changes to them here. Change them there instead.
+                The poster and highlights link are fine to change here.
+              </p>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-5 font-body">
               <div>
                 <label htmlFor="title" className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 font-headline">
